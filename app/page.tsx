@@ -8,6 +8,9 @@ import {
   type NormalizedLandmark,
 } from "@mediapipe/tasks-vision";
 import { CoachAgent, AgentMemory, loadAgentConfig, runMultiAgent } from "./agent/index.js";
+import ExerciseLibrary from "./components/ExerciseLibrary";
+import Dashboard from "./components/Dashboard";
+import TrainingHistory from "./components/TrainingHistory";
 
 type Exercise = "squat" | "pushup" | "jack" | "lunge" | "plank";
 type ModelState = "idle" | "loading" | "ready" | "error";
@@ -76,6 +79,7 @@ export default function Home() {
     plan: { nextPlan: string[]; generatedBy: "llm" | "heuristic" };
   }>(null);
   const [speakOn, setSpeakOn] = useState(false);
+  const [activeTab, setActiveTab] = useState<"train" | "library" | "dashboard" | "history">("train");
   const [goals, setGoals] = useState<string[]>([]);
   const [goalInput, setGoalInput] = useState("");
   const [spark, setSpark] = useState<number[]>([]);
@@ -439,6 +443,29 @@ export default function Home() {
         <span className="privacy-pill"><i /> AGENTIC COACH</span>
       </header>
 
+      {/* Tab Navigation */}
+      <nav className="tab-nav" role="tablist" aria-label="功能导航">
+        {[
+          { key: "train" as const, label: "实时训练", icon: "🎯" },
+          { key: "library" as const, label: "动作库", icon: "📚", badge: "200+" },
+          { key: "dashboard" as const, label: "数据面板", icon: "📊" },
+          { key: "history" as const, label: "训练记录", icon: "📋" },
+        ].map((tab) => (
+          <button
+            key={tab.key}
+            role="tab"
+            aria-selected={activeTab === tab.key}
+            className={`tab-btn ${activeTab === tab.key ? "active" : ""}`}
+            onClick={() => setActiveTab(tab.key)}
+          >
+            <span className="tab-icon">{tab.icon}</span>
+            <span>{tab.label}</span>
+            {tab.badge && <small className="tab-badge">{tab.badge}</small>}
+          </button>
+        ))}
+      </nav>
+
+      {activeTab === "train" && (<>
       <section className="hero" id="top">
         <div className="hero-copy">
           <span className="eyebrow">你的动作，AI 看得见</span>
@@ -613,6 +640,11 @@ export default function Home() {
           <article><b>03</b><span className="step-icon">↗</span><h3>即时纠正</h3><p>把模型输出翻译成短促、明确、当下就能执行的训练提示。</p></article>
         </div>
       </section>
+      </>)}
+
+      {activeTab === "library" && <ExerciseLibrary />}
+      {activeTab === "dashboard" && <Dashboard />}
+      {activeTab === "history" && <TrainingHistory />}
 
       <footer>
         <div className="brand"><span className="brand-mark">AIX</span><span>AIxcellentSport</span></div>
