@@ -6,7 +6,7 @@
 // 这样的职责切分便于评分、可解释，也方便在 Qoder 上把每个子智能体独立部署/复用。
 
 import { assessForm } from "./tools.js";
-import { CoachAgent } from "./coachAgent.js";
+import { CoachAgent, callLLM } from "./coachAgent.js";
 
 /** 子智能体 1：形态分析 */
 export function formAnalyzer(metric) {
@@ -35,12 +35,37 @@ export function progressTracker(memory, exercise) {
   };
 }
 
-/** 子智能体 3：计划生成（有密钥时用 LLM，否则启发式） */
+/** 子智能体 3：计划生成（有密钥时真调 LLM 生成个性化计划，否则启发式兜底） */
 export async function planGenerator(memory, exercise, config) {
   const summary = memory.summarize(exercise);
   if (config?.apiKey) {
-    // 预留：调用 LLM 生成下一阶段计划（与 CoachAgent.callLLM 同协议）
-    // 此处保持确定性输出，确保离线可演示
+    const sys = [
+      "你是 AIxcellentSport 的训练计划智能体，运行在用户浏览器端（隐私优先）。",
+      "你拥有用户的历史记忆：平均分、总次数、反复出现的问题、目标。",
+      "请基于这些信息，生成下一步训练的简短计划，3 条要点，聚焦反复出现的问题。",
+      '输出严格 JSON：{"nextPlan": ["...","...","..."]}。只输出 JSON，不要解释。',
+      `用户记忆摘要：${JSON.stringify(summary)}`,
+    ].join("\n");
+    const user = `动作：${exercise}。请给下一步计划。`;
+    const reply = await callLLM(
+      [
+        { role: "system", content: sys },
+        { role: "user", content: user },
+      ],
+      config,
+    );
+    if (reply) {
+      try {
+        const parsed = JSON.parse(reply);
+        const plan = (Array.isArray(parsed.nextPlan) ? parsed.nextPlan : [String(parsed.nextPlan)])
+          .filter(Boolean)
+          .slice(0, 4)
+          .map(String);
+        if (plan.length) return { agent: "PlanGenerator", nextPlan: plan, generatedBy: "llm" };
+      } catch {
+        /* 模型没返回合法 JSON，退回启发式 */
+      }
+    }
   }
   const focus = summary.recurringIssues[0]?.issue || "保持动作标准与节奏";
   const nextPlan = [
@@ -48,7 +73,7 @@ export async function planGenerator(memory, exercise, config) {
     "每组 8-12 次，组间休息 60s，质量优先于次数",
     "完成后回看平均评分，若连续达标则逐步增加负荷",
   ];
-  return { agent: "PlanGenerator", nextPlan, generatedBy: config?.apiKey ? "llm" : "heuristic" };
+  return { agent: "PlanGenerator", nextPlan, generatedBy: "heuristic" };
 }
 
 /**
