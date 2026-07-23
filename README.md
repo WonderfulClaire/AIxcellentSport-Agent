@@ -1,110 +1,95 @@
-# AIxcellentSport
+# AIxcellentSport · Agent
 
-[![CI](https://github.com/WonderfulClaire/AIxcellentSport/actions/workflows/ci.yml/badge.svg)](https://github.com/WonderfulClaire/AIxcellentSport/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-55c8ff.svg)](LICENSE)
-[![Live demo](https://img.shields.io/badge/Live_demo-open-071521?logo=googlechrome&logoColor=white)](https://aixcellentsport.cocoa-moth-8728.chatgpt.site)
+> 隐私优先的浏览器端 AI 动作教练 —— 这一仓库是 **Agentic 层（智能体）的独立实验分支**。
 
-![AIxcellentSport social preview](./public/social-card.png)
+AIxcellentSport 在浏览器里用 MediaPipe 检测 33 个身体关键点、测量关节几何、计数动作次数，并把这些动作模式转成可解释的教练提示，**不上传任何摄像头原始帧**。
 
-> Your form, understood. 用浏览器摄像头获得实时、可解释的动作反馈。
+本仓库在原始项目之上，额外叠加了一层 **Agentic Coaching（智能体教练）**：它带记忆、会调用工具、能跨动作/跨会话做自适应规划。这一层**默认零密钥即可运行**（确定性启发式），一旦配置 LLM 密钥就自动升级为「LLM 驱动」模式。
 
-AIxcellentSport is a privacy-first AI movement coach that runs in the browser. It detects 33 body landmarks, measures joint geometry, counts repetitions, and turns movement patterns into concise coaching cues—without uploading raw camera frames.
+- 🧠 **记忆层**：只存结构化指标文本，绝不存视频/图像（隐私红线）
+- 🛠️ **工具调用**：`assess_form` / `log_rep` / `get_recurring_issues` / `set_goal`
+- 🤖 **多智能体编排**：`FormAnalyzer`（感知）→ `ProgressTracker`（记忆）→ `PlanGenerator`（规划），由 `CoachAgent` 统一指挥
+- 🔌 **LLM 可插拔**：OpenAI 兼容协议，支持 Qwen / DeepSeek / OpenAI 预设，**不配密钥也能演示**
+- 🛡️ **永不翻车**：LLM 超时 / 鉴权失败 / 无网络 → 自动降级为确定性启发式
 
-**[Try the live demo](https://aixcellentsport.cocoa-moth-8728.chatgpt.site)** · No account or paid API required. A desktop browser and camera work best.
+> 这是为「阿里云 Qoder 智能体黑客松」打磨的独立仓库，原项目在 [`WonderfulClaire/AIxcellentSport`](https://github.com/WonderfulClaire/AIxcellentSport)。本仓库专注于 Agent 能力，可独立运行、评审、部署。
 
-## Why it exists
-
-Most fitness apps measure duration or repetition count. AIxcellentSport explores a more useful question: **how was the movement performed?** The first release favors transparent geometry and state-machine rules over opaque scores, so contributors can inspect, test, and improve every cue.
-
-## Current capabilities
-
-| Exercise | Rep detection | Current feedback signals |
-| --- | --- | --- |
-| Squat | Hip/knee movement phases | depth, knee tracking, trunk stability |
-| Push-up | Elbow movement phases | range of motion, body-line stability |
-| Jumping jack | Arm/leg open-close phases | coordination, range, completion |
-
-- Real-time MediaPipe Pose Landmarker inference
-- 33-point skeleton and landmark overlay
-- Joint-angle, symmetry, and movement-quality indicators
-- **Agentic coaching layer** (`app/agent`): an on-device coach agent with memory, tool use, and planning that adapts feedback across reps and sessions. Runs fully offline (deterministic heuristic) and upgrades to an LLM when a key is configured.
-- Local camera processing and responsive Chinese interface
-- Graceful camera/model error states
-
-## Quick start
-
-Requirements: Node.js 22.13+
+## 在线演示
 
 ```bash
-git clone https://github.com/WonderfulClaire/AIxcellentSport.git
-cd AIxcellentSport
+git clone https://github.com/WonderfulClaire/AIxcellentSport-Agent.git
+cd AIxcellentSport-Agent
 npm ci
 npm run dev
 ```
 
-Then open the displayed local URL, select an exercise, and allow camera access. The MediaPipe model and WebAssembly runtime are downloaded on first use.
+打开本地 URL，选动作、允许摄像头。**无需任何 API Key 即可看到 Agent 反馈面板**（🤖 Agent 重点）。桌面浏览器 + 摄像头体验最佳。
 
 ```bash
-npm run check   # lint, production build, and product-contract tests
+npm run check   # lint + 生产构建 + 产品契约测试
 ```
 
-## How it works
+## 架构
 
 ```mermaid
 flowchart LR
   A[Camera frame] --> B[MediaPipe: 33 landmarks]
   B --> C[Joint geometry]
   C --> D[Exercise state machine]
-  D --> E[Rep count + coaching cues]
-  B --> F[Canvas skeleton overlay]
+  D -->|rep done| E[Agent layer]
+  E --> F1[FormAnalyzer\n识别问题]
+  E --> F2[ProgressTracker\n记忆/进度]
+  E --> F3[PlanGenerator\n下一步计划]
+  F1 --> G[CoachAgent]
+  F2 --> G
+  F3 --> G
+  G --> H[自适应教练反馈]
+  B --> I[Canvas skeleton overlay]
 ```
 
-The MVP deliberately keeps exercise logic in an explainable rule layer. A future temporal model can improve robustness while retaining rule-based safety checks and visible evidence.
+Agent 层数据流（`app/agent/`）：
 
-## Agentic coaching layer
+| 模块 | 职责 |
+| --- | --- |
+| `index.js` | 统一出口 + LLM 配置解析（含厂商预设 / 超时默认） |
+| `coachAgent.js` | 编排核心：评估 → 记忆 → 规划 → 生成反馈（provider-agnostic LLM + 启发式兜底） |
+| `multiAgent.js` | 三子智能体协作，输出结构化「训练报告」 |
+| `memory.js` | `AgentMemory` 类：localStorage 持久化，结构化指标，跨会话自适应 |
+| `tools.js` | 工具注册表（含 JSON schema，供 LLM function calling） |
+| `form.js` | 动作质量阈值规则（`assess_form`） |
 
-AIxcellentSport ships an on-device **coach agent** (`app/agent/`) that turns the per-rep metrics into adaptive, memory-aware feedback — the app is not just a detector, it is an agent.
+## 接入 LLM（可选，一行配置）
 
-```mermaid
-flowchart LR
-  A[Rep completed] --> B[FormAnalyzer: assess_form]
-  B --> C[CoachAgent: remember + plan]
-  C --> D[(AgentMemory: localStorage)]
-  C --> E[Feedback: heuristic or LLM]
-  C --> F[ProgressTracker + PlanGenerator]
+在 `app/page.tsx` 注入 `window.__AGENT_CONFIG__` 即可，**无需改任何代码**：
+
+```js
+// 方式 A：预设厂商（推荐）
+window.__AGENT_CONFIG__ = { provider: "qwen" };     // 通义千问 DashScope
+// window.__AGENT_CONFIG__ = { provider: "deepseek" };
+// window.__AGENT_CONFIG__ = { provider: "openai" };
+
+// 方式 B：OpenAI 兼容直连
+window.__AGENT_CONFIG__ = {
+  baseUrl: "https://dashscope.aliyuncs.com/compatible-mode/v1",
+  apiKey: "sk-xxx",
+  model: "qwen-plus",
+};
 ```
 
-- **Memory**: `AgentMemory` stores only structured metrics (never video) and surfaces *recurring issues* to set the session focus.
-- **Tools**: `assess_form`, `log_rep`, `get_recurring_issues`, `set_goal` — callable by the agent and by LLM function-calling.
-- **Planning**: the coach agent decides what to emphasize based on history, then produces the cue.
-- **Multi-agent**: `runMultiAgent` orchestrates FormAnalyzer, ProgressTracker, and PlanGenerator for a structured training report.
-- **LLM-optional**: the LLM call is OpenAI-compatible (set `window.__AGENT_CONFIG__` with `baseUrl`/`apiKey`/`model`). With no key, a deterministic heuristic runs — so the demo works with zero configuration and never breaks.
+不配置 → 自动走确定性启发式（零依赖、零密钥、演示永不翻车）。LLM 调用带 8s 超时，超时即降级，保证演示不卡死。
 
-See [Architecture](docs/ARCHITECTURE.md) for boundaries and extension points.
+> 黑客松若要求使用 Qoder / 通义千问平台，把 `provider` 设为 `"qwen"` 即可，无需改动业务代码。
 
-## Privacy, safety, and evidence
+## 测试
 
-- Raw camera frames stay in the browser in this version.
-- The app does not require an account and does not persist video.
-- Feedback is general fitness education, not medical diagnosis.
-- Camera angle, occlusion, lighting, and individual anatomy affect results.
-- Accuracy claims must include a reproducible dataset, protocol, and report. Historical concept-deck figures are not current MVP evidence.
+```bash
+npm run test   # 运行 tests/agent.test.js（记忆 / 工具 / 评估）
+```
 
-Please report security or privacy concerns through [GitHub's private security advisory flow](SECURITY.md).
+## 黑客松定位
 
-## Roadmap
-
-- [ ] Move inference into a Web Worker
-- [ ] Add side-view calibration and more exercise profiles
-- [ ] Add local session history and progress trends
-- [ ] Support user-calibrated range-of-motion targets
-- [ ] Evaluate a temporal movement-quality classifier
-- [ ] Extract a community exercise-rule SDK
-
-## Contributing
-
-Issues and pull requests are welcome. New exercises should specify the camera view, phase boundaries, repetition rule, feedback rule, and reproducible edge cases. Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
+详见 [`HACKATHON.md`](./HACKATHON.md) —— 本项目的参赛 Pitch、差异化与演示动线。
 
 ## License
 
-[MIT](LICENSE)
+MIT
