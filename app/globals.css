@@ -123,6 +123,21 @@ a { color: inherit; text-decoration: none; }
 .report-row ul { margin: 0; padding-left: 18px; }
 .report-row li { font-size: 13px; line-height: 1.55; color: var(--ink); }
 .report-src { font: 400 10px monospace; color: rgba(245,245,235,.4); }
+.goal-box { display: flex; flex-direction: column; gap: 8px; padding: 14px; border: 1px solid rgba(245,245,235,.14); border-radius: 12px; }
+.goal-box > span { font: 700 11px monospace; letter-spacing: .06em; color: rgba(245,245,235,.7); }
+.goal-input-row { display: flex; gap: 8px; }
+.goal-input { flex: 1; padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(245,245,235,.2); background: rgba(0,0,0,.25); color: var(--ink); font-size: 13px; }
+.goal-input::placeholder { color: rgba(245,245,235,.4); }
+.goal-add { padding: 8px 12px; border: none; border-radius: 8px; background: var(--acid); color: var(--ink); font-weight: 700; cursor: pointer; }
+.goal-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.goal-tag { display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 999px; background: rgba(183,255,42,.12); color: var(--ink); font-size: 12px; }
+.goal-tag button { border: none; background: transparent; color: rgba(245,245,235,.6); cursor: pointer; font-size: 14px; line-height: 1; }
+.progress-card { display: flex; flex-direction: column; gap: 6px; padding: 14px; border: 1px solid rgba(183,255,42,.3); border-radius: 12px; background: rgba(183,255,42,.04); }
+.progress-card > span { font: 700 11px monospace; letter-spacing: .06em; color: var(--acid); }
+.progress-card .spark { width: 100%; height: 44px; }
+.progress-card small { font: 400 10px monospace; color: rgba(245,245,235,.5); }
+.speak-toggle { padding: 10px; border: 1px solid rgba(245,245,235,.2); border-radius: 10px; background: transparent; color: var(--ink); cursor: pointer; font-size: 13px; }
+.speak-toggle[aria-pressed="true"] { background: rgba(183,255,42,.15); border-color: var(--acid); }
 
 .how-section { max-width: 1440px; padding: 96px 5vw 110px; margin: auto; }
 .steps { display: grid; grid-template-columns: repeat(3,1fr); border-top: 1px solid var(--line); }
