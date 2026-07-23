@@ -12,6 +12,8 @@ import { assessForm, getTool } from "./tools.js";
  */
 async function callLLM(messages, config, tools) {
   if (!config || !config.apiKey || !config.baseUrl) return null;
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), config.timeoutMs || 8000);
   try {
     const body = {
       model: config.model || "gpt-4o-mini",
@@ -27,6 +29,7 @@ async function callLLM(messages, config, tools) {
     }
     const res = await fetch(config.baseUrl.replace(/\/$/, "") + "/chat/completions", {
       method: "POST",
+      signal: ctrl.signal,
       headers: {
         "content-type": "application/json",
         authorization: `Bearer ${config.apiKey}`,
@@ -51,7 +54,9 @@ async function callLLM(messages, config, tools) {
     }
     return msg?.content ?? null;
   } catch {
-    return null; // 网络/鉴权异常 → 兜底
+    return null; // 网络/鉴权异常 / 超时 → 兜底
+  } finally {
+    clearTimeout(timer);
   }
 }
 
