@@ -1,0 +1,38 @@
+name: Bug report
+description: Report a reproducible problem in the app
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Please avoid uploading identifiable camera footage.
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      placeholder: Describe the actual and expected behavior.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Browser and operating system
+      placeholder: Chrome 128, Windows 11
+    validations:
+      required: true
+  - type: dropdown
+    id: exercise
+    attributes:
+      label: Exercise
+      options: [Squat, Push-up, Jumping jack, Not exercise-specific]
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Non-sensitive context
+      description: Camera angle, lighting, distance, and whether the full body was visible.

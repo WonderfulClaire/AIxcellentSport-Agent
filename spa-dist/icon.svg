@@ -1,0 +1,26 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#151517"/>
+      <stop offset="1" stop-color="#050506"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F4D27A"/>
+      <stop offset="0.5" stop-color="#D4AF37"/>
+      <stop offset="1" stop-color="#B8912B"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.42" r="0.55">
+      <stop offset="0" stop-color="#D4AF37" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#D4AF37" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <circle cx="256" cy="220" r="180" fill="url(#glow)"/>
+  <!-- ✦ spark mark -->
+  <g transform="translate(256 236)">
+    <path d="M0 -132 C 22 -46, 46 -22, 132 0 C 46 22, 22 46, 0 132 C -22 46, -46 22, -132 0 C -46 -22, -22 -46, 0 -132 Z" fill="url(#gold)"/>
+    <path d="M0 -60 C 10 -21, 21 -10, 60 0 C 21 10, 10 21, 0 60 C -10 21, -21 10, -60 0 C -21 -10, -10 -21, 0 -60 Z" fill="#0B0B0D" opacity="0.35"/>
+  </g>
+  <!-- wordmark -->
+  <text x="256" y="430" font-family="Georgia, 'Playfair Display', serif" font-size="66" font-weight="700" fill="url(#gold)" text-anchor="middle" letter-spacing="2">AIx</text>
+</svg>
