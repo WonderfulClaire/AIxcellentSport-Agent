@@ -7,7 +7,7 @@ import {
   PoseLandmarker,
   type NormalizedLandmark,
 } from "@mediapipe/tasks-vision";
-import { CoachAgent, AgentMemory, loadAgentConfig } from "./agent/index.js";
+import { CoachAgent, AgentMemory, loadAgentConfig, runMultiAgent } from "./agent/index.js";
 
 type Exercise = "squat" | "pushup" | "jack";
 type ModelState = "idle" | "loading" | "ready" | "error";
@@ -63,6 +63,12 @@ export default function Home() {
   const [feedback, setFeedback] = useState("准备好后，退后两步并让全身进入画面");
   const [feedbackTone, setFeedbackTone] = useState<"good" | "warn">("good");
   const [agentFocus, setAgentFocus] = useState<string | null>(null);
+  const [report, setReport] = useState<null | {
+    form: { issues: string[] };
+    coaching: { message: string; tone: "good" | "warn"; focusArea: string | null };
+    progress: { averageScore: number | null; totalReps: number; recurringIssues: Array<{ issue: string; count: number }> };
+    plan: { nextPlan: string[]; generatedBy: "llm" | "heuristic" };
+  }>(null);
   const [errorMessage, setErrorMessage] = useState("");
   const lastFpsTime = useRef(0);
   const frameCount = useRef(0);
@@ -92,7 +98,8 @@ export default function Home() {
     });
   }, []);
 
-  // 一次动作完成后，把指标交给教练智能体，获取自适应反馈（记忆/规划/工具）
+  // 一次动作完成后，把指标交给多智能体编排（感知→记忆→规划→反馈），
+  // 产出结构化「训练报告」并实时更新教练反馈。
   const triggerAgent = useCallback(
     (metric: {
       exercise: Exercise;
@@ -106,12 +113,12 @@ export default function Home() {
     }) => {
       const agent = agentRef.current;
       if (!agent) return;
-      agent
-        .getCoaching(metric)
+      runMultiAgent(metric, { memory: agent.memory, config: agent.config })
         .then((res) => {
-          setFeedback(res.message);
-          setFeedbackTone(res.tone);
-          if (res.focusArea) setAgentFocus(res.focusArea);
+          setFeedback(res.coaching.message);
+          setFeedbackTone(res.coaching.tone);
+          if (res.coaching.focusArea) setAgentFocus(res.coaching.focusArea);
+          setReport(res);
         })
         .catch(() => {
           /* 智能体异常时保留原有实时反馈，保证不中断训练 */
@@ -319,7 +326,7 @@ export default function Home() {
         <nav aria-label="主导航">
           <a href="#coach">实时教练</a>
           <a href="#how">技术原理</a>
-          <a href="https://github.com/WonderfulClaire/AIxcellentSport" target="_blank" rel="noreferrer">GitHub ↗</a>
+          <a href="https://github.com/WonderfulClaire/AIxcellentSport-Agent" target="_blank" rel="noreferrer">GitHub ↗</a>
         </nav>
         <span className="privacy-pill"><i /> ON-DEVICE AI</span>
         <span className="privacy-pill"><i /> AGENTIC COACH</span>
@@ -408,6 +415,18 @@ export default function Home() {
               <div className="agent-focus">
                 <span>🤖 Agent 重点</span>
                 <strong>{agentFocus}</strong>
+              </div>
+            )}
+            {report && (
+              <div className="report-card">
+                <span className="report-title">🤖 训练报告</span>
+                <div className="report-row"><small>本次问题</small><p>{report.form.issues.length ? report.form.issues.join("、") : "动作标准，暂无可纠正项"}</p></div>
+                <div className="report-row"><small>阶段进展</small><p>平均分 {report.progress.averageScore ?? "—"} · 已练 {report.progress.totalReps} 次</p></div>
+                {report.progress.recurringIssues.length > 0 && (
+                  <div className="report-row"><small>反复问题</small><p>{report.progress.recurringIssues.map((r) => `${r.issue}(${r.count})`).join("、")}</p></div>
+                )}
+                <div className="report-row"><small>下一步</small><ul>{report.plan.nextPlan.map((s, i) => <li key={i}>{s}</li>)}</ul></div>
+                <small className="report-src">由 {report.plan.generatedBy === "llm" ? "LLM" : "确定性启发式"} 生成</small>
               </div>
             )}
             {isTraining && <button className="stop-button" onClick={stopTraining}>结束本次训练</button>}
