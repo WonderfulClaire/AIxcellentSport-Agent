@@ -69,6 +69,10 @@ export default function Home() {
     progress: { averageScore: number | null; totalReps: number; recurringIssues: Array<{ issue: string; count: number }> };
     plan: { nextPlan: string[]; generatedBy: "llm" | "heuristic" };
   }>(null);
+  const [speakOn, setSpeakOn] = useState(false);
+  const [goals, setGoals] = useState<string[]>([]);
+  const [goalInput, setGoalInput] = useState("");
+  const [spark, setSpark] = useState<number[]>([]);
   const [errorMessage, setErrorMessage] = useState("");
   const lastFpsTime = useRef(0);
   const frameCount = useRef(0);
@@ -98,6 +102,17 @@ export default function Home() {
     });
   }, []);
 
+  // 浏览器端语音播报（教练出声）
+  const speak = useCallback((text: string) => {
+    if (typeof window === "undefined" || !window.speechSynthesis) return;
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "zh-CN";
+    u.rate = 1.05;
+    u.pitch = 1;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(u);
+  }, []);
+
   // 一次动作完成后，把指标交给多智能体编排（感知→记忆→规划→反馈），
   // 产出结构化「训练报告」并实时更新教练反馈。
   const triggerAgent = useCallback(
@@ -119,13 +134,33 @@ export default function Home() {
           setFeedbackTone(res.coaching.tone);
           if (res.coaching.focusArea) setAgentFocus(res.coaching.focusArea);
           setReport(res);
+          setSpark(agent.memory.getHistory(metric.exercise).map((r) => r.score));
+          if (speakOn) speak(res.coaching.message);
         })
         .catch(() => {
           /* 智能体异常时保留原有实时反馈，保证不中断训练 */
         });
     },
-    [],
+    [speakOn, speak],
   );
+
+  // 设定训练目标（驱动 PlanGenerator 生成目标导向的计划）
+  const addGoal = useCallback(() => {
+    const g = goalInput.trim();
+    if (!g) return;
+    const agent = agentRef.current;
+    const next = [...goals, g];
+    if (agent) agent.memory.setGoals(next);
+    setGoals(next);
+    setGoalInput("");
+  }, [goalInput, goals]);
+
+  const removeGoal = useCallback((g: string) => {
+    const agent = agentRef.current;
+    const next = goals.filter((x) => x !== g);
+    if (agent) agent.memory.setGoals(next);
+    setGoals(next);
+  }, [goals]);
 
   const analyzePose = useCallback(
     (landmarks: NormalizedLandmark[]) => {
@@ -429,7 +464,45 @@ export default function Home() {
                 <small className="report-src">由 {report.plan.generatedBy === "llm" ? "LLM" : "确定性启发式"} 生成</small>
               </div>
             )}
+
+            <div className="goal-box">
+              <span>🎯 训练目标</span>
+              <div className="goal-input-row">
+                <input
+                  className="goal-input"
+                  placeholder="如：改善膝盖内扣 / 增肌"
+                  value={goalInput}
+                  onChange={(e) => setGoalInput(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") addGoal(); }}
+                />
+                <button className="goal-add" onClick={addGoal}>添加</button>
+              </div>
+              {goals.length > 0 && (
+                <div className="goal-tags">
+                  {goals.map((g) => (
+                    <span key={g} className="goal-tag">{g}<button onClick={() => removeGoal(g)} aria-label="删除目标">×</button></span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {spark.length > 1 && (
+              <div className="progress-card">
+                <span>📈 动作质量趋势</span>
+                <svg className="spark" viewBox="0 0 240 44" preserveAspectRatio="none" aria-label="动作质量趋势">
+                  <polyline
+                    fill="none"
+                    stroke="var(--acid)"
+                    strokeWidth="2"
+                    points={spark.map((s, i) => `${8 + (i * (240 - 16)) / Math.max(1, spark.length - 1)},${40 - (Math.max(0, Math.min(100, s)) / 100) * 36}`).join(" ")}
+                  />
+                </svg>
+                <small>最近 {spark.length} 次 · 平均 {Math.round(spark.reduce((a, b) => a + b, 0) / spark.length)} 分</small>
+              </div>
+            )}
+
             {isTraining && <button className="stop-button" onClick={stopTraining}>结束本次训练</button>}
+            <button className="speak-toggle" onClick={() => setSpeakOn((v) => !v)} aria-pressed={speakOn}>{speakOn ? "🔊 语音开" : "🔈 语音关"}</button>
           </aside>
         </div>
       </section>
