@@ -577,18 +577,23 @@ export default function Home() {
         <span className="privacy-pill"><i /> 隐私优先</span>
       </header>
 
-      {activeTab === "assistant" &&
-        (authUser ? (
-          <MemberHome user={authUser} onLaunch={handleLaunch} onLogout={logout} />
-        ) : (
-          <LandingPage onLaunch={handleLaunch} />
-        ))}
-
-      {activeTab === "member" && authUser && (
-        <MemberHome user={authUser} onLaunch={handleLaunch} onLogout={logout} />
+      {activeTab === "assistant" && (
+        <div key="assistant" className="page-fade-in">
+          {authUser ? (
+            <MemberHome user={authUser} onLaunch={handleLaunch} onLogout={logout} />
+          ) : (
+            <LandingPage onLaunch={handleLaunch} />
+          )}
+        </div>
       )}
 
-      {activeTab === "hub" && <AssistantHub onLaunch={handleLaunch} />}
+      {activeTab === "member" && authUser && (
+        <div key="member" className="page-fade-in">
+          <MemberHome user={authUser} onLaunch={handleLaunch} onLogout={logout} />
+        </div>
+      )}
+
+      {activeTab === "hub" && <div key="hub" className="page-fade-in"><AssistantHub onLaunch={handleLaunch} /></div>}
 
       <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} onSuccess={(u) => { setAuthUser(u); setAuthOpen(false); setActiveTab("member"); }} />
 
@@ -773,34 +778,34 @@ export default function Home() {
       </section>
       </>)}
 
-      {activeTab === "video" && <VideoAnalyzer />}
+      {activeTab === "video" && <div key="video" className="page-fade-in"><VideoAnalyzer /></div>}
 
-      {activeTab === "posture" && <PostureAssessment />}
+      {activeTab === "posture" && <div key="posture" className="page-fade-in"><PostureAssessment /></div>}
 
-      {activeTab === "nutrition" && <PrivateNutrition />}
+      {activeTab === "nutrition" && <div key="nutrition" className="page-fade-in"><PrivateNutrition /></div>}
 
-      {activeTab === "doctor" && <HealthConcierge />}
+      {activeTab === "doctor" && <div key="doctor" className="page-fade-in"><HealthConcierge /></div>}
 
-      {activeTab === "image" && <ImageConsultant />}
+      {activeTab === "image" && <div key="image" className="page-fade-in"><ImageConsultant /></div>}
 
-      {activeTab === "plan" && <WorkoutPlanner />}
+      {activeTab === "plan" && <div key="plan" className="page-fade-in"><WorkoutPlanner /></div>}
 
-      {activeTab === "timeline" && <TrainingTimeline />}
+      {activeTab === "timeline" && <div key="timeline" className="page-fade-in"><TrainingTimeline /></div>}
 
-      {activeTab === "energy" && <EnergyState />}
+      {activeTab === "energy" && <div key="energy" className="page-fade-in"><EnergyState /></div>}
 
-      {activeTab === "diet" && <DietTracker />}
+      {activeTab === "diet" && <div key="diet" className="page-fade-in"><DietTracker /></div>}
 
-      {activeTab === "sleep" && <SleepTracker />}
+      {activeTab === "sleep" && <div key="sleep" className="page-fade-in"><SleepTracker /></div>}
 
-      {activeTab === "tcm" && <TCMWellness />}
+      {activeTab === "tcm" && <div key="tcm" className="page-fade-in"><TCMWellness /></div>}
 
-      {activeTab === "library" && <ExerciseLibrary />}
-      {activeTab === "dashboard" && <Dashboard />}
-      {activeTab === "history" && <TrainingHistory />}
-      {activeTab === "wearable" && <WearableConnect />}
-      {activeTab === "trends" && <HealthTrends />}
-      {activeTab === "weekly_report" && <WeeklyReport />}
+      {activeTab === "library" && <div key="library" className="page-fade-in"><ExerciseLibrary /></div>}
+      {activeTab === "dashboard" && <div key="dashboard" className="page-fade-in"><Dashboard /></div>}
+      {activeTab === "history" && <div key="history" className="page-fade-in"><TrainingHistory /></div>}
+      {activeTab === "wearable" && <div key="wearable" className="page-fade-in"><WearableConnect /></div>}
+      {activeTab === "trends" && <div key="trends" className="page-fade-in"><HealthTrends /></div>}
+      {activeTab === "weekly_report" && <div key="weekly_report" className="page-fade-in"><WeeklyReport /></div>}
 
       <footer>
         <div className="brand"><span className="brand-mark">✦</span><span>AIxcellent 私享管家</span></div>

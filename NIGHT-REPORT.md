@@ -39,3 +39,23 @@
 
 **遗留问题**：
 - 无
+
+## T3. 移动端体验打磨 ✅
+
+**做了什么**：
+- globals.css 新增/完善移动端媒体查询（≤820px、≤580px）
+- 修复横向溢出、字号过小、按钮触控区过小等问题
+- 表单输入框 font-size: 16px 防 iOS 缩放
+- 底部 tabbar 加金色高亮指示 + transition 过渡动画
+- 页面切换内容区加 fadeInPage 轻量淡入动画
+- 确保 HealthTrends/WeeklyReport SVG 图表在窄屏自适应
+
+**改了哪些文件**：
+- `app/globals.css`（移动端媒体查询增强）
+- `app/page.tsx`（tabbar 高亮逻辑 + 内容区动画 class）
+
+**自测结果**：
+- `npm run build` 构建通过 ✅
+
+**遗留问题**：
+- 需真机测试验证各机型表现（模拟器下逻辑正确）
