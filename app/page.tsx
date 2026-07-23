@@ -29,6 +29,7 @@ import AuthModal from "./components/AuthModal";
 import MemberHome from "./components/MemberHome";
 import WearableConnect from "./components/WearableConnect";
 import HealthTrends from "./components/HealthTrends";
+import WeeklyReport from "./components/WeeklyReport";
 import { getStoredUser, clearSession } from "./api";
 
 type Exercise = "squat" | "pushup" | "jack" | "lunge" | "plank";
@@ -98,7 +99,7 @@ export default function Home() {
     plan: { nextPlan: string[]; generatedBy: "llm" | "heuristic" };
   }>(null);
   const [speakOn, setSpeakOn] = useState(false);
-  const [activeTab, setActiveTab] = useState<"assistant" | "member" | "hub" | "train" | "video" | "posture" | "nutrition" | "doctor" | "image" | "plan" | "timeline" | "energy" | "library" | "diet" | "sleep" | "tcm" | "dashboard" | "history" | "wearable" | "trends">("assistant");
+  const [activeTab, setActiveTab] = useState<"assistant" | "member" | "hub" | "train" | "video" | "posture" | "nutrition" | "doctor" | "image" | "plan" | "timeline" | "energy" | "library" | "diet" | "sleep" | "tcm" | "dashboard" | "history" | "wearable" | "trends" | "weekly_report">("assistant");
   const [menuOpen, setMenuOpen] = useState(false);
   const [authUser, setAuthUser] = useState<any>(null);
   const [authOpen, setAuthOpen] = useState(false);
@@ -531,6 +532,7 @@ export default function Home() {
                   { key: "tcm" as const, label: "中医养生", desc: "节气·体质·穴位" },
                   { key: "energy" as const, label: "能量状态", desc: "精力管理建议" },
                   { key: "trends" as const, label: "健康趋势", desc: "多维度数据可视化" },
+                  { key: "weekly_report" as const, label: "每周报告", desc: "本周健康数据汇总" },
                   { key: "doctor" as const, label: "健康咨询", desc: "就医准备支持" },
                 ].map((item) => (
                   <button key={item.key} className="dropdown-item" onClick={() => { setActiveTab(item.key); setMenuOpen(false); }}>
@@ -798,6 +800,7 @@ export default function Home() {
       {activeTab === "history" && <TrainingHistory />}
       {activeTab === "wearable" && <WearableConnect />}
       {activeTab === "trends" && <HealthTrends />}
+      {activeTab === "weekly_report" && <WeeklyReport />}
 
       <footer>
         <div className="brand"><span className="brand-mark">✦</span><span>AIxcellent 私享管家</span></div>
