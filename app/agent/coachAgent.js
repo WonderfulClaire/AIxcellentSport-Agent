@@ -10,7 +10,7 @@ import { assessForm, getTool } from "./tools.js";
  * Provider-agnostic LLM 调用（OpenAI 兼容 /chat/completions）。
  * @returns {Promise<string|null>} 模型文本，或 null（需走兜底）
  */
-async function callLLM(messages, config, tools) {
+export async function callLLM(messages, config, tools) {
   if (!config || !config.apiKey || !config.baseUrl) return null;
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), config.timeoutMs || 8000);
