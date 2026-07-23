@@ -38,14 +38,18 @@ export function progressTracker(memory, exercise) {
 /** 子智能体 3：计划生成（有密钥时真调 LLM 生成个性化计划，否则启发式兜底） */
 export async function planGenerator(memory, exercise, config) {
   const summary = memory.summarize(exercise);
+  const avoid = config?.injuries?.length ? config.injuries : [];
   if (config?.apiKey) {
     const sys = [
       "你是 AIxcellentSport 的训练计划智能体，运行在用户浏览器端（隐私优先）。",
       "你拥有用户的历史记忆：平均分、总次数、反复出现的问题、目标。",
       "请基于这些信息，生成下一步训练的简短计划，3 条要点，聚焦反复出现的问题。",
+      avoid.length
+        ? `用户需规避的部位：${avoid.join("、")}，请在计划中避免刺激这些部位的动作。`
+        : "",
       '输出严格 JSON：{"nextPlan": ["...","...","..."]}。只输出 JSON，不要解释。',
       `用户记忆摘要：${JSON.stringify(summary)}`,
-    ].join("\n");
+    ].filter(Boolean).join("\n");
     const user = `动作：${exercise}。请给下一步计划。`;
     const reply = await callLLM(
       [
@@ -73,6 +77,7 @@ export async function planGenerator(memory, exercise, config) {
     "每组 8-12 次，组间休息 60s，质量优先于次数",
     "完成后回看平均评分，若连续达标则逐步增加负荷",
   ];
+  if (avoid.length) nextPlan.unshift(`已规避你标记的部位：${avoid.join("、")}（相关动作已关闭）`);
   return { agent: "PlanGenerator", nextPlan, generatedBy: "heuristic" };
 }
 
