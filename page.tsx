@@ -21,6 +21,7 @@ import HealthConcierge from "./components/HealthConcierge";
 import ImageConsultant from "./components/ImageConsultant";
 import WorkoutPlanner from "./components/WorkoutPlanner";
 import TrainingTimeline from "./components/TrainingTimeline";
+import EnergyState from "./components/EnergyState";
 
 type Exercise = "squat" | "pushup" | "jack" | "lunge" | "plank";
 type ModelState = "idle" | "loading" | "ready" | "error";
@@ -89,7 +90,7 @@ export default function Home() {
     plan: { nextPlan: string[]; generatedBy: "llm" | "heuristic" };
   }>(null);
   const [speakOn, setSpeakOn] = useState(false);
-  const [activeTab, setActiveTab] = useState<"train" | "video" | "posture" | "nutrition" | "doctor" | "image" | "plan" | "timeline" | "library" | "diet" | "sleep" | "tcm" | "dashboard" | "history">("train");
+  const [activeTab, setActiveTab] = useState<"train" | "video" | "posture" | "nutrition" | "doctor" | "image" | "plan" | "timeline" | "energy" | "library" | "diet" | "sleep" | "tcm" | "dashboard" | "history">("train");
   const [goals, setGoals] = useState<string[]>([]);
   const [goalInput, setGoalInput] = useState("");
   const [spark, setSpark] = useState<number[]>([]);
@@ -464,6 +465,7 @@ export default function Home() {
           { key: "image" as const, label: "形象管理", icon: "💄" },
           { key: "plan" as const, label: "训练计划", icon: "📋" },
           { key: "timeline" as const, label: "时间轴", icon: "⏱️" },
+          { key: "energy" as const, label: "能量状态", icon: "🔋" },
           { key: "library" as const, label: "动作库", icon: "📚", badge: "200+" },
           { key: "diet" as const, label: "饮食", icon: "🥗" },
           { key: "sleep" as const, label: "睡眠", icon: "😴" },
@@ -679,6 +681,8 @@ export default function Home() {
       {activeTab === "plan" && <WorkoutPlanner />}
 
       {activeTab === "timeline" && <TrainingTimeline />}
+
+      {activeTab === "energy" && <EnergyState />}
 
       {activeTab === "diet" && <DietTracker />}
 
