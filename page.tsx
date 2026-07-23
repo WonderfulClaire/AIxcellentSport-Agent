@@ -19,6 +19,8 @@ import PostureAssessment from "./components/PostureAssessment";
 import PrivateNutrition from "./components/PrivateNutrition";
 import HealthConcierge from "./components/HealthConcierge";
 import ImageConsultant from "./components/ImageConsultant";
+import WorkoutPlanner from "./components/WorkoutPlanner";
+import TrainingTimeline from "./components/TrainingTimeline";
 
 type Exercise = "squat" | "pushup" | "jack" | "lunge" | "plank";
 type ModelState = "idle" | "loading" | "ready" | "error";
@@ -87,7 +89,7 @@ export default function Home() {
     plan: { nextPlan: string[]; generatedBy: "llm" | "heuristic" };
   }>(null);
   const [speakOn, setSpeakOn] = useState(false);
-  const [activeTab, setActiveTab] = useState<"train" | "video" | "posture" | "nutrition" | "doctor" | "image" | "library" | "diet" | "sleep" | "tcm" | "dashboard" | "history">("train");
+  const [activeTab, setActiveTab] = useState<"train" | "video" | "posture" | "nutrition" | "doctor" | "image" | "plan" | "timeline" | "library" | "diet" | "sleep" | "tcm" | "dashboard" | "history">("train");
   const [goals, setGoals] = useState<string[]>([]);
   const [goalInput, setGoalInput] = useState("");
   const [spark, setSpark] = useState<number[]>([]);
@@ -460,6 +462,8 @@ export default function Home() {
           { key: "nutrition" as const, label: "私人营养", icon: "🥗" },
           { key: "doctor" as const, label: "私人医生", icon: "🩺" },
           { key: "image" as const, label: "形象管理", icon: "💄" },
+          { key: "plan" as const, label: "训练计划", icon: "📋" },
+          { key: "timeline" as const, label: "时间轴", icon: "⏱️" },
           { key: "library" as const, label: "动作库", icon: "📚", badge: "200+" },
           { key: "diet" as const, label: "饮食", icon: "🥗" },
           { key: "sleep" as const, label: "睡眠", icon: "😴" },
@@ -671,6 +675,10 @@ export default function Home() {
       {activeTab === "doctor" && <HealthConcierge />}
 
       {activeTab === "image" && <ImageConsultant />}
+
+      {activeTab === "plan" && <WorkoutPlanner />}
+
+      {activeTab === "timeline" && <TrainingTimeline />}
 
       {activeTab === "diet" && <DietTracker />}
 
