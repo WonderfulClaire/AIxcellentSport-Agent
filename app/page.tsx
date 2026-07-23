@@ -9,7 +9,7 @@ import {
 } from "@mediapipe/tasks-vision";
 import { CoachAgent, AgentMemory, loadAgentConfig, runMultiAgent } from "./agent/index.js";
 
-type Exercise = "squat" | "pushup" | "jack";
+type Exercise = "squat" | "pushup" | "jack" | "lunge" | "plank";
 type ModelState = "idle" | "loading" | "ready" | "error";
 
 const EXERCISES: Array<{
@@ -17,11 +17,17 @@ const EXERCISES: Array<{
   name: string;
   detail: string;
   focus: string;
+  regions: string[];
 }> = [
-  { id: "squat", name: "深蹲", detail: "膝髋轨迹 · 躯干角度", focus: "下肢" },
-  { id: "pushup", name: "俯卧撑", detail: "肘部角度 · 身体直线", focus: "上肢" },
-  { id: "jack", name: "开合跳", detail: "手脚协调 · 动作幅度", focus: "全身" },
+  { id: "squat", name: "深蹲", detail: "膝髋轨迹 · 躯干角度", focus: "下肢", regions: ["膝", "腰", "髋"] },
+  { id: "pushup", name: "俯卧撑", detail: "肘部角度 · 身体直线", focus: "上肢", regions: ["手腕", "肩", "腰"] },
+  { id: "jack", name: "开合跳", detail: "手脚协调 · 动作幅度", focus: "全身", regions: ["膝", "踝"] },
+  { id: "lunge", name: "弓步", detail: "前后腿 · 膝盖稳定", focus: "下肢", regions: ["膝", "髋", "踝"] },
+  { id: "plank", name: "平板支撑", detail: "躯干直线 · 核心收紧", focus: "核心", regions: ["腰", "肩", "手腕"] },
 ];
+
+// 可被用户标记为「需要规避」的身体部位（伤病 / 不适）
+const INJURY_OPTIONS = ["肩", "膝", "腰", "手腕", "踝", "髋", "颈"];
 
 const MODEL_URL =
   "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/latest/pose_landmarker_lite.task";
@@ -73,6 +79,17 @@ export default function Home() {
   const [goals, setGoals] = useState<string[]>([]);
   const [goalInput, setGoalInput] = useState("");
   const [spark, setSpark] = useState<number[]>([]);
+  const [injuries, setInjuries] = useState<string[]>([]);
+  const isBlocked = (regions: string[]) => regions.some((r) => injuries.includes(r));
+  // 若当前动作因伤病规避被禁用，自动切到安全的动作
+  useEffect(() => {
+    const cur = EXERCISES.find((e) => e.id === exercise);
+    if (cur && isBlocked(cur.regions)) {
+      const safe = EXERCISES.find((e) => !isBlocked(e.regions));
+      if (safe) selectExercise(safe.id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [injuries]);
   const [errorMessage, setErrorMessage] = useState("");
   const lastFpsTime = useRef(0);
   const frameCount = useRef(0);
@@ -128,7 +145,7 @@ export default function Home() {
     }) => {
       const agent = agentRef.current;
       if (!agent) return;
-      runMultiAgent(metric, { memory: agent.memory, config: agent.config })
+      runMultiAgent(metric, { memory: agent.memory, config: { ...agent.config, injuries } })
         .then((res) => {
           setFeedback(res.coaching.message);
           setFeedbackTone(res.coaching.tone);
@@ -141,7 +158,7 @@ export default function Home() {
           /* 智能体异常时保留原有实时反馈，保证不中断训练 */
         });
     },
-    [speakOn, speak],
+    [speakOn, speak, injuries],
   );
 
   // 设定训练目标（驱动 PlanGenerator 生成目标导向的计划）
@@ -250,6 +267,48 @@ export default function Home() {
         setFeedback(open ? "幅度到位，落地时保持膝盖柔软" : "双手举过头顶，脚步再打开一些");
         setFeedbackTone(open ? "good" : "warn");
       }
+
+      if (exercise === "lunge") {
+        // 弓步：双侧膝盖角均值（类似深蹲的上下相位），前后腿通用
+        const left = angle(landmarks[23], landmarks[25], landmarks[27]);
+        const right = angle(landmarks[24], landmarks[26], landmarks[28]);
+        const kneeAngle = (left + right) / 2;
+        const kneeGap = Math.abs(landmarks[25].x - landmarks[26].x);
+        const ankleGap = Math.abs(landmarks[27].x - landmarks[28].x);
+        const valgusPenalty = kneeGap < ankleGap * 0.7 ? 16 : 0;
+        const score = Math.round(clamp(100 - Math.abs(170 - kneeAngle) * 0.5 - valgusPenalty));
+        setJointAngle(Math.round(kneeAngle));
+        setScore(score);
+        if (kneeAngle < 105 && phaseRef.current === "up") {
+          phaseRef.current = "down";
+          setFeedback("后腿膝盖下沉，前膝对准脚尖");
+          setFeedbackTone("good");
+        } else if (kneeAngle > 160 && phaseRef.current === "down") {
+          phaseRef.current = "up";
+          repCountRef.current += 1;
+          setReps(repCountRef.current);
+          triggerAgent({ exercise: "lunge", repIndex: repCountRef.current, score, jointAngle: Math.round(kneeAngle), kneeGap, ankleGap });
+        } else if (valgusPenalty) {
+          setFeedback("膝盖内扣，主动朝脚尖方向推开");
+          setFeedbackTone("warn");
+        }
+      }
+
+      if (exercise === "plank") {
+        // 平板支撑：持续保持，不计数；只看躯干是否成直线
+        const bodyLine = angle(landmarks[11], landmarks[23], landmarks[27]);
+        const hipLine = angle(landmarks[23], landmarks[25], landmarks[27]);
+        const score = Math.round(clamp(100 - Math.abs(175 - bodyLine) * 1.2));
+        setJointAngle(Math.round(bodyLine));
+        setScore(score);
+        if (bodyLine < 160 || hipLine < 150) {
+          setFeedback("髋部在塌，收紧核心、肩髋踝成一条线");
+          setFeedbackTone("warn");
+        } else {
+          setFeedback("躯干稳定，保持呼吸均匀");
+          setFeedbackTone("good");
+        }
+      }
     },
     [exercise, triggerAgent],
   );
@@ -269,19 +328,32 @@ export default function Home() {
         const result = landmarker.detectForVideo(video, performance.now());
         const context = canvas.getContext("2d");
         context?.clearRect(0, 0, width, height);
-        if (context && result.landmarks[0]) {
+        if (context && result.landmarks?.length) {
+          // 多人时选取画面中最大（离镜头最近）的人，避免误判
+          const chosen =
+            result.landmarks.length === 1
+              ? result.landmarks[0]
+              : result.landmarks.reduce((best, lm) => {
+                  const xs = lm.map((p) => p.x);
+                  const ys = lm.map((p) => p.y);
+                  const area = (Math.max(...xs) - Math.min(...xs)) * (Math.max(...ys) - Math.min(...ys));
+                  return area > best.area ? { lm, area } : best;
+                }, { lm: result.landmarks[0], area: -1 }).lm;
           const drawing = new DrawingUtils(context);
-          drawing.drawConnectors(result.landmarks[0], PoseLandmarker.POSE_CONNECTIONS, {
+          drawing.drawConnectors(chosen, PoseLandmarker.POSE_CONNECTIONS, {
             color: "#55c8ff",
             lineWidth: 4,
           });
-          drawing.drawLandmarks(result.landmarks[0], {
+          drawing.drawLandmarks(chosen, {
             color: "#fff4b8",
             fillColor: "#071521",
             lineWidth: 2,
             radius: 4,
           });
-          analyzePose(result.landmarks[0]);
+          if (result.landmarks.length > 1) {
+            setFeedback(`检测到 ${result.landmarks.length} 人，已锁定最大目标`);
+          }
+          analyzePose(chosen);
         } else {
           setFeedback("没有检测到完整人体，请退后并保持光线充足");
           setFeedbackTone("warn");
@@ -312,7 +384,7 @@ export default function Home() {
         landmarkerRef.current = await PoseLandmarker.createFromOptions(vision, {
           baseOptions: { modelAssetPath: MODEL_URL, delegate: "GPU" },
           runningMode: "VIDEO",
-          numPoses: 1,
+          numPoses: 4,
           minPoseDetectionConfidence: 0.55,
           minPosePresenceConfidence: 0.55,
           minTrackingConfidence: 0.55,
@@ -409,12 +481,38 @@ export default function Home() {
           <p>选择动作，打开摄像头。所有视频帧只在你的设备上处理。</p>
         </div>
 
-        <div className="exercise-tabs" role="tablist" aria-label="选择训练动作">
-          {EXERCISES.map((item) => (
-            <button key={item.id} className={exercise === item.id ? "active" : ""} onClick={() => selectExercise(item.id)} role="tab" aria-selected={exercise === item.id}>
-              <span>{item.name}</span><small>{item.detail}</small><b>{item.focus}</b>
+        <div className="injury-bar" role="group" aria-label="需要规避的部位">
+          <span className="injury-label">🩹 规避部位</span>
+          {INJURY_OPTIONS.map((opt) => (
+            <button
+              key={opt}
+              className={`injury-chip ${injuries.includes(opt) ? "on" : ""}`}
+              aria-pressed={injuries.includes(opt)}
+              onClick={() => setInjuries((prev) => (prev.includes(opt) ? prev.filter((x) => x !== opt) : [...prev, opt]))}
+            >
+              {opt}
             </button>
           ))}
+        </div>
+
+        <div className="exercise-tabs" role="tablist" aria-label="选择训练动作">
+          {EXERCISES.map((item) => {
+            const blocked = isBlocked(item.regions);
+            return (
+              <button
+                key={item.id}
+                className={`${exercise === item.id ? "active" : ""} ${blocked ? "blocked" : ""}`}
+                disabled={blocked}
+                onClick={() => !blocked && selectExercise(item.id)}
+                role="tab"
+                aria-selected={exercise === item.id}
+                title={blocked ? "该动作会刺激你标记规避的部位" : undefined}
+              >
+                <span>{item.name}</span><small>{item.detail}</small><b>{item.focus}</b>
+                {blocked && <em className="blocked-tag">规避</em>}
+              </button>
+            );
+          })}
         </div>
 
         <div className="coach-grid">
