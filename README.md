@@ -1,28 +1,22 @@
-# AIxcellentSport · Agent
+# AIxcellentHealth · AI 私人健康专家
 
-> 隐私优先的浏览器端 AI 动作教练 —— 这一仓库是 **Agentic 层（智能体）的独立实验分支**。
+> **你的全方位 AI 健康管家** —— 实时姿态教练 + 视频动作分析 + 饮食营养管理 + 睡眠质量追踪 + 中医节气养生
 
-AIxcellentSport 在浏览器里用 MediaPipe 检测 33 个身体关键点、测量关节几何、计数动作次数，并把这些动作模式转成可解释的教练提示，**不上传任何摄像头原始帧**。
+AIxcellentHealth 在浏览器端运行，**所有数据不出设备**。从运动到饮食、从睡眠到养生，7 大模块覆盖健康管理的方方面面。
 
-本仓库在原始项目之上，额外叠加了一层 **Agentic Coaching（智能体教练）**：它带记忆、会调用工具、能跨动作/跨会话做自适应规划。这一层**默认零密钥即可运行**（确定性启发式），一旦配置 LLM 密钥就自动升级为「LLM 驱动」模式。
+## ✨ 核心功能（7 大模块）
 
-- 🧠 **记忆层**：只存结构化指标文本，绝不存视频/图像（隐私红线）
-- 🛠️ **工具调用**：`assess_form` / `log_rep` / `get_recurring_issues` / `set_goal`
-- 🤖 **多智能体编排**：`FormAnalyzer`（感知）→ `ProgressTracker`（记忆）→ `PlanGenerator`（规划），由 `CoachAgent` 统一指挥，并实时渲染「训练报告」
-- 🔌 **LLM 可插拔**：OpenAI 兼容协议，内置 **混元Hy3（hunyuan）/ Qwen / DeepSeek / OpenAI** 预设，**不配密钥也能演示**
-- 🛡️ **永不翻车**：LLM 超时 / 鉴权失败 / 无网络 → 自动降级为确定性启发式
-- 🔊 **语音播报**：教练反馈实时语音读出（浏览器 Web Speech API）
-- 🎯 **目标驱动**：设定训练目标，计划生成器据此产出下一步方案
-- 🩹 **伤病规避**：标记需规避的部位，相关动作自动禁用、训练计划自动避开
-- 📈 **进度可视**：动作质量趋势图 + 结构化训练报告
-- 🧩 **动作库**：内置 **200+ 动作**（来自开源 exercises-dataset，含中文说明），卡片网格浏览，支持搜索/筛选（部位/器械/区域）
-- 📊 **数据面板**：Chart.js 可视化仪表盘 —— 肌群分布饼图、训练日容量柱状图、月度趋势折线图、高频动作排名
-- 📋 **训练记录**：完整历史日志面板，支持筛选/分页/展开详情
-- 🧩 **实时训练动作**：深蹲 / 俯卧撑 / 开合跳 / 弓步 / 平板支撑，支持多人同框（自动锁定最大目标）
+| 模块 | 功能 | 技术栈 |
+|------|------|--------|
+| 🎯 **实时训练** | MediaPipe 实时姿态识别，33 关键点追踪，即时纠正 | MediaPipe Tasks Vision |
+| 🎬 **视频分析** | 上传健身视频 → 逐帧分析 → Gemini 级专业报告（问题诊断/改进方法/替代方案/进阶调整） | MediaPipe IMAGE 模式 + LLM |
+| 📚 **动作库** | 200+ 动作数据库，中文说明，肌群映射，搜索筛选 | exercises-dataset (MIT) |
+| 🥗 **饮食管理** | 中文食物营养库，卡路里/蛋白质/碳水/脂肪追踪，每日目标 | localStorage |
+| 😴 **睡眠追踪** | 睡眠时长记录，质量评分(1-5)，7日趋势分析 | Web API |
+| 🌿 **中医养生** | 二十四节气算法 + 天气联动 + 体质辨识问卷 + 穴位保健建议 | 纯算法 + Open-Meteo API |
+| 🤖 **AI 智能体** | 多智能体编排（感知→记忆→规划→反馈），LLM 可插拔 | OpenAI 兼容协议 |
 
-> 这是为「阿里云 Qoder 智能体黑客松」打磨的仓库，专注于 Agentic Coaching（智能体教练）能力，可独立运行、评审、部署。
-
-## 在线演示
+## 🚀 快速开始
 
 ```bash
 git clone https://github.com/WonderfulClaire/AIxcellentSport-Agent.git
@@ -31,73 +25,101 @@ npm ci
 npm run dev
 ```
 
-打开本地 URL，选动作、允许摄像头。**无需任何 API Key 即可看到 Agent 反馈面板**（🤖 Agent 重点）。桌面浏览器 + 摄像头体验最佳。
+打开本地 URL 即可使用全部功能。**无需任何 API Key 即可体验基础功能**。
 
 ```bash
 npm run check   # lint + 生产构建 + 产品契约测试
 ```
 
-## 架构
-
-```mermaid
-flowchart LR
-  A[Camera frame] --> B[MediaPipe: 33 landmarks]
-  B --> C[Joint geometry]
-  C --> D[Exercise state machine]
-  D -->|rep done| E[Agent layer]
-  E --> F1[FormAnalyzer\n识别问题]
-  E --> F2[ProgressTracker\n记忆/进度]
-  E --> F3[PlanGenerator\n下一步计划]
-  F1 --> G[CoachAgent]
-  F2 --> G
-  F3 --> G
-  G --> H[自适应教练反馈]
-  B --> I[Canvas skeleton overlay]
-```
-
-Agent 层数据流（`app/agent/`）：
-
-| 模块 | 职责 |
-| --- | --- |
-| `index.js` | 统一出口 + LLM 配置解析（含厂商预设 / 超时默认） |
-| `coachAgent.js` | 编排核心：评估 → 记忆 → 规划 → 生成反馈（provider-agnostic LLM + 启发式兜底） |
-| `multiAgent.js` | 三子智能体协作，输出结构化「训练报告」 |
-| `memory.js` | `AgentMemory` 类：localStorage 持久化，结构化指标，跨会话自适应 |
-| `tools.js` | 工具注册表（含 JSON schema，供 LLM function calling） |
-| `form.js` | 动作质量阈值规则（`assess_form`） |
-
 ## 接入 LLM（可选，一行配置）
 
-在 `app/page.tsx` 注入 `window.__AGENT_CONFIG__` 即可，**无需改任何代码**：
+在浏览器控制台注入 `window.__AGENT_CONFIG__`：
 
 ```js
-// 方式 A：预设厂商（推荐）
-window.__AGENT_CONFIG__ = { provider: "hunyuan" };  // 混元Hy3（本仓库即由 WorkBuddy + 混元Hy3 开发）
-// window.__AGENT_CONFIG__ = { provider: "qwen" };     // 通义千问 DashScope
+// 预设厂商（推荐）
+window.__AGENT_CONFIG__ = { provider: "hunyuan" };  // 混元Hy3
+// window.__AGENT_CONFIG__ = { provider: "qwen" };     // 通义千问
 // window.__AGENT_CONFIG__ = { provider: "deepseek" };
 // window.__AGENT_CONFIG__ = { provider: "openai" };
 
-// 方式 B：OpenAI 兼容直连
+// 或直连任意 OpenAI 兼容接口
 window.__AGENT_CONFIG__ = {
-  baseUrl: "https://dashscope.aliyuncs.com/compatible-mode/v1",
+  baseUrl: "https://api.example.com/v1",
   apiKey: "sk-xxx",
-  model: "qwen-plus",
+  model: "model-name",
 };
 ```
 
-不配置 → 自动走确定性启发式（零依赖、零密钥、演示永不翻车）。LLM 调用带 8s 超时，超时即降级，保证演示不卡死。
+不配置 → 自动走确定性启发式（零依赖、零密钥）。LLM 超时自动降级。
 
-> 黑客松若要求使用 Qoder / 通义千问平台，把 `provider` 设为 `"qwen"` 即可，无需改动业务代码。
+## 架构
+
+```
+┌─────────────────────────────────────────────────────┐
+│                  AIxcellentHealth                    │
+├──────────┬──────────┬──────────┬──────────┬─────────┤
+│ 实时训练  │ 视频分析  │ 饮食管理  │ 睡眠追踪  │ 中医养生  │
+│          │          │          │          │         │
+│ MediaPipe │ IMAGE模式 │ 食物DB   │ 质量评分  │ 节气算法 │
+│ VIDEO模式 │ 逐帧提取 │ 营养计算 │ 趋势分析  │ 天气API  │
+│ GPU加速   │ LLM报告  │ 目标追踪 │ 建议生成  │ 体质辨识 │
+├──────────┴──────────┴──────────┴──────────┴─────────┤
+│              Agent 智能体层 (app/agent/)              │
+│  CoachAgent → FormAnalyzer / ProgressTracker / PlanGenerator │
+│  callLLM (OpenAI兼容) ← 可插拔 LLM / 启发式兜底      │
+└─────────────────────────────────────────────────────┘
+```
+
+### 文件结构
+
+```
+app/
+├── page.tsx              # 主页面（7 Tab 导航）
+├── components/
+│   ├── VideoAnalyzer.tsx # 视频上传 + 分析 UI
+│   ├── DietTracker.tsx   # 饮食管理 UI
+│   ├── SleepTracker.tsx  # 睡眠追踪 UI
+│   ├── TCMWellness.tsx   # 中医养生 UI
+│   ├── ExerciseLibrary.tsx   # 动作库
+│   ├── Dashboard.tsx     # 数据面板
+│   └── TrainingHistory.tsx   # 训练记录
+├── agent/
+│   ├── index.js          # 统一出口 + LLM 配置
+│   ├── coachAgent.js     # 教练智能体编排
+│   ├── multiAgent.js     # 多智能体协作
+│   ├── memory.js         # 记忆持久化
+│   ├── tools.js          # 工具注册表
+│   ├── form.js           # 动作评估规则
+│   ├── videoAnalyzer.js  # 视频分析引擎
+│   └── tcmEngine.js      # 中医养生引擎
+public/data/
+├── exercises.json        # 200+ 动作数据
+└── foods.json            # 30+ 常见食物营养数据
+```
+
+## 视频分析详解
+
+视频分析是本产品的核心差异化功能之一（对标 Gemini 的视频健身教练）：
+
+1. **上传视频**：支持 mp4/mov/webm，最大 200MB
+2. **逐帧提取**：MediaPipe IMAGE 模式，每 6 帧采样一次，最多 120 帧
+3. **关节角时序**：计算膝/肘/髋/躯干等 12 个关节角的逐帧变化
+4. **问题检测**：幅度不足、左右不对称、躯干不稳定、膝盖内扣等
+5. **LLM 报告**：四段式结构 —— 问题诊断 → 改进方法 → 替代方案 → 进阶调整
+6. **关键帧截图**：每 10 帧截取一张带骨架叠加的图片
+
+## 中医养生引擎
+
+- **24 节气完整数据**：每个节气含养生原则、推荐食材、推荐运动、宜忌
+- **天气联动**：通过 Open-Meteo 免费 API 获取当地天气，生成针对性建议
+- **体质辨识**：5 题快速测试（气虚/阳虚/阴虚/痰湿/平和），给出食疗+穴位建议
+- **地理定位**：浏览器 Geolocation API，自动获取位置（可手动输入城市）
 
 ## 测试
 
 ```bash
-npm run test   # 运行 tests/agent.test.js（记忆 / 工具 / 评估）
+npm run test   # 运行 tests/agent.test.js
 ```
-
-## 黑客松定位
-
-详见 [`HACKATHON.md`](./HACKATHON.md) —— 本项目的参赛 Pitch、差异化与演示动线。
 
 ## License
 
