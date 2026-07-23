@@ -1,0 +1,26 @@
+name: Exercise or feature request
+description: Propose a new movement, feedback rule, or product capability
+title: "[Feature]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence or references
+      description: For coaching rules, include reputable biomechanics or training references when possible.
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
