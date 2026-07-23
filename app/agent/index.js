@@ -17,7 +17,11 @@ import { runMultiAgent } from "./multiAgent.js";
 
 // 预设厂商的 OpenAI 兼容接入点（仅 base url，不含密钥）。
 // 7/24 黑客松若要求 Qoder/通义千问，把 provider 设为 "qwen" 即可，无需改代码。
+// 本仓库用 WorkBuddy + 混元Hy3 开发，故额外内置 hunyuan 预设：在页面注入
+//   window.__AGENT_CONFIG__ = { provider: "hunyuan", apiKey: "你的混元密钥" }
+// 即可让教练反馈与训练计划真正由混元大模型驱动（不配则仍走启发式兜底）。
 const PROVIDER_PRESETS = {
+  hunyuan: { baseUrl: "https://api.hunyuan.cloud.tencent.com/v1", model: "hunyuan-turbo" },
   qwen: { baseUrl: "https://dashscope.aliyuncs.com/compatible-mode/v1", model: "qwen-plus" },
   dashscope: { baseUrl: "https://dashscope.aliyuncs.com/compatible-mode/v1", model: "qwen-plus" },
   deepseek: { baseUrl: "https://api.deepseek.com/v1", model: "deepseek-chat" },
