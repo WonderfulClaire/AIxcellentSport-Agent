@@ -15,6 +15,7 @@ import VideoAnalyzer from "./components/VideoAnalyzer";
 import DietTracker from "./components/DietTracker";
 import SleepTracker from "./components/SleepTracker";
 import TCMWellness from "./components/TCMWellness";
+import PostureAssessment from "./components/PostureAssessment";
 
 type Exercise = "squat" | "pushup" | "jack" | "lunge" | "plank";
 type ModelState = "idle" | "loading" | "ready" | "error";
@@ -83,7 +84,7 @@ export default function Home() {
     plan: { nextPlan: string[]; generatedBy: "llm" | "heuristic" };
   }>(null);
   const [speakOn, setSpeakOn] = useState(false);
-  const [activeTab, setActiveTab] = useState<"train" | "video" | "library" | "diet" | "sleep" | "tcm" | "dashboard" | "history">("train");
+  const [activeTab, setActiveTab] = useState<"train" | "video" | "posture" | "library" | "diet" | "sleep" | "tcm" | "dashboard" | "history">("train");
   const [goals, setGoals] = useState<string[]>([]);
   const [goalInput, setGoalInput] = useState("");
   const [spark, setSpark] = useState<number[]>([]);
@@ -452,6 +453,7 @@ export default function Home() {
         {[
           { key: "train" as const, label: "实时训练", icon: "🎯" },
           { key: "video" as const, label: "视频分析", icon: "🎬" },
+          { key: "posture" as const, label: "体态评估", icon: "🧍" },
           { key: "library" as const, label: "动作库", icon: "📚", badge: "200+" },
           { key: "diet" as const, label: "饮食", icon: "🥗" },
           { key: "sleep" as const, label: "睡眠", icon: "😴" },
@@ -655,6 +657,8 @@ export default function Home() {
       </>)}
 
       {activeTab === "video" && <VideoAnalyzer />}
+
+      {activeTab === "posture" && <PostureAssessment />}
 
       {activeTab === "diet" && <DietTracker />}
 
