@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { getWearable, saveWearable } from "../healthStore";
+import { getProfile, getWearable, saveWearable } from "../healthStore";
 
 /* 可穿戴设备接入
  * ① 网页蓝牙(Web Bluetooth)直连标准心率服务(0x180D) → 浏览器内实时 BPM，无需装 App。
@@ -15,10 +15,37 @@ import { getWearable, saveWearable } from "../healthStore";
 
 type Status = "idle" | "connecting" | "connected" | "error";
 type Sample = { t: number; bpm: number };
+type ZoneDist = { name: string; min: number; max: number; color: string; percent: number };
+type SessionSummary = { durationSec: number; avg: number; peak: number; distribution: ZoneDist[] };
+
+const HR_ZONE_COLORS = ['#F4E4B0', '#F4D27A', '#D4AF37', '#B8860B', '#8B6914'];
+const HR_ZONE_NAMES = ['热身', '燃脂', '有氧', '无氧', '极限'];
+const HR_ZONE_THRESHOLDS = [0.5, 0.6, 0.7, 0.8, 0.9, 1.0];
+
+function computeSessionSummary(hrSamples: number[], mhr: number, durationSec: number): SessionSummary {
+  const avg = hrSamples.length ? Math.round(hrSamples.reduce((a, b) => a + b, 0) / hrSamples.length) : 0;
+  const peak = hrSamples.length ? Math.max(...hrSamples) : 0;
+  const zones: ZoneDist[] = HR_ZONE_NAMES.map((name, i) => {
+    const min = mhr * HR_ZONE_THRESHOLDS[i];
+    const max = mhr * HR_ZONE_THRESHOLDS[i + 1];
+    const count = hrSamples.filter(hr => hr >= min && (i === 4 ? hr <= max : hr < max)).length;
+    return { name, min, max, color: HR_ZONE_COLORS[i], percent: hrSamples.length ? Math.round(count / hrSamples.length * 1000) / 10 : 0 };
+  });
+  return { durationSec, avg, peak, distribution: zones };
+}
+
+function calcAge(birthday: string): number | null {
+  if (!birthday) return null;
+  const b = new Date(birthday);
+  if (isNaN(b.getTime())) return null;
+  const now = new Date();
+  let age = now.getFullYear() - b.getFullYear();
+  if (now.getMonth() < b.getMonth() || (now.getMonth() === b.getMonth() && now.getDate() < b.getDate())) age--;
+  return age > 0 && age < 120 ? age : null;
+}
 
 const todayStr = () => new Date().toISOString().slice(0, 10);
 const num = (v: any) => (v === undefined || v === null || v === "" ? null : Number(v));
-// 快捷指令里我们约定的名称（用于 deep link 唤起）
 const SHORTCUT_NAME = "同步健康到私享管家";
 
 function parseHeartRate(value: DataView): number {
@@ -27,9 +54,6 @@ function parseHeartRate(value: DataView): number {
   return is16 ? value.getUint16(1, true) : value.getUint8(1);
 }
 
-/* 归一化 Apple 健康快捷指令导出的 JSON（schema: aix-apple-health/v1）
- * 支持 records（每日汇总）与 workouts（训练，含 hr_samples 自动推导平均/峰值心率）。
- * 同一天会被合并为一条记录（与后端 /sync、本地存储的合并逻辑一致），避免互相覆盖。*/
 function normalizeAppleHealth(j: any): any[] {
   const byDate = new Map<string, any>();
   const get = (date: string) => {
@@ -94,9 +118,15 @@ export default function WearableConnect() {
   const [saved, setSaved] = useState<string>("");
   const [history, setHistory] = useState<any[]>([]);
   const [showAppleSteps, setShowAppleSteps] = useState(false);
+  const [sessionSummary, setSessionSummary] = useState<SessionSummary | null>(null);
+  const [showSummary, setShowSummary] = useState(false);
+  const [userAge, setUserAge] = useState<number | null>(null);
+  const [showAgeConfig, setShowAgeConfig] = useState(false);
+  const [ageInput, setAgeInput] = useState("");
 
   const deviceRef = useRef<any>(null);
   const startedRef = useRef<number>(0);
+  const allSamplesRef = useRef<number[]>([]);
 
   const loadHistory = useCallback(async () => {
     setHistory(await getWearable());
@@ -105,11 +135,25 @@ export default function WearableConnect() {
     loadHistory();
   }, [loadHistory]);
 
+  useEffect(() => {
+    (async () => {
+      try {
+        const p = await getProfile();
+        if (!p) return;
+        if (p.age && Number(p.age) > 0) { setUserAge(Number(p.age)); return; }
+        if (p.birthday) { const a = calcAge(p.birthday); if (a) setUserAge(a); }
+      } catch { /* ignore */ }
+    })();
+  }, []);
+
+  const mhr = userAge ? 220 - userAge : 190;
+
   const onHR = useCallback((e: any) => {
     const v: DataView = e.target.value;
     const b = parseHeartRate(v);
     if (!b || b < 25 || b > 240) return;
     setBpm(b);
+    allSamplesRef.current.push(b);
     setSamples((prev) => {
       const next = [...prev, { t: Date.now(), bpm: b }];
       return next.length > 90 ? next.slice(next.length - 90) : next;
@@ -142,6 +186,9 @@ export default function WearableConnect() {
       ch.addEventListener("characteristicvaluechanged", onHR);
       startedRef.current = Date.now();
       setSamples([]);
+      allSamplesRef.current = [];
+      setShowSummary(false);
+      setSessionSummary(null);
       setStatus("connected");
       try {
         const bs = await server.getPrimaryService("battery_service");
@@ -167,9 +214,15 @@ export default function WearableConnect() {
     } catch {
       /* ignore */
     }
+    if (allSamplesRef.current.length > 0 && startedRef.current) {
+      const dur = Math.round((Date.now() - startedRef.current) / 1000);
+      const summary = computeSessionSummary(allSamplesRef.current, mhr, dur);
+      setSessionSummary(summary);
+      setShowSummary(true);
+    }
     setStatus("idle");
     setBpm(0);
-  }, []);
+  }, [mhr]);
 
   const bpms = samples.map((s) => s.bpm);
   const avgHr = bpms.length ? Math.round(bpms.reduce((a, b) => a + b, 0) / bpms.length) : 0;
@@ -192,7 +245,6 @@ export default function WearableConnect() {
     loadHistory();
   }, [bpms.length, deviceName, minHr, avgHr, maxHr, loadHistory]);
 
-  // 手动录入
   const [m, setM] = useState<any>({ date: todayStr(), steps: "", sleep_hours: "", spo2: "", hrv: "", resting_hr: "" });
   const saveManual = useCallback(async () => {
     const payload: any = { date: m.date || todayStr(), source: "manual" };
@@ -205,7 +257,6 @@ export default function WearableConnect() {
     loadHistory();
   }, [m, loadHistory]);
 
-  // 导入 JSON / CSV / Apple 健康 JSON
   const fileRef = useRef<HTMLInputElement>(null);
   const onImport = useCallback(
     async (file: File) => {
@@ -256,16 +307,27 @@ export default function WearableConnect() {
   );
 
   const runShortcut = () => {
-    // 在 iPhone 上点击 → 唤起「快捷指令」App 并运行同步快捷指令
     const url = `shortcuts://run-shortcut?name=${encodeURIComponent(SHORTCUT_NAME)}`;
     window.location.href = url;
   };
 
-  // 心跳动画节奏跟随 bpm
   const beatDur = bpm ? Math.max(0.35, 60 / bpm) : 1;
 
   const srcLabel = (s: string) =>
     s === "ble" ? "实时" : s === "import" ? "导入" : s === "apple_health" ? "🍎 Apple" : "手动";
+
+  const closeSummary = () => { setShowSummary(false); setSessionSummary(null); };
+
+  const applyAge = () => {
+    const v = parseInt(ageInput, 10);
+    if (v > 0 && v < 120) { setUserAge(v); setShowAgeConfig(false); }
+  };
+
+  const fmtDuration = (sec: number) => {
+    const mm = Math.floor(sec / 60);
+    const ss = sec % 60;
+    return `${mm}:${ss.toString().padStart(2, '0')}`;
+  };
 
   return (
     <section className="wearable-wrap">
@@ -275,6 +337,29 @@ export default function WearableConnect() {
           <h2>可穿戴设备 · 实时数据</h2>
         </div>
         <p>连接你的蓝牙心率设备，浏览器内实时读取心率；数据自动进入你的健康档案。</p>
+      </div>
+
+      {/* 心率区间年龄配置 */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+        <button
+          onClick={() => setShowAgeConfig(v => !v)}
+          style={{ background: 'transparent', border: '1px solid rgba(212,175,55,.4)', color: '#D4AF37', borderRadius: 6, padding: '4px 10px', fontSize: 12, cursor: 'pointer' }}
+        >
+          ⚙ 心率区间设置 (MHR={mhr})
+        </button>
+        {showAgeConfig && (
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <input
+              type="number"
+              placeholder="输入年龄"
+              value={ageInput}
+              onChange={e => setAgeInput(e.target.value)}
+              style={{ width: 72, background: 'rgba(24,22,18,.9)', border: '1px solid rgba(212,175,55,.3)', color: '#ECE7D8', borderRadius: 4, padding: '3px 6px', fontSize: 12 }}
+            />
+            <button onClick={applyAge} style={{ background: '#D4AF37', color: '#0B0B0D', border: 'none', borderRadius: 4, padding: '3px 8px', fontSize: 12, cursor: 'pointer' }}>确定</button>
+            <span style={{ color: '#888', fontSize: 11 }}>{userAge ? `当前年龄 ${userAge}` : '未设置，默认 MHR=190'}</span>
+          </span>
+        )}
       </div>
 
       {/* 实时心率主卡 */}
@@ -327,6 +412,54 @@ export default function WearableConnect() {
           )}
         </div>
       </div>
+
+      {/* 会话小结卡片 */}
+      {showSummary && sessionSummary && (
+        <div style={{
+          background: 'rgba(24,22,18,.92)',
+          border: '1px solid rgba(212,175,55,.3)',
+          borderRadius: 12,
+          padding: '20px 24px',
+          marginTop: 16,
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+            <h3 style={{ color: '#D4AF37', margin: 0, fontSize: 16 }}>本次会话小结</h3>
+            <button onClick={closeSummary} style={{ background: 'transparent', border: '1px solid rgba(212,175,55,.3)', color: '#D4AF37', borderRadius: 6, padding: '4px 12px', fontSize: 12, cursor: 'pointer' }}>关闭小结</button>
+          </div>
+          <div style={{ display: 'flex', gap: 24, marginBottom: 18, flexWrap: 'wrap' }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ color: '#ECE7D8', fontSize: 28, fontWeight: 700 }}>{fmtDuration(sessionSummary.durationSec)}</div>
+              <div style={{ color: '#888', fontSize: 12 }}>时长</div>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ color: '#ECE7D8', fontSize: 28, fontWeight: 700 }}>{sessionSummary.avg}</div>
+              <div style={{ color: '#888', fontSize: 12 }}>平均心率 bpm</div>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ color: '#ECE7D8', fontSize: 28, fontWeight: 700 }}>{sessionSummary.peak}</div>
+              <div style={{ color: '#888', fontSize: 12 }}>峰值心率 bpm</div>
+            </div>
+          </div>
+          <div style={{ marginTop: 8 }}>
+            <div style={{ fontSize: 12, color: '#888', marginBottom: 6 }}>心率区间分布 (MHR={mhr})</div>
+            <div style={{ display: 'flex', height: 22, borderRadius: 6, overflow: 'hidden' }}>
+              {sessionSummary.distribution.map((z, i) => (
+                z.percent > 0 ? (
+                  <div key={i} style={{ width: `${z.percent}%`, background: z.color, minWidth: z.percent > 0 ? 2 : 0 }} title={`${z.name} ${z.percent}%`} />
+                ) : null
+              ))}
+            </div>
+            <div style={{ display: 'flex', gap: 10, marginTop: 8, flexWrap: 'wrap' }}>
+              {sessionSummary.distribution.map((z, i) => (
+                <span key={i} style={{ fontSize: 11, color: '#ECE7D8', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                  <span style={{ display: 'inline-block', width: 10, height: 10, borderRadius: 2, background: z.color }} />
+                  {z.name} {z.percent}%
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 实时折线 */}
       {samples.length > 1 && (
