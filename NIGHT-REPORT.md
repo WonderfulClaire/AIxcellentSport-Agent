@@ -19,3 +19,23 @@
 
 **遗留问题**：
 - 体重数据目前 healthStore 未定义专门字段，示例数据模式下可正常展示
+
+## T2. AI 周报（本地模板版） ✅
+
+**做了什么**：
+- 新增 `app/components/WeeklyReport.tsx`
+- 模板+规则拼装生成中文自然语言周报（不依赖大模型）
+- 汇总训练次数、平均睡眠、心率变化、步数、体重变化
+- 支持复制到剪贴板 + 导出 .txt 文件
+- 无数据时提供示例周报演示
+- 在 page.tsx 注册 "weekly_report" tab
+
+**改了哪些文件**：
+- `app/components/WeeklyReport.tsx`（新建）
+- `app/page.tsx`（新增 tab）
+
+**自测结果**：
+- `npm run build` 构建通过 ✅
+
+**遗留问题**：
+- 无
