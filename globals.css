@@ -1325,3 +1325,110 @@ footer small { color: #737a6b; font-size: 9px; }
   .tl-stats { flex-wrap: wrap; gap: 12px; }
   .tl-summary-grid { grid-template-columns: 1fr; }
 }
+
+/* ═════════════════════════════════════════════
+   Phase 10: Energy State (能量状态自适应)
+   ═══════════════════════════════════════════ */
+.es-container { max-width: 960px; margin: 0 auto; padding: 0 16px; }
+.es-header { text-align: center; margin-bottom: 24px; }
+.es-header h2 { font-size: 24px; margin: 0 0 6px; color: var(--ink); }
+.es-header p { font-size: 14px; color: var(--muted); margin: 0; max-width: 640px; margin-left: auto; margin-right: auto; line-height: 1.6; }
+
+.es-quick { text-align: center; margin-bottom: 18px; }
+.es-auto-btn {
+  padding: 12px 26px; border: none; border-radius: 12px;
+  background: linear-gradient(135deg, var(--acid), #6bbd00); color: #fff;
+  font-size: 15px; font-weight: 700; cursor: pointer;
+}
+.es-constitution { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px; font-size: 13px; color: var(--muted); }
+.es-constitution select { padding: 7px 12px; border: 1px solid var(--line); border-radius: 9px; font-size: 13px; background: #fff; color: var(--ink); }
+
+.es-state-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+.es-state-card {
+  display: flex; flex-direction: column; gap: 6px; align-items: flex-start; text-align: left;
+  padding: 18px 20px; background: #fff; border: 2px solid var(--line); border-radius: 16px;
+  cursor: pointer; transition: all .18s;
+}
+.es-state-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,.08); }
+.es-state-icon {
+  width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+  font-size: 24px; color: #fff; margin-bottom: 4px;
+}
+.es-state-card strong { font-size: 16px; color: var(--ink); }
+.es-pattern { font-size: 11.5px; color: var(--muted); font-weight: 600; }
+.es-card-desc { font-size: 12.5px; color: var(--muted); line-height: 1.6; margin-top: 2px; }
+
+.es-back {
+  display: block; margin: 0 auto 18px; padding: 8px 20px; border: 1px solid var(--line);
+  border-radius: 99px; background: #fff; cursor: pointer; font-size: 13px; color: var(--ink);
+}
+
+/* Hero */
+.es-hero {
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 18px; flex-wrap: wrap;
+  padding: 20px 24px; background: linear-gradient(135deg, rgba(85,200,255,.05), rgba(107,189,0,.03));
+  border: 2px solid var(--line); border-radius: 18px; margin-bottom: 18px;
+}
+.es-hero-left { display: flex; gap: 14px; align-items: flex-start; }
+.es-hero-icon {
+  width: 54px; height: 54px; border-radius: 14px; display: flex; align-items: center; justify-content: center;
+  font-size: 30px; color: #fff; flex-shrink: 0;
+}
+.es-hero h2 { font-size: 22px; margin: 0 0 2px; }
+.es-hero-desc { font-size: 13px; color: var(--muted); margin: 6px 0 0; max-width: 420px; line-height: 1.6; }
+.es-chips { display: flex; flex-wrap: wrap; gap: 6px; max-width: 320px; justify-content: flex-end; }
+.es-chip { padding: 4px 10px; background: rgba(255,255,255,.7); border: 1px solid var(--line); border-radius: 99px; font-size: 11.5px; color: var(--ink); }
+
+/* Dual columns */
+.es-dual { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.es-card { padding: 18px 20px; background: #fff; border: 1px solid var(--line); border-radius: 16px; }
+.es-card h3 { font-size: 16px; margin: 0 0 14px; color: var(--ink); }
+.es-card h5 { font-size: 13px; margin: 14px 0 6px; color: var(--acid); }
+.es-principle { font-size: 13px; color: var(--ink); background: rgba(85,200,255,.06); padding: 8px 12px; border-radius: 10px; margin-bottom: 4px; }
+.es-list { margin: 0; padding-left: 16px; }
+.es-list li { font-size: 12.5px; line-height: 1.75; color: var(--muted); }
+.es-avoid li { color: #dc2626; }
+.es-extras li { color: var(--ink); }
+.es-supp li { color: #7c3aed; font-weight: 500; }
+
+/* Boxes */
+.es-box { padding: 18px 20px; background: #fff; border: 1px solid var(--line); border-radius: 16px; margin-bottom: 16px; }
+.es-box h3 { font-size: 16px; margin: 0 0 12px; color: var(--ink); }
+.es-high { background: linear-gradient(135deg, rgba(239,68,68,.04), rgba(245,158,11,.03)); border-color: rgba(239,68,68,.15); }
+.es-high h3 { color: #dc2626; }
+.es-nourish { background: linear-gradient(135deg, rgba(22,163,74,.04), rgba(85,200,255,.03)); border-color: rgba(22,163,74,.15); }
+.es-nourish h3 { color: #16a34a; }
+
+/* Actions */
+.es-actions-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.es-progress { font-size: 12.5px; color: var(--muted); font-weight: 600; }
+.es-action-list { display: flex; flex-direction: column; gap: 8px; }
+.es-action {
+  display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: rgba(0,0,0,.02);
+  border: 1px solid var(--line); border-radius: 12px; cursor: pointer; transition: all .15s;
+}
+.es-action:hover { background: rgba(85,200,255,.04); }
+.es-action.now { border-color: var(--acid); background: rgba(85,200,255,.05); }
+.es-action.done { opacity: .55; }
+.es-action.done .es-action-text { text-decoration: line-through; }
+.es-action input { width: 16px; height: 16px; accent-color: var(--acid); cursor: pointer; }
+.es-action-slot { font-size: 11.5px; font-weight: 600; color: var(--acid); background: rgba(85,200,255,.1); padding: 2px 8px; border-radius: 99px; white-space: nowrap; }
+.es-now-badge { font-size: 10.5px; font-weight: 700; color: #fff; background: var(--acid); padding: 2px 8px; border-radius: 99px; }
+.es-action-text { font-size: 13px; color: var(--ink); line-height: 1.5; }
+
+/* LLM */
+.es-llm-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+.es-llm-btn {
+  padding: 9px 18px; border: none; border-radius: 10px; background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+  color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap;
+}
+.es-llm-btn:disabled { opacity: .5; cursor: not-allowed; }
+.es-llm-text { font-size: 13.5px; line-height: 1.8; color: var(--ink); margin: 0; white-space: pre-wrap; }
+.es-llm-msg { font-size: 13px; color: var(--muted); margin: 0; }
+
+@media (max-width: 860px) {
+  .es-dual { grid-template-columns: 1fr; }
+  .es-hero { flex-direction: column; }
+  .es-chips { justify-content: flex-start; max-width: none; }
+  .es-state-grid { grid-template-columns: 1fr; }
+}
