@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { getRecords, getWearable } from "../healthStore";
+import ModuleIntro from "./ModuleIntro";
 
 /* --- Types --- */
 interface WeekStats {
@@ -330,6 +331,11 @@ export default function WeeklyReport() {
 
   return (
     <div style={S.wrapper}>
+      <ModuleIntro
+        title="每周报告"
+        what="汇总本周训练、睡眠、心率数据，生成可读的周报"
+        how={["每周自动汇总近 7 天数据","阅读私享管家的分析总结","可复制或导出报告文本"]}
+      />
       <div style={S.card}>
         <div style={S.title}>{"\u{1F4CB} \u6BCF\u5468\u5065\u5EB7\u62A5\u544A"}</div>
         <div style={S.subtitle}>{"\u6A21\u677F\u89C4\u5219\u62FC\u88C5 \u00B7 \u4E0D\u4F9D\u8D56\u5927\u6A21\u578B \u00B7 \u6570\u636E\u4E0D\u51FA\u8BBE\u5907"}</div>

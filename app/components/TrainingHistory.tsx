@@ -1,6 +1,7 @@
 "use client";
 
 import { Fragment, useEffect, useMemo, useState } from "react";
+import ModuleIntro from "./ModuleIntro";
 
 type RepRecord = {
   exercise: string;
@@ -118,6 +119,11 @@ export default function TrainingHistory() {
   return (
     <section className="aix-hist">
       <style>{css}</style>
+      <ModuleIntro
+        title="训练记录"
+        what="浏览所有历史训练，查看每次的详细数据和评分"
+        how={["查看按日期排列的训练列表","点击展开查看单次详情","对比不同时期的表现"]}
+      />
 
       <header className="aix-hist-head">
         <div>

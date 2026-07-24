@@ -10,6 +10,7 @@ import {
   generateEventPrep,
 } from "../agent/nutritionPlanner.ts";
 import { loadAgentConfig } from "../agent/index.ts";
+import ModuleIntro from "./ModuleIntro";
 
 type Profile = {
   gender: "male" | "female";
@@ -84,6 +85,11 @@ export default function PrivateNutrition() {
   if (step === "form") {
     return (
       <div className="pn-form">
+        <ModuleIntro
+          title="私人营养"
+          what="根据你的身体数据计算每日热量需求，给出三大营养素配比"
+          how={["填写身高体重和活动量","系统计算你的基础代谢和每日所需","获取个性化的营养方案"]}
+        />
         <div className="pn-header">
           <h2>🥗 你的私人营养师</h2>
           <p>像明星一样，拥有专属定制的营养方案</p>

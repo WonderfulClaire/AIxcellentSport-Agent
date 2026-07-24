@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import ModuleIntro from "./ModuleIntro";
 import {
   getCurrentSolarTerm,
   generateDailyWellnessAdvice,
@@ -109,6 +110,11 @@ export default function TCMWellness() {
 
   return (
     <div className="tcm-wellness">
+      <ModuleIntro
+        title="中医养生"
+        what="根据当前节气和你的体质，推荐食疗与养生方案"
+        how={["选择你的体质类型","查看当前节气的养生建议","获取食疗方和生活起居提示"]}
+      />
       <div className="tcm-header">
         <h2>🌿 中医养生</h2>
         <p>结合节气、气候与个人体质，给你最详尽的健康指导</p>

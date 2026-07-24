@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import ModuleIntro from "./ModuleIntro";
 
 /** 动作数据集中的单条动作（字段与 /data/exercises.json 对齐） */
 type ExerciseItem = {
@@ -111,6 +112,11 @@ export default function ExerciseLibrary() {
   return (
     <section className="aix-lib">
       <style>{css}</style>
+      <ModuleIntro
+        title="动作库"
+        what="200+ 动作教程，含目标肌群、难度和动作要领"
+        how={["按肌群或难度筛选动作","点击查看动作详情和要领","收藏常用动作到训练计划"]}
+      />
 
       <header className="aix-lib-head">
         <div>

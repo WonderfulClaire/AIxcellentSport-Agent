@@ -9,6 +9,7 @@ import {
 } from "../agent/energyStateEngine.ts";
 import { BODY_TYPES } from "../agent/tcmEngine.ts";
 import { loadAgentConfig } from "../agent/index.ts";
+import ModuleIntro from "./ModuleIntro";
 
 type Ctx = {
   hour: number;
@@ -129,6 +130,11 @@ export default function EnergyState() {
   if (!plan) {
     return (
       <div className="es-container">
+        <ModuleIntro
+          title="能量状态"
+          what="综合心率、睡眠等数据，评估你当前的恢复与精力水平"
+          how={["确保已录入近期睡眠和心率数据","查看 0-100 能量评分","根据建议调整训练强度"]}
+        />
         <div className="es-header">
           <h2>🔋 能量状态自适应健康方案</h2>
           <p>人不是一直忙，也不是一直闲。你正处在哪种「能量态」？我们据此给你最贴合的中医滋补 + 明星规划师式能量管理。</p>

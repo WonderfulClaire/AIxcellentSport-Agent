@@ -42,3 +42,40 @@
 
 **遗留问题**：
 - 无
+
+## U3. 每模块说明条 + 空状态示例引导 ✅
+
+**做了什么**：
+- 新建通用 `app/components/ModuleIntro.tsx`（可折叠说明条）
+- 给 20 个功能模块顶部加入"这是什么/怎么用"说明
+- 空状态模块加"加载示例数据体验"按钮（DietTracker、SleepTracker）
+
+**改了哪些文件**：
+- `app/components/ModuleIntro.tsx`（新建）
+- `app/components/PostureAssessment.tsx`（加入 ModuleIntro）
+- `app/components/VideoAnalyzer.tsx`（加入 ModuleIntro）
+- `app/components/PrivateNutrition.tsx`（加入 ModuleIntro）
+- `app/components/DietTracker.tsx`（加入 ModuleIntro + 示例数据按钮）
+- `app/components/SleepTracker.tsx`（加入 ModuleIntro + 示例数据按钮）
+- `app/components/HealthConcierge.tsx`（加入 ModuleIntro）
+- `app/components/WearableConnect.tsx`（加入 ModuleIntro）
+- `app/components/HealthTrends.tsx`（加入 ModuleIntro）
+- `app/components/WeeklyReport.tsx`（加入 ModuleIntro）
+- `app/components/AssistantHub.tsx`（加入 ModuleIntro）
+- `app/components/TCMWellness.tsx`（加入 ModuleIntro）
+- `app/components/EnergyState.tsx`（加入 ModuleIntro）
+- `app/components/ImageConsultant.tsx`（加入 ModuleIntro）
+- `app/components/WorkoutPlanner.tsx`（加入 ModuleIntro）
+- `app/components/TrainingTimeline.tsx`（加入 ModuleIntro）
+- `app/components/ExerciseLibrary.tsx`（加入 ModuleIntro）
+- `app/components/Dashboard.tsx`（加入 ModuleIntro）
+- `app/components/TrainingHistory.tsx`（加入 ModuleIntro）
+- `app/components/MemberHome.tsx`（加入 ModuleIntro）
+- `app/components/Settings.tsx`（加入 ModuleIntro）
+
+**自测结果**：
+- `npm run build` 构建通过 ✅
+- `npm test` 测试通过 ✅
+
+**遗留问题**：
+- 无

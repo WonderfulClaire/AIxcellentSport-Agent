@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getProfile, getWearable, saveWearable } from "../healthStore";
+import ModuleIntro from "./ModuleIntro";
 
 /* 可穿戴设备接入
  * ① 网页蓝牙(Web Bluetooth)直连标准心率服务(0x180D) → 浏览器内实时 BPM，无需装 App。
@@ -331,6 +332,12 @@ export default function WearableConnect() {
 
   return (
     <section className="wearable-wrap">
+      <ModuleIntro
+        title="可穿戴设备"
+        what="连接蓝牙心率带或导入 Apple Watch 数据"
+        how={["点击扫描连接蓝牙心率设备","或通过 iOS 快捷指令导入 Apple 健康数据","查看实时心率和会话小结"]}
+        tip="支持标准心率 BLE 协议设备"
+      />
       <div className="section-heading">
         <div>
           <span className="eyebrow">WEARABLE SYNC</span>

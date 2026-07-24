@@ -10,6 +10,7 @@ import {
   generateHealthReport,
 } from "../agent/healthConcierge.ts";
 import { loadAgentConfig } from "../agent/index.ts";
+import ModuleIntro from "./ModuleIntro";
 
 type Profile = {
   gender: "male" | "female";
@@ -56,6 +57,12 @@ export default function HealthConcierge() {
   if (step === "form") {
     return (
       <div className="hc-form">
+        <ModuleIntro
+          title="健康咨询"
+          what="向私享管家描述症状或困扰，获取健康建议和就医指引"
+          how={["输入你的健康问题或症状","管家结合你的档案给出建议","必要时提供就医科室推荐"]}
+          tip="仅供参考，不替代医生诊断"
+        />
         <div className="hc-header">
           <h2>🩺 你的私人保健医生</h2>
           <p>亿万富豪级的主动健康管理，现在你也有了</p>

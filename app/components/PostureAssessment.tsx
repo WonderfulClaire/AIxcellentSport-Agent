@@ -6,6 +6,7 @@ import {
   FilesetResolver,
   PoseLandmarker,
 } from "@mediapipe/tasks-vision";
+import ModuleIntro from "./ModuleIntro";
 import {
   computePostureMetrics,
   getPostureGrade,
@@ -200,6 +201,12 @@ export default function PostureAssessment() {
 
   return (
     <div className="posture-assessment">
+      <ModuleIntro
+        title="体态评估"
+        what="用摄像头识别你的站姿，评估圆肩、骨盆前倾等问题"
+        how={["打开摄像头，正对镜头站直","保持5秒让系统识别33个关节点","查看评估报告和改善建议"]}
+        tip="穿贴身衣物效果更好"
+      />
       {/* 头部 */}
       <div className="pa-header">
         <h2>🧍 AI 体态评估</h2>

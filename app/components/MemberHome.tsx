@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import ModuleIntro from "./ModuleIntro";
 import {
   getProfile,
   saveProfile,
@@ -148,6 +149,11 @@ export default function MemberHome({ user, onLaunch, onLogout }: Props) {
 
   return (
     <div className="member">
+      <ModuleIntro
+        title="我的主页"
+        what="管理个人档案、查看健康概览和账号设置"
+        how={["完善个人健康档案","查看健康数据概览","管理账号和偏好设置"]}
+      />
       {/* 顶栏信息条 */}
       <div className="member-bar">
         <div className="member-id">

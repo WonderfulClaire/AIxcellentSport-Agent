@@ -1,5 +1,7 @@
 "use client";
 
+import ModuleIntro from "./ModuleIntro";
+
 import { useCallback, useEffect, useState } from "react";
 import { getLLMConfig, saveLLMConfig, type LLMConfig } from "../agent/config";
 import { callLLM } from "../agent/coachAgent";
@@ -199,6 +201,11 @@ export default function Settings() {
 
   return (
     <div style={S.page}>
+      <ModuleIntro
+        title="设置"
+        what="配置智能对话、单位偏好和数据管理"
+        how={["填写对话服务配置启用完整能力","选择体重单位(公斤/磅)","管理演示数据和清除选项"]}
+      />
       <h1 style={S.heading}>全局设置</h1>
 
       {/* 大模型配置区 */}

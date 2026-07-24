@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import ModuleIntro from "./ModuleIntro";
 
 type Food = {
   id: string; name: string; category: string;
@@ -119,8 +120,30 @@ export default function DietTracker() {
     items: entries.filter((e) => e.mealType === m.key),
   }));
 
+
+  // --- 示例数据 ---
+  const loadDemoData = () => {
+    const demoEntries: MealEntry[] = [
+      { id: "demo-1", foodId: "egg", foodName: "水煮蛋", amount: 2, mealType: "breakfast", calories: 156, protein: 12.6, carbs: 1.2, fat: 10.6, timestamp: Date.now() - 36000000 },
+      { id: "demo-2", foodId: "oat", foodName: "燕麦片", amount: 1, mealType: "breakfast", calories: 150, protein: 5, carbs: 27, fat: 2.5, timestamp: Date.now() - 35000000 },
+      { id: "demo-3", foodId: "chicken", foodName: "鸡胸肉", amount: 1.5, mealType: "lunch", calories: 248, protein: 46.5, carbs: 0, fat: 5.4, timestamp: Date.now() - 18000000 },
+      { id: "demo-4", foodId: "rice", foodName: "糙米饭", amount: 1, mealType: "lunch", calories: 216, protein: 4.5, carbs: 45, fat: 1.8, timestamp: Date.now() - 17500000 },
+      { id: "demo-5", foodId: "salmon", foodName: "三文鱼", amount: 1, mealType: "dinner", calories: 208, protein: 20, carbs: 0, fat: 13, timestamp: Date.now() - 7200000 },
+    ];
+    saveEntries(demoEntries);
+  };
+
+  const clearDemoData = () => {
+    saveEntries([]);
+  };
+
   return (
     <div className="diet-tracker">
+      <ModuleIntro
+        title="饮食追踪"
+        what="记录每餐食物，自动计算热量和营养素摄入"
+        how={["搜索或选择食物","填写份量","查看当日营养摄入与目标对比"]}
+      />
       <div className="dt-header">
         <h2>🥗 饮食管理</h2>
         <p>记录每日饮食，追踪营养摄入</p>

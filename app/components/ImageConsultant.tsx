@@ -9,6 +9,7 @@ import {
   generateImagePlan,
 } from "../agent/imageConsultant.ts";
 import { loadAgentConfig } from "../agent/index.ts";
+import ModuleIntro from "./ModuleIntro";
 
 export default function ImageConsultant() {
   const [step, setStep] = useState<"form" | "loading" | "result">("form");
@@ -47,6 +48,11 @@ export default function ImageConsultant() {
     const answeredCount = Object.keys(profile.colorAnswers).length;
     return (
       <div className="ic-form">
+        <ModuleIntro
+          title="形象顾问"
+          what="根据你的体型和风格偏好，提供穿搭和形象建议"
+          how={["上传一张全身照或描述你的需求","获取配色和穿搭建议","查看适合你的风格方案"]}
+        />
         <div className="ic-header">
           <h2>💄 你的私人形象顾问</h2>
           <p>明星造型师同款诊断，找到最衬你的色彩与风格</p>

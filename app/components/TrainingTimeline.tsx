@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import ModuleIntro from "./ModuleIntro";
 
 // ═══════════════════════════════════════════════════
 // 训练时间轴 — 甘特图式可视化（对标截图1）
@@ -121,6 +122,11 @@ export default function TrainingTimeline({ events: propEvents, mode = "display" 
 
   return (
     <div className="tl-container" ref={containerRef}>
+      <ModuleIntro
+        title="训练时间轴"
+        what="记录你的健身历程，回顾每个阶段的进步"
+        how={["查看按时间排列的训练记录","点击任一节点看详情","对比不同阶段的数据变化"]}
+      />
       {/* 头部 */}
       <div className="tl-header">
         <h2>⏱️ 训练时间轴</h2>

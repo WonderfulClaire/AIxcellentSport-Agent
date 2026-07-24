@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import ModuleIntro from "./ModuleIntro";
 
 type SleepRecord = {
   id: string;
@@ -98,8 +99,43 @@ export default function SleepTracker() {
     avgDuration >= 7 && avgDuration <= 9 ? "good" :
     avgDuration < 6 ? "bad" : "warn";
 
+
+  // --- 示例数据 ---
+  const loadDemoData = () => {
+    const now = new Date();
+    const demoRecords: SleepRecord[] = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(now);
+      d.setDate(d.getDate() - i);
+      const bedH = 22 + Math.floor(Math.random() * 2);
+      const bedM = Math.floor(Math.random() * 60);
+      const wakeH = 6 + Math.floor(Math.random() * 2);
+      const wakeM = Math.floor(Math.random() * 60);
+      const bed = `${String(bedH).padStart(2,"0")}:${String(bedM).padStart(2,"0")}`;
+      const wake = `${String(wakeH).padStart(2,"0")}:${String(wakeM).padStart(2,"0")}`;
+      return {
+        id: `demo-${i}`,
+        date: d.toISOString().split("T")[0],
+        bedTime: bed,
+        wakeTime: wake,
+        durationHours: calcDuration(bed, wake),
+        quality: Math.min(5, Math.max(1, 3 + Math.round((Math.random() - 0.3) * 3))),
+        notes: "",
+      };
+    });
+    saveRecords(demoRecords);
+  };
+
+  const clearDemoData = () => {
+    saveRecords([]);
+  };
+
   return (
     <div className="sleep-tracker">
+      <ModuleIntro
+        title="睡眠监控"
+        what="记录入睡和醒来时间，分析睡眠质量与规律性"
+        how={["记录昨晚的入睡和醒来时间","查看睡眠时长趋势","获取改善睡眠的建议"]}
+      />
       <div className="st-header">
         <h2>😴 睡眠追踪</h2>
         <p>记录睡眠质量，了解恢复状态</p>
@@ -185,8 +221,27 @@ export default function SleepTracker() {
       <div className="st-history">
         <h3>📋 近期记录</h3>
         {records.length === 0 ? (
-          <p className="st-empty">还没有睡眠记录，点击上方按钮开始记录</p>
+          <div className="st-empty" style={{ textAlign: "center" }}>
+            <p>还没有睡眠记录，点击上方按钮开始记录</p>
+            <button
+              onClick={loadDemoData}
+              style={{ marginTop: 10, padding: "8px 16px", background: "rgba(212,175,55,.12)", border: "1px solid rgba(212,175,55,.4)", borderRadius: 8, color: "#D4AF37", fontSize: 13, fontWeight: 600, cursor: "pointer" }}
+            >
+              ✨ 加载示例数据体验
+            </button>
+          </div>
         ) : (
+          <>
+          <div style={{ marginBottom: 8 }}>
+            {records.some(r => r.id.startsWith("demo-")) && (
+              <button
+                onClick={clearDemoData}
+                style={{ padding: "4px 12px", background: "transparent", border: "1px solid rgba(212,175,55,.25)", borderRadius: 6, color: "rgba(212,175,55,.7)", fontSize: 11, cursor: "pointer" }}
+              >
+                清除示例数据
+              </button>
+            )}
+          </div>
           <div className="st-table">
             <div className="st-row st-head-row">
               <span>日期</span><span>就寝</span><span>起床</span><span>时长</span><span>质量</span><span></span>
@@ -202,6 +257,7 @@ export default function SleepTracker() {
               </div>
             ))}
           </div>
+          </>
         )}
       </div>
 

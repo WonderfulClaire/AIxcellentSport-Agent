@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import ModuleIntro from "./ModuleIntro";
 
 /** 训练记录（与 app/agent/memory.js 写入 localStorage 的结构一致） */
 type RepRecord = {
@@ -311,6 +312,11 @@ export default function Dashboard() {
   return (
     <section className="aix-dash">
       <style>{css}</style>
+      <ModuleIntro
+        title="训练仪表盘"
+        what="用图表展示你的训练频率、肌群分布和长期趋势"
+        how={["完成几次训练后数据自动汇总","查看肌群分布和月度趋势","根据数据调整训练重点"]}
+      />
 
       <header className="aix-dash-head">
         <div>

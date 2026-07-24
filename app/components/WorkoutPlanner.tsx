@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import ModuleIntro from "./ModuleIntro";
 
 // ═══════════════════════════════════════════════════
 // 训练计划系统 — 对标 Codex 完整训练计划界面
@@ -51,6 +52,11 @@ export default function WorkoutPlanner() {
   if (step === "config") {
     return (
       <div className="wp-container">
+        <ModuleIntro
+          title="训练计划"
+          what="根据你的目标和水平，生成个性化的周训练安排"
+          how={["设置你的训练目标和可用时间","获取每周训练安排","可按需调整强度和动作"]}
+        />
         <div className="wp-header">
           <h2>📋 AI 训练计划生成器</h2>
           <p>回答几个问题，为你生成专属训练方案（对标专业教练的计划设计）</p>

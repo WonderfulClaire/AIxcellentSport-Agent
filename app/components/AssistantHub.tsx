@@ -5,6 +5,7 @@ import { callLLM } from "../agent/coachAgent.ts";
 import { getLLMConfig, hasLLM } from "../agent/config";
 import { generateDailyWellnessAdvice } from "../agent/tcmEngine.ts";
 import { recommendState, buildEnergyPlan } from "../agent/energyStateEngine.ts";
+import ModuleIntro from "./ModuleIntro";
 
 type ModuleKey =
   | "train" | "video" | "posture" | "nutrition" | "doctor" | "image"
@@ -230,6 +231,12 @@ export default function AssistantHub({ onLaunch }: { onLaunch: (k: ModuleKey | "
 
   return (
     <main className="aix-hub">
+      <ModuleIntro
+        title="私享管家"
+        what="和你的健康管家对话，获取个性化建议和模块导航"
+        how={["直接输入你的问题或需求","管家结合你的数据给出建议","可让管家帮你打开指定功能"]}
+        tip="需在设置中配置后启用完整对话"
+      />
       <section className="aix-hero">
         <div className="aix-orb" aria-hidden>
           <span className="aix-orb-core" />

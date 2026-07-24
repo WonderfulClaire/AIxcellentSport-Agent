@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { getRecords, getWearable } from "../healthStore";
+import ModuleIntro from "./ModuleIntro";
 
 /* ─── Types ─── */
 type DataPoint = { date: string; value: number };
@@ -216,6 +217,11 @@ export default function HealthTrends() {
 
   return (
     <section style={styles.container}>
+      <ModuleIntro
+        title="健康趋势"
+        what="查看体重、心率、睡眠、步数的长期变化图表"
+        how={["选择 30 天或 90 天时间范围","查看各指标的折线趋势","发现数据变化规律"]}
+      />
       <div style={styles.header}>
         <div>
           <h2 style={styles.title}>✦ 健康趋势</h2>

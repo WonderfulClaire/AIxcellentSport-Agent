@@ -7,6 +7,7 @@ import {
   PoseLandmarker,
 } from "@mediapipe/tasks-vision";
 import { extractFramePoses, analyzeTimeSeries, generateVideoReport } from "../agent/videoAnalyzer.ts";
+import ModuleIntro from "./ModuleIntro";
 import { loadAgentConfig } from "../agent/index.ts";
 
 type AnalysisReport = {
@@ -322,6 +323,12 @@ export default function VideoAnalyzer() {
 
   return (
     <div className="video-analyzer">
+      <ModuleIntro
+        title="视频动作分析"
+        what="上传训练视频，逐帧分析动作质量与关节角度"
+        how={["点击上传一段训练视频","系统自动标注骨骼关键点","查看每个动作的评分和改进点"]}
+        tip="建议录制时全身入镜"
+      />
       <div className="va-header">
         <h2>🎬 视频动作分析</h2>
         <p>上传你的健身视频，AI 逐帧分析姿态，给出专业改进建议（对标 Gemini 级别）</p>
