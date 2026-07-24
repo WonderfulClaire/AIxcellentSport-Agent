@@ -9,6 +9,9 @@ import {
   RED_FLAGS,
   generateHealthReport,
 } from "../agent/healthConcierge.ts";
+import { callLLM } from "../agent/coachAgent.ts";
+import { getLLMConfig, hasLLM } from "../agent/config";
+import { buildHealthContext } from "../agent/context";
 import { loadAgentConfig } from "../agent/index.ts";
 import ModuleIntro from "./ModuleIntro";
 
@@ -19,6 +22,94 @@ type Profile = {
   history: string;
   goal: string;
 };
+
+// ---------- 无 Key 提示卡片 ----------
+function NoKeyBanner({ onSettings }: { onSettings?: () => void }) {
+  return (
+    <div className="aix-nokey-card" style={{ margin: "0 0 1rem" }}>
+      <div className="aix-nokey-icon">✦</div>
+      <p>配置智能对话服务后可获得更个性化的健康咨询回答。</p>
+      <p className="aix-nokey-sub">当前使用规则引擎生成报告，前往「设置」填写配置即可升级。</p>
+      {onSettings && <button className="aix-nokey-btn" onClick={onSettings}>前往设置 →</button>}
+    </div>
+  );
+}
+
+// ---------- 健康问答 Chat ----------
+interface ChatMessage {
+  role: "user" | "assistant";
+  text: string;
+}
+
+function HealthChat() {
+  const [chatMsgs, setChatMsgs] = useState<ChatMessage[]>([]);
+  const [chatInput, setChatInput] = useState("");
+  const [chatLoading, setChatLoading] = useState(false);
+
+  const sendChat = useCallback(async () => {
+    const text = chatInput.trim();
+    if (!text || chatLoading) return;
+    setChatInput("");
+    setChatMsgs((prev) => [...prev, { role: "user", text }]);
+    setChatLoading(true);
+
+    try {
+      const cfg = getLLMConfig();
+      if (!cfg) {
+        setChatMsgs((prev) => [...prev, { role: "assistant", text: "未配置智能对话服务，请前往设置页填写配置。当前功能仅支持报告生成模式。" }]);
+        setChatLoading(false);
+        return;
+      }
+      const healthCtx = await buildHealthContext();
+      const sys = [
+        "你是用户的私享健康咨询助手，拥有医学知识但不替代医生诊断。",
+        "基于用户的健康数据和问题，给出专业、简洁、可执行的建议。",
+        "涉及严重症状时，务必提醒及时就医。回答控制在 2-4 句。",
+        healthCtx,
+      ].join("\n");
+
+      const history = chatMsgs.slice(-6).map((m) => ({ role: m.role, content: m.text }));
+      const reply = await callLLM(
+        [{ role: "system", content: sys }, ...history, { role: "user", content: text }],
+        { ...cfg, timeoutMs: 10000 },
+        undefined,
+      );
+
+      if (reply) {
+        setChatMsgs((prev) => [...prev, { role: "assistant", text: reply }]);
+      } else {
+        setChatMsgs((prev) => [...prev, { role: "assistant", text: "连接失败，请检查配置或稍后重试。你也可以使用下方的体检报告功能。" }]);
+      }
+    } catch {
+      setChatMsgs((prev) => [...prev, { role: "assistant", text: "服务暂时不可用，请稍后重试。" }]);
+    }
+    setChatLoading(false);
+  }, [chatInput, chatLoading, chatMsgs]);
+
+  return (
+    <div className="hc-chat">
+      <h3>💬 健康问答</h3>
+      <p className="hc-chat-hint">有什么健康困扰？直接问我，结合你的档案给你个性化建议。</p>
+      <div className="hc-chat-messages">
+        {chatMsgs.map((m, i) => (
+          <div key={i} className={`hc-chat-msg hc-chat-${m.role}`}>
+            {m.role === "assistant" && <span className="hc-chat-avatar">✦</span>}
+            <span className="hc-chat-text">{m.text}</span>
+          </div>
+        ))}
+        {chatLoading && <div className="hc-chat-msg hc-chat-assistant"><span className="hc-chat-avatar">✦</span><span className="hc-chat-text">思考中…</span></div>}
+      </div>
+      <form className="hc-chat-form" onSubmit={(e) => { e.preventDefault(); sendChat(); }}>
+        <input
+          value={chatInput}
+          onChange={(e) => setChatInput(e.target.value)}
+          placeholder="描述你的症状或健康问题…"
+        />
+        <button type="submit" disabled={chatLoading || !chatInput.trim()}>发送</button>
+      </form>
+    </div>
+  );
+}
 
 export default function HealthConcierge() {
   const [step, setStep] = useState<"form" | "input" | "loading" | "result">("form");
@@ -38,13 +129,7 @@ export default function HealthConcierge() {
 
   const generate = useCallback(async () => {
     setStep("loading");
-    const config = loadAgentConfig();
-    let result;
-    if (config?.apiKey) {
-      result = await generateHealthReport(profile, markers, screenings);
-    } else {
-      result = await generateHealthReport(profile, markers, screenings);
-    }
+    const result = await generateHealthReport(profile, markers, screenings);
     setReport(result);
     setStep("result");
   }, [profile, markers, screenings]);
@@ -53,6 +138,8 @@ export default function HealthConcierge() {
     const n = parseFloat(val);
     setMarkers(m => ({ ...m, [key]: isNaN(n) ? undefined as any : n }));
   };
+
+  const llmAvailable = hasLLM();
 
   if (step === "form") {
     return (
@@ -67,6 +154,11 @@ export default function HealthConcierge() {
           <h2>🩺 你的私人保健医生</h2>
           <p>亿万富豪级的主动健康管理，现在你也有了</p>
         </div>
+
+        {/* 智能问答区（有 Key 时显示） */}
+        {llmAvailable && <HealthChat />}
+        {!llmAvailable && <NoKeyBanner />}
+
         <div className="hc-form-grid">
           <div className="hc-field">
             <label>性别</label>
@@ -103,7 +195,7 @@ export default function HealthConcierge() {
       <div className="hc-input">
         <div className="hc-header">
           <h2>📋 录入你的体检数据</h2>
-          <p>填多少算多少，AI 会据此评估风险趋势（数据仅存本地）</p>
+          <p>填多少算多少，系统会据此评估风险趋势（数据仅存本地）</p>
         </div>
 
         <div className="hc-screenings">

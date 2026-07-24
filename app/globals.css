@@ -2512,3 +2512,109 @@ body {
   .metrics-panel { padding: 14px 12px; }
   .steps article { padding: 24px 12px 20px 0; }
 }
+
+/* ── U6: No-Key 提示卡片 ── */
+.aix-nokey-card {
+  background: linear-gradient(135deg, rgba(30,30,30,0.95), rgba(20,20,20,0.98));
+  border: 1px solid rgba(212,175,55,0.3);
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  margin: 1rem 0;
+}
+.aix-nokey-card .aix-nokey-icon {
+  font-size: 2rem;
+  color: var(--gold, #d4af37);
+  margin-bottom: 8px;
+}
+.aix-nokey-card p {
+  color: rgba(255,255,255,0.85);
+  margin: 4px 0;
+  font-size: 0.95rem;
+}
+.aix-nokey-card .aix-nokey-sub {
+  color: rgba(255,255,255,0.5);
+  font-size: 0.85rem;
+}
+.aix-nokey-btn {
+  margin-top: 12px;
+  padding: 8px 20px;
+  background: linear-gradient(135deg, #d4af37, #b8860b);
+  color: #111;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.aix-nokey-btn:hover { opacity: 0.85; }
+
+/* ── U6: 内嵌对话（HealthConcierge / ImageConsultant 共用） ── */
+.hc-chat {
+  background: rgba(25,25,25,0.6);
+  border: 1px solid rgba(212,175,55,0.2);
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 1.5rem;
+}
+.hc-chat h3 { color: var(--gold, #d4af37); margin: 0 0 4px; font-size: 1.05rem; }
+.hc-chat-hint { color: rgba(255,255,255,0.5); font-size: 0.85rem; margin: 0 0 12px; }
+.hc-chat-messages {
+  max-height: 240px;
+  overflow-y: auto;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.hc-chat-msg {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.hc-chat-user { justify-content: flex-end; }
+.hc-chat-user .hc-chat-text {
+  background: rgba(212,175,55,0.15);
+  border-radius: 12px 12px 4px 12px;
+  padding: 8px 12px;
+  color: #fff;
+  font-size: 0.9rem;
+  max-width: 80%;
+}
+.hc-chat-assistant .hc-chat-avatar {
+  color: var(--gold, #d4af37);
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+.hc-chat-assistant .hc-chat-text {
+  background: rgba(255,255,255,0.05);
+  border-radius: 12px 12px 12px 4px;
+  padding: 8px 12px;
+  color: rgba(255,255,255,0.9);
+  font-size: 0.9rem;
+  max-width: 80%;
+}
+.hc-chat-form {
+  display: flex;
+  gap: 8px;
+}
+.hc-chat-form input {
+  flex: 1;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: #fff;
+  font-size: 0.9rem;
+}
+.hc-chat-form input::placeholder { color: rgba(255,255,255,0.35); }
+.hc-chat-form button {
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #d4af37, #b8860b);
+  color: #111;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.hc-chat-form button:disabled { opacity: 0.4; cursor: not-allowed; }

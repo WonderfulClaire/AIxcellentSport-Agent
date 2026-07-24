@@ -10,18 +10,18 @@ import { assessForm, getTool } from "./tools.ts";
  * Provider-agnostic LLM 调用（OpenAI 兼容 /chat/completions）。
  * @returns {Promise<string|null>} 模型文本，或 null（需走兜底）
  */
-export async function callLLM(messages, config, tools) {
+export async function callLLM(messages: any, config: any, tools?: any): Promise<string | null> {
   if (!config || !config.apiKey || !config.baseUrl) return null;
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), config.timeoutMs || 8000);
   try {
-    const body = {
+    const body: any = {
       model: config.model || "gpt-4o-mini",
       messages,
       temperature: 0.7,
     };
     if (tools && tools.length) {
-      body.tools = tools.map((t) => ({
+      body.tools = tools.map((t: any) => ({
         type: "function",
         function: { name: t.name, description: t.description, parameters: t.parameters },
       }));
@@ -60,12 +60,59 @@ export async function callLLM(messages, config, tools) {
   }
 }
 
+/**
+ * 完整版 LLM 调用：返回 message 对象（含 content + tool_calls），
+ * 用于管家等需要处理 function calling 的场景。
+ * @returns {Promise<{content:string|null, tool_calls:any[]}|null>}
+ */
+export async function callLLMRaw(
+  messages: any[],
+  config: any,
+  tools?: any[]
+): Promise<{ content: string | null; tool_calls: any[] } | null> {
+  if (!config || !config.apiKey || !config.baseUrl) return null;
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), config.timeoutMs || 12000);
+  try {
+    const body: any = {
+      model: config.model || "gpt-4o-mini",
+      messages,
+      temperature: 0.7,
+    };
+    if (tools && tools.length) {
+      body.tools = tools;
+      body.tool_choice = "auto";
+    }
+    const res = await fetch(config.baseUrl.replace(/\/$/, "") + "/chat/completions", {
+      method: "POST",
+      signal: ctrl.signal,
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${config.apiKey}`,
+      },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const msg = data.choices?.[0]?.message;
+    if (!msg) return null;
+    return {
+      content: msg.content ?? null,
+      tool_calls: msg.tool_calls || [],
+    };
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 /** 确定性兜底：基于问题 + 记忆生成反馈（无密钥也成立） */
-function heuristicCoaching({ issues, recurring, focusArea, exercise, score }) {
+function heuristicCoaching({ issues, recurring, focusArea, exercise, score }: any) {
   if (issues.length) {
     const top = issues[0];
     const tone = "warn";
-    const map = {
+    const map: Record<string, string> = {
       "膝盖内扣(valgus)": "膝盖有内扣趋势，主动朝脚尖方向推开，想象把地面踩宽。",
       "左右不对称": "左右发力不均，慢下来感受弱侧，先求对称再求速度。",
       "下蹲深度不足": "再蹲深一点，髋部低于膝盖，脚跟踩稳。",
@@ -87,10 +134,11 @@ function heuristicCoaching({ issues, recurring, focusArea, exercise, score }) {
 }
 
 export class CoachAgent {
-  /**
-   * @param {{memory:import('./memory.js').AgentMemory, config?:any}} deps
-   */
-  constructor({ memory, config = {} }) {
+  memory: any;
+  config: any;
+  focusArea: string | null;
+
+  constructor({ memory, config = {} }: { memory: any; config?: any }) {
     this.memory = memory;
     this.config = config;
     this.focusArea = null;
@@ -98,16 +146,14 @@ export class CoachAgent {
 
   /**
    * 处理一次完成的动作，返回自适应教练反馈。
-   * @param {{exercise:string, repIndex:number, score:number, jointAngle:number, symmetryError?:number, kneeGap?:number, ankleGap?:number, bodyLine?:number}} metric
-   * @returns {Promise<{message:string, tone:'good'|'warn', focusArea:string|null, source:'llm'|'heuristic'}>}
    */
-  async getCoaching(metric) {
+  async getCoaching(metric: any) {
     // 1) 评估（工具：assess_form）
     const issues = assessForm(metric);
     metric.issues = issues;
 
     // 2) 记忆（工具：log_rep）
-    getTool("log_rep").run(metric, { memory: this.memory });
+    getTool("log_rep")?.run(metric, { memory: this.memory });
 
     // 3) 规划：依据记忆里的"反复问题"决定本次重点
     const recurring = this.memory.getRecurringIssues(metric.exercise);
@@ -115,8 +161,8 @@ export class CoachAgent {
     const summary = this.memory.summarize(metric.exercise);
 
     // 4) 生成反馈
-    let message = null;
-    let source = "heuristic";
+    let message: string | null = null;
+    let source: "llm" | "heuristic" = "heuristic";
     if (this.config.apiKey) {
       const sys = [
         "你是 AIxcellentSport 的私人动作教练智能体，运行在用户浏览器端（隐私优先）。",

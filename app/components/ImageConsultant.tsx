@@ -8,8 +8,105 @@ import {
   diagnoseBodyShape,
   generateImagePlan,
 } from "../agent/imageConsultant.ts";
+import { callLLM } from "../agent/coachAgent.ts";
+import { getLLMConfig, hasLLM } from "../agent/config";
+import { buildHealthContext } from "../agent/context";
 import { loadAgentConfig } from "../agent/index.ts";
 import ModuleIntro from "./ModuleIntro";
+
+// ---------- 无 Key 提示卡片 ----------
+function NoKeyBanner() {
+  return (
+    <div className="aix-nokey-card" style={{ margin: "0 0 1rem" }}>
+      <div className="aix-nokey-icon">✦</div>
+      <p>配置智能对话服务后可获得更个性化的形象建议。</p>
+      <p className="aix-nokey-sub">当前使用规则引擎生成方案，前往「设置」填写配置即可升级为智能形象顾问。</p>
+    </div>
+  );
+}
+
+// ---------- 形象问答 Chat ----------
+interface ChatMessage {
+  role: "user" | "assistant";
+  text: string;
+}
+
+function ImageChat({ profile }: { profile: any }) {
+  const [chatMsgs, setChatMsgs] = useState<ChatMessage[]>([]);
+  const [chatInput, setChatInput] = useState("");
+  const [chatLoading, setChatLoading] = useState(false);
+
+  const sendChat = useCallback(async () => {
+    const text = chatInput.trim();
+    if (!text || chatLoading) return;
+    setChatInput("");
+    setChatMsgs((prev) => [...prev, { role: "user", text }]);
+    setChatLoading(true);
+
+    try {
+      const cfg = getLLMConfig();
+      if (!cfg) {
+        setChatMsgs((prev) => [...prev, { role: "assistant", text: "未配置智能对话服务，请前往设置页填写配置。" }]);
+        setChatLoading(false);
+        return;
+      }
+
+      const profileCtx = [
+        `用户信息：性别${profile.gender === "female" ? "女" : "男"}，${profile.age}岁`,
+        profile.style ? `风格偏好：${profile.style}` : "",
+        profile.concern ? `主要诉求：${profile.concern}` : "",
+        profile.occasion ? `常见场合：${profile.occasion}` : "",
+      ].filter(Boolean).join("，");
+
+      const sys = [
+        "你是用户的私享形象顾问，精通色彩搭配、服装风格、妆容设计和气质提升。",
+        "基于用户的体型、肤色和偏好，给出专业、可执行的形象建议。",
+        "回答亲切专业，控制在 3-5 句。",
+        profileCtx,
+      ].join("\n");
+
+      const history = chatMsgs.slice(-6).map((m) => ({ role: m.role, content: m.text }));
+      const reply = await callLLM(
+        [{ role: "system", content: sys }, ...history, { role: "user", content: text }],
+        { ...cfg, timeoutMs: 10000 },
+        undefined,
+      );
+
+      if (reply) {
+        setChatMsgs((prev) => [...prev, { role: "assistant", text: reply }]);
+      } else {
+        setChatMsgs((prev) => [...prev, { role: "assistant", text: "连接失败，请检查配置或稍后重试。你可以先使用下方的问卷诊断功能。" }]);
+      }
+    } catch {
+      setChatMsgs((prev) => [...prev, { role: "assistant", text: "服务暂时不可用，请稍后重试。" }]);
+    }
+    setChatLoading(false);
+  }, [chatInput, chatLoading, chatMsgs, profile]);
+
+  return (
+    <div className="hc-chat">
+      <h3>💬 形象咨询</h3>
+      <p className="hc-chat-hint">关于穿搭、配色、妆容、气质的问题，直接问我。</p>
+      <div className="hc-chat-messages">
+        {chatMsgs.map((m, i) => (
+          <div key={i} className={`hc-chat-msg hc-chat-${m.role}`}>
+            {m.role === "assistant" && <span className="hc-chat-avatar">✦</span>}
+            <span className="hc-chat-text">{m.text}</span>
+          </div>
+        ))}
+        {chatLoading && <div className="hc-chat-msg hc-chat-assistant"><span className="hc-chat-avatar">✦</span><span className="hc-chat-text">思考中…</span></div>}
+      </div>
+      <form className="hc-chat-form" onSubmit={(e) => { e.preventDefault(); sendChat(); }}>
+        <input
+          value={chatInput}
+          onChange={(e) => setChatInput(e.target.value)}
+          placeholder="问我穿搭建议，例如：职场面试穿什么好？"
+        />
+        <button type="submit" disabled={chatLoading || !chatInput.trim()}>发送</button>
+      </form>
+    </div>
+  );
+}
 
 export default function ImageConsultant() {
   const [step, setStep] = useState<"form" | "loading" | "result">("form");
@@ -32,17 +129,12 @@ export default function ImageConsultant() {
     setStep("loading");
     setSeason(diagnoseSeason(profile.colorAnswers));
     setBody(diagnoseBodyShape(profile.shoulders, profile.waist, profile.hips));
-
-    const config = loadAgentConfig();
-    let result;
-    if (config?.apiKey) {
-      result = await generateImagePlan(profile);
-    } else {
-      result = await generateImagePlan(profile);
-    }
+    const result = await generateImagePlan(profile);
     setPlan(result);
     setStep("result");
   }, [profile]);
+
+  const llmAvailable = hasLLM();
 
   if (step === "form") {
     const answeredCount = Object.keys(profile.colorAnswers).length;
@@ -57,6 +149,10 @@ export default function ImageConsultant() {
           <h2>💄 你的私人形象顾问</h2>
           <p>明星造型师同款诊断，找到最衬你的色彩与风格</p>
         </div>
+
+        {/* 智能问答区 */}
+        {llmAvailable && <ImageChat profile={profile} />}
+        {!llmAvailable && <NoKeyBanner />}
 
         {/* 基础信息 */}
         <div className="ic-section">
@@ -198,7 +294,7 @@ export default function ImageConsultant() {
 
         {/* 身型穿搭 */}
         <div className="ic-card">
-          <h3>👗 扬长避短</h3>
+          <h3>�� 扬长避短</h3>
           <div className="ic-do-avoid">
             <div className="ic-do">
               <h5>✅ 穿</h5>

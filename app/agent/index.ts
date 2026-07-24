@@ -54,3 +54,4 @@ export function loadAgentConfig() {
 export { AgentMemory, CoachAgent, runMultiAgent };
 export * from "./tools.ts";
 export * from "./multiAgent.ts";
+export { buildHealthContext } from "./context.ts";

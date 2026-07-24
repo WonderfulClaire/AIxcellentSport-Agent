@@ -1,8 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { callLLM } from "../agent/coachAgent.ts";
+import { callLLMRaw } from "../agent/coachAgent.ts";
 import { getLLMConfig, hasLLM } from "../agent/config";
+import { buildHealthContext } from "../agent/context";
+import { AGENT_TOOLS } from "../agent/tools.ts";
 import { generateDailyWellnessAdvice } from "../agent/tcmEngine.ts";
 import { recommendState, buildEnergyPlan } from "../agent/energyStateEngine.ts";
 import ModuleIntro from "./ModuleIntro";
@@ -10,7 +12,7 @@ import ModuleIntro from "./ModuleIntro";
 type ModuleKey =
   | "train" | "video" | "posture" | "nutrition" | "doctor" | "image"
   | "plan" | "timeline" | "energy" | "library" | "diet" | "sleep" | "tcm"
-  | "dashboard" | "history";
+  | "dashboard" | "history" | "wearable" | "trends" | "weekly_report" | "settings";
 
 interface ModuleMeta {
   key: ModuleKey;
@@ -28,14 +30,14 @@ const MODULES: ModuleMeta[] = [
   { key: "library", label: "动作库", icon: "📚", blurb: "200+ 标准动作", group: "运动" },
   { key: "timeline", label: "时间轴", icon: "⏱️", blurb: "训练日程甘特图", group: "运动" },
   { key: "nutrition", label: "私人营养", icon: "🥗", blurb: "明星级膳食方案", group: "生活" },
-  { key: "diet", label: "饮食记录", icon: "🍱", blurb: "热量与营养追踪", group: "生活" },
+  { key: "diet", label: "饮食记录", icon: "��", blurb: "热量与营养追踪", group: "生活" },
   { key: "sleep", label: "睡眠", icon: "😴", blurb: "睡眠质量与恢复", group: "生活" },
   { key: "doctor", label: "私人医生", icon: "🩺", blurb: "体检与指标解读", group: "生活" },
   { key: "image", label: "形象管理", icon: "💄", blurb: "穿搭/妆容/变美", group: "生活" },
   { key: "tcm", label: "中医养生", icon: "🌿", blurb: "节气天气体质", group: "养生" },
   { key: "energy", label: "能量状态", icon: "🔋", blurb: "高能量/滋补调理", group: "养生" },
   { key: "dashboard", label: "数据面板", icon: "📊", blurb: "全景健康数据", group: "我的" },
-  { key: "history", label: "训练记录", icon: "📁", blurb: "历史与趋势", group: "我的" },
+  { key: "history", label: "训练记录", icon: "��", blurb: "历史与趋势", group: "我的" },
 ];
 
 interface ChatCard {
@@ -54,7 +56,6 @@ interface ChatMsg {
 
 // ---------- 意图识别 ----------
 function detectEngine(text: string): "tcm" | "energy" | null {
-  const t = text.toLowerCase();
   if (/(养生|节气|中医|天气|体质|今天(吃|怎么|该)|怎么养|煲汤|进补)/.test(text)) return "tcm";
   if (/(能量|累|疲劳|透支|疲惫|没精神|休息|滋补|调理|状态差|精力)/.test(text)) return "energy";
   return null;
@@ -92,10 +93,23 @@ function heuristicAnswer(text: string): string {
   return "我是你的私人健康管家，可以帮你练得更准、吃得更对、睡得更好、按节气养生。试试下面的「技能中心」，或直接告诉我你想解决什么，比如「帮我看看体态」「今天怎么养生」「我最近很累怎么调理」。";
 }
 
+// ---------- 无 Key 提示卡片 ----------
+function NoKeyCard({ onLaunch }: { onLaunch: (k: string) => void }) {
+  return (
+    <div className="aix-nokey-card">
+      <div className="aix-nokey-icon">✦</div>
+      <p>尚未配置智能对话服务，当前使用基础规则回答。</p>
+      <p className="aix-nokey-sub">前往「设置」填写服务配置即可开启私享管家完整对话能力。</p>
+      <button className="aix-nokey-btn" onClick={() => onLaunch("settings")}>前往设置 →</button>
+    </div>
+  );
+}
+
 export default function AssistantHub({ onLaunch }: { onLaunch: (k: ModuleKey | "settings") => void }) {
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [input, setInput] = useState("");
   const [thinking, setThinking] = useState(false);
+  const [showNoKey, setShowNoKey] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const idRef = useRef(1);
 
@@ -111,6 +125,8 @@ export default function AssistantHub({ onLaunch }: { onLaunch: (k: ModuleKey | "
         quick: ["今天怎么养生", "我最近很累怎么调理", "帮我看看体态", "给我做个训练计划"],
       },
     ]);
+    // 检查是否配置了 LLM
+    if (!hasLLM()) setShowNoKey(true);
   }, []);
 
   useEffect(() => {
@@ -148,11 +164,59 @@ export default function AssistantHub({ onLaunch }: { onLaunch: (k: ModuleKey | "
     };
   }
 
+  // ---------- Function calling 处理 ----------
+  async function handleToolCalls(
+    toolCalls: any[],
+    conversationMessages: any[],
+    cfg: any
+  ): Promise<string | null> {
+    // 执行 tool calls
+    const toolResults: any[] = [];
+    for (const tc of toolCalls) {
+      const fnName = tc.function?.name;
+      let result = "";
+      try {
+        const args = JSON.parse(tc.function?.arguments || "{}");
+        if (fnName === "navigate_to_module") {
+          const mod = args.module;
+          const meta = MODULES.find((m) => m.key === mod);
+          if (meta) {
+            onLaunch(mod);
+            result = JSON.stringify({ success: true, module: mod, label: meta.label });
+          } else {
+            result = JSON.stringify({ success: false, error: "未知模块" });
+          }
+        } else if (fnName === "get_health_summary") {
+          const ctx = await buildHealthContext();
+          result = JSON.stringify({ summary: ctx });
+        } else {
+          result = JSON.stringify({ error: "未知工具" });
+        }
+      } catch {
+        result = JSON.stringify({ error: "工具执行失败" });
+      }
+      toolResults.push({
+        role: "tool",
+        tool_call_id: tc.id,
+        content: result,
+      });
+    }
+
+    // 把 tool results 追加到对话继续调用 LLM
+    const followUp = [
+      ...conversationMessages,
+      { role: "assistant", content: null, tool_calls: toolCalls },
+      ...toolResults,
+    ];
+    const followResp = await callLLMRaw(followUp, cfg, AGENT_TOOLS);
+    return followResp?.content ?? null;
+  }
+
   const send = useCallback(
     async (raw?: string) => {
       const text = (raw ?? input).trim();
       if (!text || thinking) return;
-      // “前往设置”快捷指令直接跳转
+      // "前往设置"快捷指令直接跳转
       if (/前往设置|打开设置|设置页/.test(text)) {
         onLaunch("settings" as any);
         return;
@@ -176,9 +240,9 @@ export default function AssistantHub({ onLaunch }: { onLaunch: (k: ModuleKey | "
         return;
       }
 
-      // 2) 模块唤起意图
+      // 2) 模块唤起意图（快速规则路径）
       const mod = detectModule(text);
-      if (mod) {
+      if (mod && !hasLLM()) {
         const meta = MODULES.find((m) => m.key === mod)!;
         push({
           role: "assistant",
@@ -190,39 +254,83 @@ export default function AssistantHub({ onLaunch }: { onLaunch: (k: ModuleKey | "
         return;
       }
 
-      // 3) 自由问答（LLM，无密钥走启发式）
+      // 3) 自由问答（LLM + function calling，无密钥走启发式）
       const cfg = getLLMConfig();
-      const sys = [
-        "你是 AIxcellentHealth 的私人健康管家，运行在用户浏览器端、隐私优先。",
-        "你整合了实时训练、视频分析、体态评估、私人营养、私人医生、形象管理、训练计划、睡眠、中医节气养生、能量状态管理等能力。",
-        "请用亲切、专业、可执行的中文回答，控制在一两句到一小段，不要长篇大论。涉及医疗时提醒以医生诊断为准。",
-      ].join("\n");
-      const history = messages
-        .filter((m) => m.role === "user" || (m.role === "assistant" && !m.card))
-        .slice(-6)
-        .map((m) => ({ role: m.role, content: m.text }));
-      let reply: string | null = null;
       if (cfg && cfg.apiKey) {
-        reply = await callLLM(
-          [{ role: "system", content: sys }, ...history, { role: "user", content: text }],
-          { ...cfg, timeoutMs: 8000 },
-          undefined,
-        );
+        try {
+          // 注入健康上下文
+          const healthCtx = await buildHealthContext();
+          const sys = [
+            "你是 AIxcellentHealth 的私享健康管家，运行在用户浏览器端、隐私优先。",
+            "你整合了实时训练、视频分析、体态评估、私人营养、私人医生、形象管理、训练计划、睡眠、中医节气养生、能量状态管理等能力。",
+            "你可以调用工具帮用户导航到指定模块或读取健康数据。",
+            "请用亲切、专业、可执行的中文回答，控制在一两句到一小段，不要长篇大论。涉及医疗时提醒以医生诊断为准。",
+            healthCtx,
+          ].join("\n");
+
+          const history = messages
+            .filter((m) => m.role === "user" || (m.role === "assistant" && !m.card))
+            .slice(-6)
+            .map((m) => ({ role: m.role, content: m.text }));
+
+          const conversationMsgs = [
+            { role: "system", content: sys },
+            ...history,
+            { role: "user", content: text },
+          ];
+
+          const resp = await callLLMRaw(conversationMsgs, { ...cfg, timeoutMs: 12000 }, AGENT_TOOLS);
+
+          if (resp) {
+            // 处理 function calling
+            if (resp.tool_calls && resp.tool_calls.length > 0) {
+              const finalReply = await handleToolCalls(resp.tool_calls, conversationMsgs, { ...cfg, timeoutMs: 12000 });
+              // 检查是否有 navigate 动作用于 launch 按钮
+              let launchMod: ModuleKey | undefined;
+              for (const tc of resp.tool_calls) {
+                if (tc.function?.name === "navigate_to_module") {
+                  try {
+                    const args = JSON.parse(tc.function.arguments || "{}");
+                    if (args.module) launchMod = args.module as ModuleKey;
+                  } catch { /* ignore */ }
+                }
+              }
+              push({
+                role: "assistant",
+                text: finalReply || "已为你执行操作。",
+                launch: launchMod,
+                quick: ["今天怎么养生", "帮我看看体态"],
+              });
+            } else if (resp.content) {
+              push({
+                role: "assistant",
+                text: resp.content,
+                quick: ["今天怎么养生", "帮我看看体态"],
+              });
+            } else {
+              // LLM 返回空内容
+              push({
+                role: "assistant",
+                text: heuristicAnswer(text),
+                quick: ["打开私人营养", "给我做个训练计划"],
+              });
+            }
+            setThinking(false);
+            return;
+          }
+        } catch {
+          // LLM 调用失败，走兜底
+        }
       }
-      if (!reply && !hasLLM()) {
-        // 无 Key 时显示友好兜底提示
-        push({
-          role: "assistant",
-          text: heuristicAnswer(text),
-          quick: ["前往设置", "打开私人营养", "给我做个训练计划"],
-        });
-        setThinking(false);
-        return;
+
+      // 无 Key 或调用失败 → 启发式兜底
+      if (!hasLLM()) {
+        setShowNoKey(true);
       }
       push({
         role: "assistant",
-        text: reply || heuristicAnswer(text),
-        quick: reply ? ["今天怎么养生", "帮我看看体态"] : ["打开私人营养", "给我做个训练计划"],
+        text: heuristicAnswer(text),
+        quick: hasLLM() ? ["今天怎么养生", "帮我看看体态"] : ["前往设置", "打开私人营养", "给我做个训练计划"],
       });
       setThinking(false);
     },
@@ -256,6 +364,8 @@ export default function AssistantHub({ onLaunch }: { onLaunch: (k: ModuleKey | "
         </div>
       </section>
 
+      {showNoKey && <NoKeyCard onLaunch={onLaunch as any} />}
+
       <section className="aix-chat-wrap">
         <div className="aix-chat" ref={scrollRef}>
           {messages.map((m) => (
@@ -266,7 +376,7 @@ export default function AssistantHub({ onLaunch }: { onLaunch: (k: ModuleKey | "
                 {m.card && <CardView card={m.card} onLaunch={onLaunch} />}
                 {m.launch && (
                   <button className="aix-launch" onClick={() => onLaunch(m.launch!)}>
-                    打开「{MODULES.find((x) => x.key === m.launch)!.label}」 →
+                    打开「{MODULES.find((x) => x.key === m.launch)?.label || m.launch}」 →
                   </button>
                 )}
                 {m.quick && (

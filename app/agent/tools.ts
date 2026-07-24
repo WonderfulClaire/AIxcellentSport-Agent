@@ -23,7 +23,7 @@ export const TOOLS = [
       },
       required: ["exercise", "score", "jointAngle"],
     },
-    run: (args) => ({ issues: assessForm(args) }),
+    run: (args: any) => ({ issues: assessForm(args) }),
   },
   {
     name: "log_rep",
@@ -39,7 +39,7 @@ export const TOOLS = [
       },
       required: ["exercise", "repIndex", "score", "jointAngle"],
     },
-    run: (args, ctx) => {
+    run: (args: any, ctx: any) => {
       ctx.memory.recordRep(args);
       return { ok: true, totalReps: ctx.memory.getHistory(args.exercise).length };
     },
@@ -52,7 +52,7 @@ export const TOOLS = [
       properties: { exercise: { type: "string" } },
       required: ["exercise"],
     },
-    run: (args, ctx) => ctx.memory.getRecurringIssues(args.exercise),
+    run: (args: any, ctx: any) => ctx.memory.getRecurringIssues(args.exercise),
   },
   {
     name: "set_goal",
@@ -62,13 +62,50 @@ export const TOOLS = [
       properties: { goals: { type: "array", items: { type: "string" } } },
       required: ["goals"],
     },
-    run: (args, ctx) => ({ goals: ctx.memory.setGoals(args.goals) }),
+    run: (args: any, ctx: any) => ({ goals: ctx.memory.setGoals(args.goals) }),
   },
 ];
 
 /** 按名称取工具 */
-export function getTool(name) {
+export function getTool(name: string) {
   return TOOLS.find((t) => t.name === name);
 }
+
+// ---------- 管家/助手级 Function Calling 工具（OpenAI 格式）----------
+// 供 AssistantHub 等模块使用，让大模型能"打开模块"或"读健康数据"
+
+export const AGENT_TOOLS = [
+  {
+    type: "function",
+    function: {
+      name: "navigate_to_module",
+      description: "导航到指定的功能模块页面",
+      parameters: {
+        type: "object",
+        properties: {
+          module: {
+            type: "string",
+            enum: [
+              "train", "video", "posture", "nutrition", "diet", "sleep",
+              "tcm", "energy", "doctor", "image", "plan", "timeline",
+              "library", "dashboard", "history", "wearable", "trends",
+              "weekly_report", "settings",
+            ],
+            description: "目标模块的 tab key",
+          },
+        },
+        required: ["module"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "get_health_summary",
+      description: "获取用户近期健康数据摘要（档案+睡眠+心率+步数+训练负荷等）",
+      parameters: { type: "object", properties: {} },
+    },
+  },
+];
 
 export { AgentMemory };

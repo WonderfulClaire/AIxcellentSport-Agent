@@ -122,3 +122,33 @@
 
 **遗留问题**：
 - 评分模型为简单加权，非临床验证，已注明仅供参考
+
+## U6. AI 管家/助手/图片顾问打通大模型 ✅
+
+**做了什么**：
+- 新建 `app/agent/context.ts`：buildHealthContext() 拼装用户档案+近期数据摘要
+- AssistantHub 打通 callLLMRaw + function calling(navigate_to_module/get_health_summary)
+- HealthConcierge 打通 callLLM（健康咨询角色+上下文）
+- ImageConsultant 打通 callLLM（形象顾问角色）
+- 全部模块无 Key 时优雅兜底（黑金风格提示卡片+保留规则回答）
+- tools.ts 完善 AGENT_TOOLS function calling 定义（OpenAI 格式）
+- coachAgent.ts 新增 callLLMRaw 返回完整 message（含 tool_calls）
+
+**改了哪些文件**：
+- `app/agent/context.ts`（新建）
+- `app/agent/tools.ts`（完善 AGENT_TOOLS 定义）
+- `app/agent/coachAgent.ts`（新增 callLLMRaw）
+- `app/agent/index.ts`（导出 buildHealthContext）
+- `app/components/AssistantHub.tsx`（打通 LLM + function calling + 无Key卡片）
+- `app/components/HealthConcierge.tsx`（打通 LLM 问答 + 兜底）
+- `app/components/ImageConsultant.tsx`（打通 LLM 问答 + 兜底）
+- `app/globals.css`（新增 .aix-nokey-card / .hc-chat 样式）
+
+**自测结果**：
+- `npm run build` 构建通过 ✅
+- `npm test` 测试通过 ✅
+- 无 Key 时各模块正常显示兜底提示，不崩溃 ✅
+
+**遗留问题**：
+- 真实大模型对话需主人填入有效 API Key（DeepSeek 或兼容服务）
+- 图片多模态分析取决于所选模型是否支持
