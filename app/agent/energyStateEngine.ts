@@ -6,6 +6,7 @@
 
 import { getCurrentSolarTerm, getWeatherTCMAdvice, BODY_TYPES } from "./tcmEngine.ts";
 import { callLLM } from "./coachAgent.ts";
+import { loadAgentConfig } from "./index.ts";
 
 /**
  * 五种能量态定义
@@ -430,7 +431,7 @@ export function buildEnergyLLMPrompt(stateId, ctx, plan) {
  * 用 LLM 增强方案（可选，无密钥时返回 null）
  */
 export async function enrichWithLLM(stateId, ctx, plan) {
-  const config = (await import("./index.ts").then((m) => m.loadAgentConfig?.() || null)) || null;
+  const config = loadAgentConfig() || null;
   if (!config || !config.apiKey) return null;
   const prompt = buildEnergyLLMPrompt(stateId, ctx, plan);
   try {

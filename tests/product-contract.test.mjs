@@ -21,7 +21,7 @@ test("keeps the AI movement coach product contract", async () => {
 
   const pkg = JSON.parse(packageJson);
   assert.ok(pkg.dependencies["@mediapipe/tasks-vision"]);
-  assert.equal(pkg.scripts.build, "vinext build");
+  assert.equal(pkg.scripts.build, "vite build");
 });
 
 test("contains no starter placeholder copy", async () => {

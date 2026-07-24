@@ -95,3 +95,47 @@
 
 **遗留问题**：
 - 需实际 BLE 设备测试会话流程（逻辑基于现有采样数组正确）
+
+## T6. 工程化收尾 ✅
+
+**做了什么**：
+- page.tsx 中非首屏组件改为 React.lazy 动态导入 + Suspense 包裹
+- 安装 vitest，创建 healthStore 基础单元测试（11 项全通过）
+- 修复构建告警（INEFFECTIVE_DYNAMIC_IMPORT → 静态导入；移除未使用的 TrustSections 导入）
+- 主 bundle 从 619KB 降至 395KB（-36%），18 个功能组件拆为独立 chunk
+
+**改了哪些文件**：
+- `app/page.tsx`（懒加载改造 + 移除未使用导入）
+- `app/agent/energyStateEngine.ts`（动态导入改静态，消除构建告警）
+- `vitest.config.ts`（新建，测试配置）
+- `package.json`（新增 vitest 依赖 + test 脚本）
+- `app/healthStore.test.ts`（新建，11 项单元测试）
+- `tests/product-contract.test.mjs`（修复已过期的构建脚本断言）
+
+**自测结果**：
+- `npm run build` 构建通过，无告警 ✅
+- `npm test` (vitest) 11 项测试全部通过 ✅
+
+**遗留问题**：
+- 可进一步增加更多组件的单元测试覆盖
+
+---
+
+## 今晚总结 & 建议下一步
+
+**完成情况**：T1-T6 全部完成，每个任务单独 commit，构建始终通过。
+
+**主要成果**：
+1. 健康趋势面板（手写SVG四维度图表）
+2. 每周报告（模板规则拼装，复制/导出）
+3. 移动端体验优化（响应式修复+过渡动画）
+4. PWA 增强（SW升级+更新提示+离线兜底）
+5. 可穿戴会话小结（心率区间按年龄配置）
+6. 工程化（懒加载拆包+单元测试+构建告警修复）
+
+**建议下一步（待主人处理）**：
+- 部署后端到 Koyeb（需账号，已跳过）
+- AI 管家接入大模型 API（需 API Key，已跳过）
+- 真机测试移动端和 BLE 功能
+- 考虑接入 CI/CD（GitHub Actions）
+

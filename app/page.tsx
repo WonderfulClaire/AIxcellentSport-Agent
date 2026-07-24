@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import React, { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import {
   DrawingUtils,
   FilesetResolver,
@@ -8,28 +8,32 @@ import {
   type NormalizedLandmark,
 } from "@mediapipe/tasks-vision";
 import { CoachAgent, AgentMemory, loadAgentConfig, runMultiAgent } from "./agent/index.ts";
-import ExerciseLibrary from "./components/ExerciseLibrary";
-import Dashboard from "./components/Dashboard";
-import TrainingHistory from "./components/TrainingHistory";
-import VideoAnalyzer from "./components/VideoAnalyzer";
-import DietTracker from "./components/DietTracker";
-import SleepTracker from "./components/SleepTracker";
-import TCMWellness from "./components/TCMWellness";
-import PostureAssessment from "./components/PostureAssessment";
-import PrivateNutrition from "./components/PrivateNutrition";
-import HealthConcierge from "./components/HealthConcierge";
-import ImageConsultant from "./components/ImageConsultant";
-import WorkoutPlanner from "./components/WorkoutPlanner";
-import TrainingTimeline from "./components/TrainingTimeline";
-import EnergyState from "./components/EnergyState";
-import AssistantHub from "./components/AssistantHub";
-import TrustSections from "./components/TrustSections";
+
+// 首屏必需组件同步导入
 import LandingPage from "./components/LandingPage";
-import AuthModal from "./components/AuthModal";
 import MemberHome from "./components/MemberHome";
-import WearableConnect from "./components/WearableConnect";
-import HealthTrends from "./components/HealthTrends";
-import WeeklyReport from "./components/WeeklyReport";
+import AuthModal from "./components/AuthModal";
+
+// 功能组件懒加载
+const HealthTrends = lazy(() => import("./components/HealthTrends"));
+const WeeklyReport = lazy(() => import("./components/WeeklyReport"));
+const Dashboard = lazy(() => import("./components/Dashboard"));
+const WearableConnect = lazy(() => import("./components/WearableConnect"));
+const VideoAnalyzer = lazy(() => import("./components/VideoAnalyzer"));
+const PostureAssessment = lazy(() => import("./components/PostureAssessment"));
+const PrivateNutrition = lazy(() => import("./components/PrivateNutrition"));
+const DietTracker = lazy(() => import("./components/DietTracker"));
+const SleepTracker = lazy(() => import("./components/SleepTracker"));
+const TCMWellness = lazy(() => import("./components/TCMWellness"));
+const EnergyState = lazy(() => import("./components/EnergyState"));
+const HealthConcierge = lazy(() => import("./components/HealthConcierge"));
+const ImageConsultant = lazy(() => import("./components/ImageConsultant"));
+const WorkoutPlanner = lazy(() => import("./components/WorkoutPlanner"));
+const TrainingTimeline = lazy(() => import("./components/TrainingTimeline"));
+const ExerciseLibrary = lazy(() => import("./components/ExerciseLibrary"));
+const TrainingHistory = lazy(() => import("./components/TrainingHistory"));
+const AssistantHub = lazy(() => import("./components/AssistantHub"));
+
 import { getStoredUser, clearSession } from "./api";
 
 type Exercise = "squat" | "pushup" | "jack" | "lunge" | "plank";
@@ -593,7 +597,9 @@ export default function Home() {
         </div>
       )}
 
+      <Suspense fallback={<div style={{color:'#D4AF37',textAlign:'center',padding:'3rem'}}>加载中...</div>}>
       {activeTab === "hub" && <div key="hub" className="page-fade-in"><AssistantHub onLaunch={handleLaunch} /></div>}
+      </Suspense>
 
       <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} onSuccess={(u) => { setAuthUser(u); setAuthOpen(false); setActiveTab("member"); }} />
 
@@ -778,34 +784,25 @@ export default function Home() {
       </section>
       </>)}
 
+      <Suspense fallback={<div style={{color:'#D4AF37',textAlign:'center',padding:'3rem'}}>加载中...</div>}>
       {activeTab === "video" && <div key="video" className="page-fade-in"><VideoAnalyzer /></div>}
-
       {activeTab === "posture" && <div key="posture" className="page-fade-in"><PostureAssessment /></div>}
-
       {activeTab === "nutrition" && <div key="nutrition" className="page-fade-in"><PrivateNutrition /></div>}
-
       {activeTab === "doctor" && <div key="doctor" className="page-fade-in"><HealthConcierge /></div>}
-
       {activeTab === "image" && <div key="image" className="page-fade-in"><ImageConsultant /></div>}
-
       {activeTab === "plan" && <div key="plan" className="page-fade-in"><WorkoutPlanner /></div>}
-
       {activeTab === "timeline" && <div key="timeline" className="page-fade-in"><TrainingTimeline /></div>}
-
       {activeTab === "energy" && <div key="energy" className="page-fade-in"><EnergyState /></div>}
-
       {activeTab === "diet" && <div key="diet" className="page-fade-in"><DietTracker /></div>}
-
       {activeTab === "sleep" && <div key="sleep" className="page-fade-in"><SleepTracker /></div>}
-
       {activeTab === "tcm" && <div key="tcm" className="page-fade-in"><TCMWellness /></div>}
-
       {activeTab === "library" && <div key="library" className="page-fade-in"><ExerciseLibrary /></div>}
       {activeTab === "dashboard" && <div key="dashboard" className="page-fade-in"><Dashboard /></div>}
       {activeTab === "history" && <div key="history" className="page-fade-in"><TrainingHistory /></div>}
       {activeTab === "wearable" && <div key="wearable" className="page-fade-in"><WearableConnect /></div>}
       {activeTab === "trends" && <div key="trends" className="page-fade-in"><HealthTrends /></div>}
       {activeTab === "weekly_report" && <div key="weekly_report" className="page-fade-in"><WeeklyReport /></div>}
+      </Suspense>
 
       <footer>
         <div className="brand"><span className="brand-mark">✦</span><span>AIxcellent 私享管家</span></div>

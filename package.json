@@ -28,7 +28,8 @@
     "start": "vite preview --port 3000 --host",
     "build:cf": "vinext build",
     "dev:cf": "vinext dev",
-    "test": "npm run build && node --test tests/*.test.js tests/*.test.mjs",
+    "test": "vitest run",
+    "test:contract": "node --test tests/*.test.js tests/*.test.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next --ignore-pattern spa-dist",
     "check": "npm run lint && npm test"
   },
@@ -50,11 +51,13 @@
     "@vitejs/plugin-rsc": "0.5.26",
     "eslint": "9.39.4",
     "eslint-config-next": "16.2.6",
+    "jsdom": "^29.1.1",
     "react-server-dom-webpack": "19.2.6",
     "tailwindcss": "4.2.1",
     "typescript": "5.9.3",
     "vinext": "0.0.50",
     "vite": "8.1.5",
+    "vitest": "^4.1.10",
     "wrangler": "4.113.0"
   },
   "optionalDependencies": {
