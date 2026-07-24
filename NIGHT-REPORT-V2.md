@@ -152,3 +152,20 @@
 **遗留问题**：
 - 真实大模型对话需主人填入有效 API Key（DeepSeek 或兼容服务）
 - 图片多模态分析取决于所选模型是否支持
+
+## U7. 测试与工程收尾 ✅（由 WorkBuddy 接手完成）
+
+**背景**：Qoder 额度耗尽，U7 完成一半（工具函数已抽取+测试已写，但未接线未提交），由 WorkBuddy 接手收尾。
+
+**做了什么**：
+- `app/agent/sleepUtils.ts`（Qoder 抽取）：bedTimeToMinutes/stdDev/getDayOfWeek，SleepTracker 已接线
+- `app/agent/nutritionUtils.ts`（Qoder 抽取）：calcFoodNutrition/calcDailyTotals，WorkBuddy 完成 DietTracker 接线（替换内联计算，组件与测试共用同一份逻辑）
+- 新增 4 个测试文件：config / nutritionUtils / sleepUtils / nutritionPlanner
+
+**自测结果**：
+- `npm run build` 通过 ✅（主包 254KB gzip 80KB，较上轮再降）
+- `npm test` **55/55 全部通过** ✅（5 个测试文件）
+
+**遗留问题**：
+- 真实大模型对话需填 API Key（设置页填入即激活）
+- Open Food Facts 在线搜索需后端代理（CORS）

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { getMeals, saveMeals, getProfile } from "../healthStore";
+import { calcFoodNutrition, calcDailyTotals } from "../agent/nutritionUtils";
 import ModuleIntro from "./ModuleIntro";
 
 type FoodItem = {
@@ -74,17 +75,14 @@ export default function DietTracker() {
   const addEntry = useCallback(() => {
     if (!selectedFood) return;
     const g = grams;
-    const p = selectedFood.per100g;
+    const nutrition = calcFoodNutrition(selectedFood.per100g, g);
     const entry: MealEntry = {
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       foodId: selectedFood.id,
       foodName: selectedFood.name,
       grams: g,
       mealType: selectedMeal,
-      calories: Math.round(p.calories * g / 100),
-      protein: Math.round(p.protein * g / 100 * 10) / 10,
-      carbs: Math.round(p.carbs * g / 100 * 10) / 10,
-      fat: Math.round(p.fat * g / 100 * 10) / 10,
+      ...nutrition,
       timestamp: Date.now(),
     };
     persistEntries([...entries, entry]);
@@ -106,15 +104,7 @@ export default function DietTracker() {
     : [];
 
   // 汇总数据
-  const totals = entries.reduce(
-    (acc, e) => ({
-      calories: acc.calories + e.calories,
-      protein: acc.protein + e.protein,
-      carbs: acc.carbs + e.carbs,
-      fat: acc.fat + e.fat,
-    }),
-    { calories: 0, protein: 0, carbs: 0, fat: 0 },
-  );
+  const totals = calcDailyTotals(entries);
 
   const calDiff = totals.calories - goal.calories;
   const calPct = Math.min(100, Math.round((totals.calories / goal.calories) * 100));
