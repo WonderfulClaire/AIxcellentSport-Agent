@@ -102,3 +102,23 @@
 
 **遗留问题**：
 - Open Food Facts API 需联网环境验证（已跳过，CORS 限制需后端代理）
+
+## U5. 睡眠/能量状态接公开算法 ✅
+
+**做了什么**：
+- SleepTracker 增强：睡眠时长/规律性(标准差)/社交时差/趋势计算 + 中文解读
+- EnergyState 增强：0-100能量评分(加权模型：睡眠35%+心率25%+HRV25%+活动15%)
+- 缺失数据自动权重重分配，至少1维度有数据即可评分
+- 全部纯本地计算，不依赖外部API
+
+**改了哪些文件**：
+- `app/components/SleepTracker.tsx`（分析算法 + 解读展示）
+- `app/components/EnergyState.tsx`（加权能量评分 + 等级解读）
+- `app/agent/energyScoreEngine.ts`（新建，能量评分算法引擎）
+
+**自测结果**：
+- `npm run build` 构建通过 ✅
+- `npm test` 测试通过 ✅
+
+**遗留问题**：
+- 评分模型为简单加权，非临床验证，已注明仅供参考

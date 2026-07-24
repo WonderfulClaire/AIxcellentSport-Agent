@@ -7,6 +7,8 @@ import {
   recommendState,
   enrichWithLLM,
 } from "../agent/energyStateEngine.ts";
+import { calcEnergyScore } from "../agent/energyScoreEngine.ts";
+import { getRecords, getWearable } from "../healthStore";
 import { BODY_TYPES } from "../agent/tcmEngine.ts";
 import { loadAgentConfig } from "../agent/index.ts";
 import ModuleIntro from "./ModuleIntro";
@@ -17,6 +19,8 @@ type Ctx = {
   weather: { temp?: number; humidity?: number; condition?: string } | null;
   constitution: string;
 };
+
+const SLEEP_STORAGE_KEY = "aix_sleep_v1";
 
 export default function EnergyState() {
   const [selected, setSelected] = useState<string | null>(null);
@@ -33,7 +37,49 @@ export default function EnergyState() {
   const [llmLoading, setLlmLoading] = useState(false);
   const [llmMsg, setLlmMsg] = useState<string | null>(null);
 
-  // 尝试获取天气（best-effort，失败不影响主流程）
+  // Energy score state
+  const [energyScore, setEnergyScore] = useState<any>(null);
+  const [scoreLoading, setScoreLoading] = useState(true);
+
+  // Load energy score data
+  useEffect(() => {
+    let cancelled = false;
+    async function loadData() {
+      try {
+        // Get sleep records from both localStorage (SleepTracker) and healthStore
+        let sleepRecords: any[] = [];
+        try {
+          const localSleep = localStorage.getItem(SLEEP_STORAGE_KEY);
+          if (localSleep) sleepRecords = JSON.parse(localSleep);
+        } catch {}
+
+        // Also get healthStore records (may have sleep_hours field)
+        const healthRecords = await getRecords();
+        // Merge: healthStore records that have sleep_hours
+        const healthSleepRecords = healthRecords
+          .filter((r: any) => r.sleep_hours && r.sleep_hours > 0)
+          .map((r: any) => ({ date: r.date, durationHours: r.sleep_hours, sleep_hours: r.sleep_hours }));
+
+        // Combine, prefer local sleep tracker data
+        const localDates = new Set(sleepRecords.map((r: any) => r.date));
+        const combined = [...sleepRecords, ...healthSleepRecords.filter((r: any) => !localDates.has(r.date))];
+
+        const wearable = await getWearable();
+
+        if (cancelled) return;
+        const result = calcEnergyScore(combined, wearable);
+        setEnergyScore(result);
+      } catch {
+        // ignore
+      } finally {
+        if (!cancelled) setScoreLoading(false);
+      }
+    }
+    loadData();
+    return () => { cancelled = true; };
+  }, []);
+
+  // Weather loading
   useEffect(() => {
     let cancelled = false;
     async function loadWeather() {
@@ -62,23 +108,15 @@ export default function EnergyState() {
                   condition: codeMap[c.weather_code] || "未知",
                 },
               }));
-            } catch {
-              /* ignore */
-            }
+            } catch { /* ignore */ }
           },
-          () => {
-            /* 用户拒绝定位，跳过天气 */
-          },
+          () => { /* 用户拒绝定位 */ },
           { enableHighAccuracy: false, timeout: 6000, maximumAge: 300000 }
         );
-      } catch {
-        /* ignore */
-      }
+      } catch { /* ignore */ }
     }
     loadWeather();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, []);
 
   const selectState = (id: string) => {
@@ -127,6 +165,9 @@ export default function EnergyState() {
 
   const stateList = useMemo(() => Object.values(ENERGY_STATES), []);
 
+  // Dimension color mapping
+  const dimColors: Record<string, string> = { sleep: "#8b5cf6", hr: "#ef4444", hrv: "#06b6d4", activity: "#22c55e" };
+
   if (!plan) {
     return (
       <div className="es-container">
@@ -135,6 +176,79 @@ export default function EnergyState() {
           what="综合心率、睡眠等数据，评估你当前的恢复与精力水平"
           how={["确保已录入近期睡眠和心率数据","查看 0-100 能量评分","根据建议调整训练强度"]}
         />
+
+        {/* 能量评分卡片 */}
+        <div style={{ margin: "0 0 20px", padding: "20px", background: "linear-gradient(135deg, rgba(15,15,15,.97), rgba(25,25,25,.95))", border: "1px solid rgba(212,175,55,.35)", borderRadius: 12 }}>
+          <h3 style={{ color: "#D4AF37", fontSize: 16, fontWeight: 700, marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
+            ⚡ 能量评分
+          </h3>
+
+          {scoreLoading ? (
+            <div style={{ textAlign: "center", padding: "20px 0", color: "rgba(255,255,255,.5)", fontSize: 13 }}>加载中...</div>
+          ) : energyScore ? (
+            <div>
+              {/* Score display */}
+              <div style={{ display: "flex", alignItems: "center", gap: 20, marginBottom: 16 }}>
+                <div style={{ textAlign: "center" }}>
+                  <div style={{ fontSize: 48, fontWeight: 800, color: "#D4AF37", lineHeight: 1 }}>
+                    {energyScore.totalScore}
+                  </div>
+                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)", marginTop: 4 }}>/100</div>
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 15, fontWeight: 600, color: "#fff", marginBottom: 4 }}>
+                    {energyScore.level}
+                  </div>
+                  <div style={{ fontSize: 13, color: "rgba(255,255,255,.7)" }}>
+                    {energyScore.levelDescription}
+                  </div>
+                </div>
+              </div>
+
+              {/* Dimension bars */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 14 }}>
+                {energyScore.dimensions.map((dim: any) => (
+                  <div key={dim.key} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <div style={{ width: 40, fontSize: 11, color: "rgba(255,255,255,.6)", textAlign: "right" }}>{dim.label}</div>
+                    <div style={{ flex: 1, height: 8, background: "rgba(255,255,255,.08)", borderRadius: 4, overflow: "hidden" }}>
+                      {dim.available && (
+                        <div style={{ width: `${dim.score}%`, height: "100%", background: dimColors[dim.key] || "#D4AF37", borderRadius: 4, transition: "width .5s ease" }} />
+                      )}
+                    </div>
+                    <div style={{ width: 70, fontSize: 11, color: dim.available ? "rgba(255,255,255,.7)" : "rgba(255,255,255,.3)" }}>
+                      {dim.available ? `${dim.score}分` : "无数据"}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Detail */}
+              <div style={{ fontSize: 11, color: "rgba(255,255,255,.5)", display: "flex", flexWrap: "wrap", gap: "4px 12px", marginBottom: 10 }}>
+                {energyScore.dimensions.filter((d: any) => d.available).map((d: any) => (
+                  <span key={d.key}>{d.label}: {d.detail}</span>
+                ))}
+              </div>
+
+              {/* Interpretations */}
+              <div style={{ borderTop: "1px solid rgba(212,175,55,.15)", paddingTop: 10 }}>
+                {energyScore.interpretations.slice(2).map((text: string, i: number) => (
+                  <p key={i} style={{ fontSize: 12, color: "rgba(255,255,255,.7)", margin: "3px 0" }}>• {text}</p>
+                ))}
+              </div>
+
+              {/* Disclaimer */}
+              <div style={{ marginTop: 10, padding: "6px 10px", background: "rgba(212,175,55,.06)", borderRadius: 6, fontSize: 11, color: "rgba(255,255,255,.4)" }}>
+                ⚠️ 仅供参考，非医疗建议。评分基于简单加权模型，非临床验证。
+              </div>
+            </div>
+          ) : (
+            <div style={{ textAlign: "center", padding: "16px 0" }}>
+              <p style={{ fontSize: 13, color: "rgba(255,255,255,.5)", marginBottom: 8 }}>暂无足够数据计算能量评分</p>
+              <p style={{ fontSize: 11, color: "rgba(255,255,255,.35)" }}>请先在「睡眠追踪」录入睡眠数据，或在「手表连接」录入心率/步数数据</p>
+            </div>
+          )}
+        </div>
+
         <div className="es-header">
           <h2>🔋 能量状态自适应健康方案</h2>
           <p>人不是一直忙，也不是一直闲。你正处在哪种「能量态」？我们据此给你最贴合的中医滋补 + 明星规划师式能量管理。</p>
@@ -244,7 +358,7 @@ export default function EnergyState() {
 
       {/* 休息滋补 */}
       <div className="es-box es-nourish">
-        <h3>🛌 休息时怎么滋补身体</h3>
+        <h3>�� 休息时怎么滋补身体</h3>
         <ul className="es-list">
           {plan.nourish.map((n: string, i: number) => (
             <li key={i}>{n}</li>
