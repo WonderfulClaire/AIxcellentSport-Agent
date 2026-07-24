@@ -1,0 +1,53 @@
+import{i as e,n as t,t as n}from"./jsx-runtime-BF6S49EV.js";var r=e(t(),1),i=n(),a=`aix_agent_memory_v1`,o=20,s={squat:`深蹲`,pushup:`俯卧撑`,jack:`开合跳`,lunge:`弓步`,plank:`平板支撑`},c={squat:`下肢`,pushup:`上肢`,jack:`全身`,lunge:`下肢`,plank:`核心`};function l(){try{let e=localStorage.getItem(a);if(!e)return[];let t=JSON.parse(e);return(Array.isArray(t?.records)?t.records:[]).slice().sort((e,t)=>t.timestamp-e.timestamp)}catch{return[]}}function u(e){let t=new Date(e),n=e=>String(e).padStart(2,`0`);return`${t.getFullYear()}-${n(t.getMonth()+1)}-${n(t.getDate())} ${n(t.getHours())}:${n(t.getMinutes())}`}function d(e){let t=new Date(e),n=e=>String(e).padStart(2,`0`);return`${t.getFullYear()}-${n(t.getMonth()+1)}-${n(t.getDate())}`}function f(e){let t=e.issues?.filter(Boolean)??[];return e.score>=90?t.length?`动作评分 ${e.score}，整体优秀；细节上留意：${t.join(`、`)}。`:`动作评分 ${e.score}，姿态标准，保持当前节奏即可。`:e.score>=75?t.length?`动作评分 ${e.score}，整体不错；重点纠正：${t.join(`、`)}。`:`动作评分 ${e.score}，稳定性尚可，尝试放慢节奏、收紧核心。`:t.length?`动作评分偏低（${e.score}），建议优先处理：${t.join(`、`)}。`:`动作评分偏低（${e.score}），建议降低速度、对照要点重做。`}function p(){let[e,t]=(0,r.useState)(null),[n,a]=(0,r.useState)(`all`),[p,_]=(0,r.useState)(``),[v,y]=(0,r.useState)(1),[b,x]=(0,r.useState)(null);(0,r.useEffect)(()=>{t(l())},[]);let S=(0,r.useMemo)(()=>{let t=e??[];return n!==`all`&&(t=t.filter(e=>(c[e.exercise]??``)===n)),p&&(t=t.filter(e=>d(e.timestamp)===p)),t},[e,n,p]),C=Math.max(1,Math.ceil(S.length/o)),w=Math.min(v,C),T=S.slice((w-1)*o,w*o),E=()=>{x(null),y(1),t(l())},D=(0,r.useMemo)(()=>{let t=new Set;return(e??[]).forEach(e=>{let n=c[e.exercise];n&&t.add(n)}),Array.from(t)},[e]);return(0,i.jsxs)(`section`,{className:`aix-hist`,children:[(0,i.jsx)(`style`,{children:g}),(0,i.jsxs)(`header`,{className:`aix-hist-head`,children:[(0,i.jsxs)(`div`,{children:[(0,i.jsx)(`span`,{className:`aix-hist-eyebrow`,children:`TRAINING LOG`}),(0,i.jsx)(`h2`,{children:`训练日志`}),(0,i.jsx)(`p`,{children:`每一次动作的评分、问题与 AI 洞察，按时间倒序排列。`})]}),(0,i.jsx)(`button`,{className:`aix-hist-refresh`,onClick:E,children:`↻ 刷新`})]}),e===null?(0,i.jsx)(`div`,{className:`aix-hist-empty`,children:`读取本地训练记录中…`}):e.length===0?(0,i.jsxs)(`div`,{className:`aix-hist-empty`,children:[`暂无训练记录。`,(0,i.jsx)(`br`,{}),`完成几次训练后，这里会按时间记录你的每一次动作。`]}):(0,i.jsxs)(i.Fragment,{children:[(0,i.jsxs)(`div`,{className:`aix-hist-toolbar`,children:[(0,i.jsxs)(`div`,{className:`aix-hist-chips`,children:[(0,i.jsx)(`button`,{className:`aix-hist-chip ${n===`all`?`on`:``}`,onClick:()=>{a(`all`),y(1)},children:`全部`}),D.map(e=>(0,i.jsx)(`button`,{className:`aix-hist-chip ${n===e?`on`:``}`,onClick:()=>{a(e),y(1)},children:e},e))]}),(0,i.jsxs)(`label`,{className:`aix-hist-date`,children:[`日期`,(0,i.jsx)(`input`,{type:`date`,value:p,onChange:e=>{_(e.target.value),y(1)}})]}),p&&(0,i.jsx)(`button`,{className:`aix-hist-clear`,onClick:()=>_(``),children:`清除日期`})]}),(0,i.jsx)(`div`,{className:`aix-hist-table-wrap`,children:(0,i.jsxs)(`table`,{className:`aix-hist-table`,children:[(0,i.jsx)(`thead`,{children:(0,i.jsxs)(`tr`,{children:[(0,i.jsx)(`th`,{children:`日期时间`}),(0,i.jsx)(`th`,{children:`动作`}),(0,i.jsx)(`th`,{children:`评分`}),(0,i.jsx)(`th`,{children:`反馈摘要`}),(0,i.jsx)(`th`,{children:`AI 洞察`}),(0,i.jsx)(`th`,{"aria-hidden":`true`})]})}),(0,i.jsx)(`tbody`,{children:T.map((e,t)=>{let n=(w-1)*o+t,a=e.issues?.filter(Boolean)??[],l=b===n;return(0,i.jsxs)(r.Fragment,{children:[(0,i.jsxs)(`tr`,{className:`aix-hist-row`,onClick:()=>x(l?null:n),children:[(0,i.jsx)(`td`,{children:u(e.timestamp)}),(0,i.jsxs)(`td`,{children:[(0,i.jsx)(`span`,{className:`aix-hist-ex`,children:s[e.exercise]??e.exercise}),(0,i.jsx)(`small`,{children:c[e.exercise]??``})]}),(0,i.jsx)(`td`,{children:(0,i.jsx)(`span`,{className:`aix-hist-score ${h(e.score)}`,children:e.score})}),(0,i.jsx)(`td`,{className:`aix-hist-sum`,children:a.length?a.join(`、`):`动作标准`}),(0,i.jsx)(`td`,{className:`aix-hist-ins`,children:f(e)}),(0,i.jsx)(`td`,{className:`aix-hist-toggle`,children:l?`▲`:`▼`})]}),l&&(0,i.jsx)(`tr`,{className:`aix-hist-detail-row`,children:(0,i.jsx)(`td`,{colSpan:6,children:(0,i.jsxs)(`div`,{className:`aix-hist-detail`,children:[(0,i.jsxs)(`div`,{className:`aix-hist-detail-grid`,children:[(0,i.jsx)(m,{label:`动作`,value:s[e.exercise]??e.exercise}),(0,i.jsx)(m,{label:`第几次`,value:`#${e.repIndex}`}),(0,i.jsx)(m,{label:`评分`,value:`${e.score} / 100`}),(0,i.jsx)(m,{label:`关键角度`,value:`${e.jointAngle}°`}),(0,i.jsx)(m,{label:`时间`,value:u(e.timestamp)}),(0,i.jsx)(m,{label:`部位类型`,value:c[e.exercise]??`—`})]}),(0,i.jsxs)(`div`,{className:`aix-hist-detail-block`,children:[(0,i.jsx)(`span`,{className:`aix-hist-detail-title`,children:`本次问题`}),a.length?(0,i.jsx)(`ul`,{children:a.map((e,t)=>(0,i.jsx)(`li`,{children:e},t))}):(0,i.jsx)(`p`,{children:`动作标准，暂无可纠正项。`})]}),(0,i.jsxs)(`div`,{className:`aix-hist-detail-block`,children:[(0,i.jsx)(`span`,{className:`aix-hist-detail-title`,children:`AI 洞察`}),(0,i.jsx)(`p`,{children:f(e)})]})]})})})]},n)})})]})}),(0,i.jsxs)(`div`,{className:`aix-hist-pager`,children:[(0,i.jsxs)(`span`,{className:`aix-hist-count`,children:[`共 `,S.length,` 条 · 第 `,w,`/`,C,` 页`]}),(0,i.jsxs)(`div`,{className:`aix-hist-pager-btns`,children:[(0,i.jsx)(`button`,{disabled:w<=1,onClick:()=>y(w-1),children:`上一页`}),(0,i.jsx)(`button`,{disabled:w>=C,onClick:()=>y(w+1),children:`下一页`})]})]})]})]})}function m({label:e,value:t}){return(0,i.jsxs)(`div`,{className:`aix-hist-detail-item`,children:[(0,i.jsx)(`span`,{children:e}),(0,i.jsx)(`b`,{children:t})]})}function h(e){return e>=90?`good`:e>=75?`mid`:`low`}var g=`
+.aix-hist { --acid:#b7ff2a; --ink:#071521; --muted:#667f92; --line:rgba(7,21,33,.13); --cream:#f3f7f8;
+  max-width:1440px; margin:0 auto; padding:64px 5vw 80px; font-family:Arial,Helvetica,sans-serif; color:var(--ink); }
+.aix-hist-eyebrow { display:inline-flex; align-items:center; gap:8px; font:800 11px/1 monospace; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); }
+.aix-hist-eyebrow::before { content:""; width:26px; height:3px; background:var(--acid); border:1px solid var(--ink); }
+.aix-hist-head { display:flex; justify-content:space-between; align-items:flex-end; gap:20px; margin-bottom:26px; flex-wrap:wrap; }
+.aix-hist-head h2 { font-size:clamp(34px,4vw,58px); margin:12px 0 8px; letter-spacing:-.055em; }
+.aix-hist-head p { color:var(--muted); font-size:14px; max-width:460px; line-height:1.6; margin:0; }
+.aix-hist-refresh { padding:10px 16px; border:2px solid var(--ink); background:var(--acid); font-weight:800; cursor:pointer; border-radius:10px; box-shadow:3px 3px 0 var(--ink); }
+.aix-hist-refresh:hover { transform:translate(1px,1px); box-shadow:2px 2px 0 var(--ink); }
+.aix-hist-empty { padding:60px 20px; text-align:center; color:var(--muted); border:1px dashed var(--line); border-radius:14px; background:#fff; line-height:1.7; }
+.aix-hist-toolbar { display:flex; align-items:center; gap:16px; flex-wrap:wrap; margin-bottom:16px; }
+.aix-hist-chips { display:flex; flex-wrap:wrap; gap:8px; }
+.aix-hist-chip { padding:7px 13px; border:1px solid var(--line); border-radius:999px; background:transparent; color:var(--ink); font-size:13px; cursor:pointer; transition:.15s; }
+.aix-hist-chip:hover { border-color:var(--ink); }
+.aix-hist-chip.on { background:var(--acid); border-color:var(--ink); font-weight:700; }
+.aix-hist-date { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted); }
+.aix-hist-date input { padding:8px 10px; border:1px solid var(--line); border-radius:8px; font:inherit; color:var(--ink); }
+.aix-hist-clear { border:none; background:transparent; color:var(--muted); cursor:pointer; font-size:13px; text-decoration:underline; }
+.aix-hist-table-wrap { border:1px solid var(--line); border-radius:14px; overflow:auto; background:#fff; }
+.aix-hist-table { width:100%; border-collapse:collapse; font-size:13px; min-width:760px; }
+.aix-hist-table thead th { text-align:left; padding:14px 16px; font:700 10px monospace; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); border-bottom:1px solid var(--line); background:var(--cream); }
+.aix-hist-row { cursor:pointer; border-bottom:1px solid var(--line); transition:background .12s; }
+.aix-hist-row:hover { background:rgba(183,255,42,.08); }
+.aix-hist-table td { padding:13px 16px; vertical-align:top; line-height:1.5; }
+.aix-hist-ex { display:block; font-weight:800; }
+.aix-hist-ex small { color:var(--muted); font-weight:400; }
+.aix-hist-score { display:inline-block; min-width:30px; text-align:center; padding:3px 8px; border-radius:8px; font-weight:800; }
+.aix-hist-score.good { background:rgba(183,255,42,.22); color:#3a5a00; }
+.aix-hist-score.mid { background:rgba(85,200,255,.18); color:#0a5a82; }
+.aix-hist-score.low { background:rgba(255,107,107,.16); color:#b5342f; }
+.aix-hist-sum { max-width:220px; color:var(--ink); }
+.aix-hist-ins { max-width:300px; color:var(--muted); }
+.aix-hist-toggle { width:36px; text-align:center; color:var(--muted); }
+.aix-hist-detail-row td { background:var(--cream); padding:0; }
+.aix-hist-detail { padding:20px; display:flex; flex-direction:column; gap:18px; }
+.aix-hist-detail-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+@media (max-width:680px){ .aix-hist-detail-grid{ grid-template-columns:repeat(2,1fr);} }
+.aix-hist-detail-item { background:#fff; border:1px solid var(--line); border-radius:10px; padding:12px; }
+.aix-hist-detail-item span { display:block; font:700 9px monospace; letter-spacing:.08em; color:var(--muted); text-transform:uppercase; margin-bottom:5px; }
+.aix-hist-detail-item b { font-size:16px; }
+.aix-hist-detail-block { background:#fff; border:1px solid var(--line); border-radius:10px; padding:14px; }
+.aix-hist-detail-title { display:block; font:700 11px monospace; letter-spacing:.06em; color:var(--acid); margin-bottom:8px; -webkit-text-stroke:.3px var(--ink); }
+.aix-hist-detail-block p { margin:0; font-size:14px; line-height:1.6; color:var(--ink); }
+.aix-hist-detail-block ul { margin:0; padding-left:18px; }
+.aix-hist-detail-block li { font-size:14px; line-height:1.6; color:var(--ink); }
+.aix-hist-pager { display:flex; justify-content:space-between; align-items:center; margin-top:18px; flex-wrap:wrap; gap:12px; }
+.aix-hist-count { font-size:13px; color:var(--muted); }
+.aix-hist-pager-btns { display:flex; gap:10px; }
+.aix-hist-pager-btns button { padding:9px 16px; border:2px solid var(--ink); background:#fff; font-weight:800; cursor:pointer; border-radius:10px; }
+.aix-hist-pager-btns button:disabled { opacity:.4; cursor:not-allowed; }
+.aix-hist-pager-btns button:not(:disabled):hover { background:var(--acid); }
+`;export{p as default};

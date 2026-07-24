@@ -33,6 +33,7 @@ const TrainingTimeline = lazy(() => import("./components/TrainingTimeline"));
 const ExerciseLibrary = lazy(() => import("./components/ExerciseLibrary"));
 const TrainingHistory = lazy(() => import("./components/TrainingHistory"));
 const AssistantHub = lazy(() => import("./components/AssistantHub"));
+const Settings = lazy(() => import("./components/Settings"));
 
 import { getStoredUser, clearSession } from "./api";
 
@@ -103,7 +104,7 @@ export default function Home() {
     plan: { nextPlan: string[]; generatedBy: "llm" | "heuristic" };
   }>(null);
   const [speakOn, setSpeakOn] = useState(false);
-  const [activeTab, setActiveTab] = useState<"assistant" | "member" | "hub" | "train" | "video" | "posture" | "nutrition" | "doctor" | "image" | "plan" | "timeline" | "energy" | "library" | "diet" | "sleep" | "tcm" | "dashboard" | "history" | "wearable" | "trends" | "weekly_report">("assistant");
+  const [activeTab, setActiveTab] = useState<"assistant" | "member" | "hub" | "train" | "video" | "posture" | "nutrition" | "doctor" | "image" | "plan" | "timeline" | "energy" | "library" | "diet" | "sleep" | "tcm" | "dashboard" | "history" | "wearable" | "trends" | "weekly_report" | "settings">("assistant");
   const [menuOpen, setMenuOpen] = useState(false);
   const [authUser, setAuthUser] = useState<any>(null);
   const [authOpen, setAuthOpen] = useState(false);
@@ -557,6 +558,7 @@ export default function Home() {
                   { key: "timeline" as const, label: "时间轴", desc: "健康历程回顾" },
                   { key: "dashboard" as const, label: "数据面板", desc: "全景数据看板" },
                   { key: "history" as const, label: "训练记录", desc: "历史训练档案" },
+                  { key: "settings" as const, label: "全局设置", desc: "智能对话配置与偏好" },
                 ].map((item) => (
                   <button key={item.key} className="dropdown-item" onClick={() => { setActiveTab(item.key); setMenuOpen(false); }}>
                     <span className="item-label">{item.label}</span><span className="item-desc">{item.desc}</span>
@@ -802,6 +804,7 @@ export default function Home() {
       {activeTab === "wearable" && <div key="wearable" className="page-fade-in"><WearableConnect /></div>}
       {activeTab === "trends" && <div key="trends" className="page-fade-in"><HealthTrends /></div>}
       {activeTab === "weekly_report" && <div key="weekly_report" className="page-fade-in"><WeeklyReport /></div>}
+      {activeTab === "settings" && <div key="settings" className="page-fade-in"><Settings /></div>}
       </Suspense>
 
       <footer>

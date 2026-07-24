@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { callLLM } from "../agent/coachAgent.ts";
-import { loadAgentConfig } from "../agent/index.ts";
+import { getLLMConfig, hasLLM } from "../agent/config";
 import { generateDailyWellnessAdvice } from "../agent/tcmEngine.ts";
 import { recommendState, buildEnergyPlan } from "../agent/energyStateEngine.ts";
 
@@ -91,16 +91,14 @@ function heuristicAnswer(text: string): string {
   return "我是你的私人健康管家，可以帮你练得更准、吃得更对、睡得更好、按节气养生。试试下面的「技能中心」，或直接告诉我你想解决什么，比如「帮我看看体态」「今天怎么养生」「我最近很累怎么调理」。";
 }
 
-export default function AssistantHub({ onLaunch }: { onLaunch: (k: ModuleKey) => void }) {
+export default function AssistantHub({ onLaunch }: { onLaunch: (k: ModuleKey | "settings") => void }) {
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [input, setInput] = useState("");
   const [thinking, setThinking] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const cfgRef = useRef<any>(null);
   const idRef = useRef(1);
 
   useEffect(() => {
-    cfgRef.current = loadAgentConfig();
     // 首次进入：问候 + 今日健康快照
     const snap = buildSnapshot();
     setMessages([
@@ -153,6 +151,11 @@ export default function AssistantHub({ onLaunch }: { onLaunch: (k: ModuleKey) =>
     async (raw?: string) => {
       const text = (raw ?? input).trim();
       if (!text || thinking) return;
+      // “前往设置”快捷指令直接跳转
+      if (/前往设置|打开设置|设置页/.test(text)) {
+        onLaunch("settings" as any);
+        return;
+      }
       setInput("");
       push({ role: "user", text });
       setThinking(true);
@@ -187,7 +190,7 @@ export default function AssistantHub({ onLaunch }: { onLaunch: (k: ModuleKey) =>
       }
 
       // 3) 自由问答（LLM，无密钥走启发式）
-      const cfg = cfgRef.current || loadAgentConfig();
+      const cfg = getLLMConfig();
       const sys = [
         "你是 AIxcellentHealth 的私人健康管家，运行在用户浏览器端、隐私优先。",
         "你整合了实时训练、视频分析、体态评估、私人营养、私人医生、形象管理、训练计划、睡眠、中医节气养生、能量状态管理等能力。",
@@ -198,12 +201,22 @@ export default function AssistantHub({ onLaunch }: { onLaunch: (k: ModuleKey) =>
         .slice(-6)
         .map((m) => ({ role: m.role, content: m.text }));
       let reply: string | null = null;
-      if (cfg.apiKey) {
+      if (cfg && cfg.apiKey) {
         reply = await callLLM(
           [{ role: "system", content: sys }, ...history, { role: "user", content: text }],
-          cfg,
+          { ...cfg, timeoutMs: 8000 },
           undefined,
         );
+      }
+      if (!reply && !hasLLM()) {
+        // 无 Key 时显示友好兜底提示
+        push({
+          role: "assistant",
+          text: heuristicAnswer(text),
+          quick: ["前往设置", "打开私人营养", "给我做个训练计划"],
+        });
+        setThinking(false);
+        return;
       }
       push({
         role: "assistant",

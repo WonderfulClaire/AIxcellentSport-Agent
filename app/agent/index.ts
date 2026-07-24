@@ -14,6 +14,7 @@
 import { AgentMemory } from "./memory.ts";
 import { CoachAgent } from "./coachAgent.ts";
 import { runMultiAgent } from "./multiAgent.ts";
+import { getLLMConfig } from "./config.ts";
 
 // 预设厂商的 OpenAI 兼容接入点（仅 base url，不含密钥）。
 // 7/24 黑客松若要求 Qoder/通义千问，把 provider 设为 "qwen" 即可，无需改代码。
@@ -29,9 +30,15 @@ const PROVIDER_PRESETS = {
 };
 
 export function loadAgentConfig() {
-  let cfg = {};
-  if (typeof window !== "undefined" && window.__AGENT_CONFIG__) {
-    cfg = { ...window.__AGENT_CONFIG__ };
+  // 优先从 localStorage 统一配置读取（Settings 页写入）
+  const stored = getLLMConfig();
+  if (stored) {
+    return { ...stored, timeoutMs: 8000 };
+  }
+  // 兑容旧的 window.__AGENT_CONFIG__ 注入方式
+  let cfg: any = {};
+  if (typeof window !== "undefined" && (window as any).__AGENT_CONFIG__) {
+    cfg = { ...(window as any).__AGENT_CONFIG__ };
   }
   // 预设厂商展开为具体 base url / model
   if (cfg.provider && PROVIDER_PRESETS[cfg.provider]) {
