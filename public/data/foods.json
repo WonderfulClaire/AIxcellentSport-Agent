@@ -1,36 +1,3702 @@
-// public/data/foods.json
-// 中文食物营养数据库（每100g可食部分）
-// 数据来源：中国食物成分表（标准版）+ 常见食物估算
-[
-  {"id": "rice", "name": "米饭（熟）", "category": "主食", "calories": 116, "protein": 2.6, "carbs": 25.6, "fat": 0.3, "fiber": 0.3, "unit": "碗", "portionGrams": 150},
-  {"id": "noodle", "name": "面条（熟）", "category": "主食", "calories": 110, "protein": 4.5, "carbs": 22.0, "fat": 0.5, "fiber": 0.4, "unit": "碗", "portionGrams": 200},
-  {"id": "steamed_bread", "name": "馒头", "category": "主食", "calories": 221, "protein": 7.0, "carbs": 45.5, "fat": 1.1, "fiber": 1.3, "unit": "个", "portionGrams": 80},
-  {"id": "oatmeal", "name": "燕麦片", "category": "主食", "calories": 377, "protein": 15.0, "carbs": 66.0, "fat": 6.7, "fiber": 10.6, "unit": "碗", "portionGrams": 40},
-  {"id": "sweet_potato", "name": "红薯（蒸）", "category": "主食", "calories": 86, "protein": 1.6, "carbs": 20.1, "fat": 0.2, "fiber": 1.6, "unit": "个(小)", "portionGrams": 150},
-  {"id": "corn", "name": "玉米（蒸）", "category": "主食", "calories": 112, "protein": 4.0, "carbs": 22.8, "fat": 1.2, "fiber": 2.9, "unit": "根", "portionGrams": 200},
-  {"id": "chicken_breast", "name": "鸡胸肉", "category": "蛋白质", "calories": 133, "protein": 31.0, "carbs": 0.0, "fat": 3.6, "fiber": 0, "unit": "份", "portionGrams": 120},
-  {"id": "egg", "name": "鸡蛋（煮）", "category": "蛋白质", "calories": 144, "protein": 13.3, "carbs": 1.4, "fat": 8.8, "fiber": 0, "unit": "个", "portionGrams": 50},
-  {"id": "egg_white", "name": "蛋白", "category": "蛋白质", "calories": 36, "protein": 11.0, "carbs": 0.2, "fat": 0.1, "fiber": 0, "unit": "个", "portionGrams": 33},
-  {"id": "beef_lean", "name": "牛瘦肉", "category": "蛋白质", "calories": 125, "protein": 26.0, "carbs": 0.0, "fat": 2.5, "fiber": 0, "unit": "份", "portionGrams": 100},
-  {"id": "pork_lean", "name": "猪瘦肉", "category": "蛋白质", "calories": 143, "protein": 20.3, "carbs": 1.5, "fat": 6.2, "fiber": 0, "unit": "份", "portionGrams": 100},
-  {"id": "fish", "name": "鱼肉（鲈鱼）", "category": "蛋白质", "calories": 105, "protein": 18.6, "carbs": 0.0, "fat": 3.4, "fiber": 0, "unit": "份", "portionGrams": 120},
-  {"id": "shrimp", "name": "虾", "category": "蛋白质", "calories": 87, "protein": 18.6, "carbs": 0.9, "fat": 0.8, "fiber": 0, "unit": "份", "portionGrams": 100},
-  {"id": "tofu", "name": "豆腐（北）", "category": "蛋白质", "calories": 98, "protein": 12.2, "carbs": 1.5, "fat": 4.8, "fiber": 0.5, "unit": "块", "portionGrams": 150},
-  {"id": "milk", "name": "牛奶", "category": "饮品", "calories": 54, "protein": 3.0, "carbs": 3.4, "fat": 3.2, "fiber": 0, "unit": "杯(250ml)", "portionGrams": 250},
-  {"id": "yogurt", "name": "酸奶（无糖）", "category": "饮品", "calories": 57, "protein": 3.3, "carbs": 4.7, "fat": 3.0, "fiber": 0, "unit": "杯", "portionGrams": 150},
-  {"id": "soy_milk", "name": "豆浆（无糖）", "category": "饮品", "calories": 16, "protein": 1.8, "carbs": 1.1, "fat": 0.7, "fiber": 0.1, "unit": "杯", "portionGrams": 250},
-  {"id": "broccoli", "name": "西兰花", "category": "蔬菜", "calories": 34, "protein": 4.1, "carbs": 4.3, "fat": 0.6, "fiber": 3.8, "unit": "份", "portionGrams": 100},
-  {"id": "spinach", "name": "菠菜", "category": "蔬菜", "calories": 24, "protein": 2.6, "carbs": 3.6, "fat": 0.3, "fiber": 2.2, "unit": "份", "portionGrams": 100},
-  {"id": "cabbage", "name": "大白菜", "category": "蔬菜", "calories": 17, "protein": 1.5, "carbs": 2.4, "fat": 0.1, "fiber": 0.8, "unit": "份", "portionGrams": 150},
-  {"id": "tomato", "name": "番茄", "category": "蔬菜", "calories": 15, "protein": 0.9, "carbs": 3.3, "fat": 0.2, "fiber": 0.5, "unit": "个", "portionGrams": 150},
-  {"id": "cucumber", "name": "黄瓜", "category": "蔬菜", "calories": 15, "protein": 0.8, "carbs": 2.7, "fat": 0.2, "fiber": 0.5, "unit": "根", "portionGrams": 200},
-  {"id": "carrot", "name": "胡萝卜", "category": "蔬菜", "calories": 37, "protein": 1.0, "carbs": 8.1, "fat": 0.2, "fiber": 2.8, "unit": "根", "portionGrams": 100},
-  {"id": "apple", "name": "苹果", "category": "水果", "calories": 52, "protein": 0.2, "carbs": 13.5, "fat": 0.2, "fiber": 1.2, "unit": "个", "portionGrams": 200},
-  {"id": "banana", "name": "香蕉", "category": "水果", "calories": 93, "protein": 1.4, "carbs": 22.0, "fat": 0.2, "fiber": 1.2, "unit": "根", "portionGrams": 120},
-  {"id": "orange", "name": "橙子", "category": "水果", "calories": 48, "protein": 0.8, "carbs": 11.5, "fat": 0.2, "fiber": 0.6, "unit": "个", "portionGrams": 180},
-  {"id": "grape", "name": "葡萄", "category": "水果", "calories": 43, "protein": 0.5, "carbs": 10.3, "fat": 0.2, "fiber": 0.4, "unit": "份", "portionGrams": 100},
-  {"id": "avocado", "name": "牛油果", "category": "水果", "calories": 161, "protein": 2.0, "carbs": 5.7, "fat": 15.3, "fiber": 2.1, "unit": "个", "portionGrams": 130},
-  {"id": "bread_whole", "name": "全麦面包", "category": "主食", "calories": 246, "protein": 8.5, "carbs": 47.0, "fat": 3.2, "fiber": 6.0, "unit": "片", "portionGrams": 35},
-  {"id": "salmon", "name": "三文鱼", "category": "蛋白质", "calories": 139, "protein": 20.5, "carbs": 0.0, "fat": 6.3, "fiber": 0, "unit": "份", "portionGrams": 100},
-  {"id": "pork_chop", "name": "猪排", "category": "蛋白质", "calories": 245, "protein": 22.0, "carbs": 0.5, "fat": 17.0, "fiber": 0, "unit": "块", "portionGrams": 120}
-]
+{
+  "_source": "数据来源：中国食物成分表（第6版）公开数值 + 常见食物营养估算，自行录入整理，仅供参考。",
+  "_license": "自录公开科学数据，无版权限制。",
+  "foods": [
+    {
+      "id": "rice_white",
+      "name": "白米饭",
+      "category": "主食",
+      "per100g": {
+        "calories": 116,
+        "protein": 2.6,
+        "carbs": 25.6,
+        "fat": 0.3,
+        "fiber": 0.3
+      }
+    },
+    {
+      "id": "rice_brown",
+      "name": "糙米饭",
+      "category": "主食",
+      "per100g": {
+        "calories": 111,
+        "protein": 2.5,
+        "carbs": 23.5,
+        "fat": 0.9,
+        "fiber": 1.8
+      }
+    },
+    {
+      "id": "rice_congee",
+      "name": "白粥",
+      "category": "主食",
+      "per100g": {
+        "calories": 46,
+        "protein": 1.1,
+        "carbs": 9.9,
+        "fat": 0.1,
+        "fiber": 0.1
+      }
+    },
+    {
+      "id": "millet_congee",
+      "name": "小米粥",
+      "category": "主食",
+      "per100g": {
+        "calories": 46,
+        "protein": 1.4,
+        "carbs": 8.4,
+        "fat": 0.7,
+        "fiber": 0.3
+      }
+    },
+    {
+      "id": "noodle_wheat",
+      "name": "面条（熟）",
+      "category": "主食",
+      "per100g": {
+        "calories": 110,
+        "protein": 4.5,
+        "carbs": 22.0,
+        "fat": 0.5,
+        "fiber": 0.4
+      }
+    },
+    {
+      "id": "noodle_rice",
+      "name": "米粉（熟）",
+      "category": "主食",
+      "per100g": {
+        "calories": 109,
+        "protein": 2.3,
+        "carbs": 24.3,
+        "fat": 0.2,
+        "fiber": 0.2
+      }
+    },
+    {
+      "id": "noodle_glass",
+      "name": "粉丝（熟）",
+      "category": "主食",
+      "per100g": {
+        "calories": 83,
+        "protein": 0.1,
+        "carbs": 20.5,
+        "fat": 0.0,
+        "fiber": 0.1
+      }
+    },
+    {
+      "id": "mantou",
+      "name": "馒头",
+      "category": "主食",
+      "per100g": {
+        "calories": 221,
+        "protein": 7.0,
+        "carbs": 45.5,
+        "fat": 1.1,
+        "fiber": 1.3
+      }
+    },
+    {
+      "id": "huajuan",
+      "name": "花卷",
+      "category": "主食",
+      "per100g": {
+        "calories": 214,
+        "protein": 6.8,
+        "carbs": 43.0,
+        "fat": 1.5,
+        "fiber": 1.0
+      }
+    },
+    {
+      "id": "baozi_pork",
+      "name": "猪肉包子",
+      "category": "主食",
+      "per100g": {
+        "calories": 226,
+        "protein": 8.5,
+        "carbs": 28.0,
+        "fat": 8.5,
+        "fiber": 0.8
+      }
+    },
+    {
+      "id": "jiaozi_pork",
+      "name": "猪肉饺子",
+      "category": "主食",
+      "per100g": {
+        "calories": 196,
+        "protein": 8.0,
+        "carbs": 24.0,
+        "fat": 7.5,
+        "fiber": 0.7
+      }
+    },
+    {
+      "id": "wonton",
+      "name": "馄饨",
+      "category": "主食",
+      "per100g": {
+        "calories": 178,
+        "protein": 7.5,
+        "carbs": 22.0,
+        "fat": 6.0,
+        "fiber": 0.5
+      }
+    },
+    {
+      "id": "bread_white",
+      "name": "白面包",
+      "category": "主食",
+      "per100g": {
+        "calories": 266,
+        "protein": 8.0,
+        "carbs": 50.0,
+        "fat": 3.2,
+        "fiber": 2.0
+      }
+    },
+    {
+      "id": "bread_whole",
+      "name": "全麦面包",
+      "category": "主食",
+      "per100g": {
+        "calories": 246,
+        "protein": 8.5,
+        "carbs": 47.0,
+        "fat": 3.2,
+        "fiber": 6.0
+      }
+    },
+    {
+      "id": "oatmeal",
+      "name": "燕麦片",
+      "category": "主食",
+      "per100g": {
+        "calories": 377,
+        "protein": 15.0,
+        "carbs": 66.0,
+        "fat": 6.7,
+        "fiber": 10.6
+      }
+    },
+    {
+      "id": "corn_steamed",
+      "name": "玉米（蒸）",
+      "category": "主食",
+      "per100g": {
+        "calories": 112,
+        "protein": 4.0,
+        "carbs": 22.8,
+        "fat": 1.2,
+        "fiber": 2.9
+      }
+    },
+    {
+      "id": "sweet_potato",
+      "name": "红薯（蒸）",
+      "category": "主食",
+      "per100g": {
+        "calories": 86,
+        "protein": 1.6,
+        "carbs": 20.1,
+        "fat": 0.2,
+        "fiber": 1.6
+      }
+    },
+    {
+      "id": "potato_boiled",
+      "name": "土豆（煮）",
+      "category": "主食",
+      "per100g": {
+        "calories": 76,
+        "protein": 2.0,
+        "carbs": 17.0,
+        "fat": 0.1,
+        "fiber": 1.4
+      }
+    },
+    {
+      "id": "taro",
+      "name": "芋头（蒸）",
+      "category": "主食",
+      "per100g": {
+        "calories": 79,
+        "protein": 2.2,
+        "carbs": 18.1,
+        "fat": 0.2,
+        "fiber": 1.0
+      }
+    },
+    {
+      "id": "yam",
+      "name": "山药（蒸）",
+      "category": "主食",
+      "per100g": {
+        "calories": 56,
+        "protein": 1.5,
+        "carbs": 12.4,
+        "fat": 0.2,
+        "fiber": 0.8
+      }
+    },
+    {
+      "id": "glutinous_rice",
+      "name": "糯米饭",
+      "category": "主食",
+      "per100g": {
+        "calories": 120,
+        "protein": 2.6,
+        "carbs": 26.8,
+        "fat": 0.3,
+        "fiber": 0.3
+      }
+    },
+    {
+      "id": "zongzi",
+      "name": "粽子",
+      "category": "主食",
+      "per100g": {
+        "calories": 180,
+        "protein": 4.2,
+        "carbs": 32.0,
+        "fat": 3.8,
+        "fiber": 0.5
+      }
+    },
+    {
+      "id": "tangyuan",
+      "name": "汤圆",
+      "category": "主食",
+      "per100g": {
+        "calories": 231,
+        "protein": 3.5,
+        "carbs": 40.0,
+        "fat": 6.5,
+        "fiber": 0.5
+      }
+    },
+    {
+      "id": "naan",
+      "name": "烧饼",
+      "category": "主食",
+      "per100g": {
+        "calories": 245,
+        "protein": 7.5,
+        "carbs": 42.0,
+        "fat": 5.2,
+        "fiber": 1.5
+      }
+    },
+    {
+      "id": "youtiao",
+      "name": "油条",
+      "category": "主食",
+      "per100g": {
+        "calories": 388,
+        "protein": 6.9,
+        "carbs": 50.3,
+        "fat": 17.6,
+        "fiber": 0.9
+      }
+    },
+    {
+      "id": "dabing",
+      "name": "大饼",
+      "category": "主食",
+      "per100g": {
+        "calories": 251,
+        "protein": 7.8,
+        "carbs": 46.0,
+        "fat": 3.5,
+        "fiber": 1.6
+      }
+    },
+    {
+      "id": "instant_noodle",
+      "name": "方便面（干）",
+      "category": "主食",
+      "per100g": {
+        "calories": 472,
+        "protein": 9.5,
+        "carbs": 60.0,
+        "fat": 21.0,
+        "fiber": 1.5
+      }
+    },
+    {
+      "id": "pasta",
+      "name": "意大利面（熟）",
+      "category": "主食",
+      "per100g": {
+        "calories": 131,
+        "protein": 5.0,
+        "carbs": 25.0,
+        "fat": 1.1,
+        "fiber": 1.8
+      }
+    },
+    {
+      "id": "quinoa",
+      "name": "藜麦（熟）",
+      "category": "主食",
+      "per100g": {
+        "calories": 120,
+        "protein": 4.4,
+        "carbs": 21.3,
+        "fat": 1.9,
+        "fiber": 2.8
+      }
+    },
+    {
+      "id": "oat_bran",
+      "name": "燕麦麸",
+      "category": "主食",
+      "per100g": {
+        "calories": 246,
+        "protein": 17.3,
+        "carbs": 66.2,
+        "fat": 7.0,
+        "fiber": 15.4
+      }
+    },
+    {
+      "id": "rice_cake",
+      "name": "年糕",
+      "category": "主食",
+      "per100g": {
+        "calories": 154,
+        "protein": 3.3,
+        "carbs": 34.7,
+        "fat": 0.2,
+        "fiber": 0.6
+      }
+    },
+    {
+      "id": "pork_lean",
+      "name": "猪瘦肉",
+      "category": "肉类",
+      "per100g": {
+        "calories": 143,
+        "protein": 20.3,
+        "carbs": 1.5,
+        "fat": 6.2,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "pork_belly",
+      "name": "五花肉",
+      "category": "肉类",
+      "per100g": {
+        "calories": 395,
+        "protein": 14.0,
+        "carbs": 0.5,
+        "fat": 37.0,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "pork_ribs",
+      "name": "猪排骨",
+      "category": "肉类",
+      "per100g": {
+        "calories": 264,
+        "protein": 18.3,
+        "carbs": 0.7,
+        "fat": 20.4,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "pork_loin",
+      "name": "猪里脊",
+      "category": "肉类",
+      "per100g": {
+        "calories": 155,
+        "protein": 20.2,
+        "carbs": 1.5,
+        "fat": 7.1,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "pork_liver",
+      "name": "猪肝",
+      "category": "肉类",
+      "per100g": {
+        "calories": 129,
+        "protein": 19.3,
+        "carbs": 5.0,
+        "fat": 3.5,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "pork_trotter",
+      "name": "猪蹄",
+      "category": "肉类",
+      "per100g": {
+        "calories": 260,
+        "protein": 22.6,
+        "carbs": 0.0,
+        "fat": 18.8,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "pork_intestine",
+      "name": "猪大肠",
+      "category": "肉类",
+      "per100g": {
+        "calories": 196,
+        "protein": 14.6,
+        "carbs": 0.0,
+        "fat": 15.3,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "beef_lean",
+      "name": "牛瘦肉",
+      "category": "肉类",
+      "per100g": {
+        "calories": 125,
+        "protein": 26.0,
+        "carbs": 0.0,
+        "fat": 2.5,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "beef_sirloin",
+      "name": "牛腩",
+      "category": "肉类",
+      "per100g": {
+        "calories": 205,
+        "protein": 19.5,
+        "carbs": 0.0,
+        "fat": 13.5,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "beef_tendon",
+      "name": "牛腱",
+      "category": "肉类",
+      "per100g": {
+        "calories": 106,
+        "protein": 22.0,
+        "carbs": 0.0,
+        "fat": 2.0,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "beef_brisket",
+      "name": "牛胸肉",
+      "category": "肉类",
+      "per100g": {
+        "calories": 172,
+        "protein": 20.5,
+        "carbs": 0.0,
+        "fat": 9.5,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "lamb_lean",
+      "name": "羊瘦肉",
+      "category": "肉类",
+      "per100g": {
+        "calories": 118,
+        "protein": 20.5,
+        "carbs": 0.0,
+        "fat": 3.9,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "lamb_leg",
+      "name": "羊腿肉",
+      "category": "肉类",
+      "per100g": {
+        "calories": 150,
+        "protein": 19.0,
+        "carbs": 0.0,
+        "fat": 8.0,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "lamb_ribs",
+      "name": "羊排",
+      "category": "肉类",
+      "per100g": {
+        "calories": 197,
+        "protein": 16.5,
+        "carbs": 0.0,
+        "fat": 14.5,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "chicken_breast",
+      "name": "鸡胸肉",
+      "category": "肉类",
+      "per100g": {
+        "calories": 133,
+        "protein": 31.0,
+        "carbs": 0.0,
+        "fat": 3.6,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "chicken_thigh",
+      "name": "鸡腿肉",
+      "category": "肉类",
+      "per100g": {
+        "calories": 181,
+        "protein": 18.5,
+        "carbs": 0.0,
+        "fat": 11.6,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "chicken_wing",
+      "name": "鸡翅",
+      "category": "肉类",
+      "per100g": {
+        "calories": 194,
+        "protein": 17.4,
+        "carbs": 0.0,
+        "fat": 13.7,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "chicken_drumstick",
+      "name": "鸡小腿",
+      "category": "肉类",
+      "per100g": {
+        "calories": 163,
+        "protein": 18.8,
+        "carbs": 0.0,
+        "fat": 9.5,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "chicken_whole",
+      "name": "整鸡（带皮）",
+      "category": "肉类",
+      "per100g": {
+        "calories": 167,
+        "protein": 19.3,
+        "carbs": 0.0,
+        "fat": 9.4,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "duck_meat",
+      "name": "鸭肉",
+      "category": "肉类",
+      "per100g": {
+        "calories": 240,
+        "protein": 15.5,
+        "carbs": 0.1,
+        "fat": 19.7,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "duck_breast",
+      "name": "鸭胸肉",
+      "category": "肉类",
+      "per100g": {
+        "calories": 132,
+        "protein": 23.5,
+        "carbs": 0.0,
+        "fat": 4.0,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "goose_meat",
+      "name": "鹅肉",
+      "category": "肉类",
+      "per100g": {
+        "calories": 251,
+        "protein": 17.9,
+        "carbs": 0.0,
+        "fat": 19.9,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "salmon",
+      "name": "三文鱼",
+      "category": "肉类",
+      "per100g": {
+        "calories": 139,
+        "protein": 20.5,
+        "carbs": 0.0,
+        "fat": 6.3,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "bass",
+      "name": "鲈鱼",
+      "category": "肉类",
+      "per100g": {
+        "calories": 105,
+        "protein": 18.6,
+        "carbs": 0.0,
+        "fat": 3.4,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "hairtail",
+      "name": "带鱼",
+      "category": "肉类",
+      "per100g": {
+        "calories": 127,
+        "protein": 17.7,
+        "carbs": 0.0,
+        "fat": 4.9,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "grass_carp",
+      "name": "草鱼",
+      "category": "肉类",
+      "per100g": {
+        "calories": 113,
+        "protein": 16.6,
+        "carbs": 0.0,
+        "fat": 5.2,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "crucian_carp",
+      "name": "鲫鱼",
+      "category": "肉类",
+      "per100g": {
+        "calories": 108,
+        "protein": 17.1,
+        "carbs": 0.0,
+        "fat": 2.7,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "cod",
+      "name": "鳕鱼",
+      "category": "肉类",
+      "per100g": {
+        "calories": 88,
+        "protein": 20.4,
+        "carbs": 0.0,
+        "fat": 0.6,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "tuna",
+      "name": "金枪鱼",
+      "category": "肉类",
+      "per100g": {
+        "calories": 144,
+        "protein": 23.3,
+        "carbs": 0.0,
+        "fat": 4.9,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "tilapia",
+      "name": "罗非鱼",
+      "category": "肉类",
+      "per100g": {
+        "calories": 96,
+        "protein": 20.1,
+        "carbs": 0.0,
+        "fat": 1.7,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "yellow_croaker",
+      "name": "黄花鱼",
+      "category": "肉类",
+      "per100g": {
+        "calories": 97,
+        "protein": 17.7,
+        "carbs": 0.0,
+        "fat": 2.5,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "shrimp",
+      "name": "虾（基围虾）",
+      "category": "肉类",
+      "per100g": {
+        "calories": 87,
+        "protein": 18.6,
+        "carbs": 0.9,
+        "fat": 0.8,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "prawn",
+      "name": "大虾",
+      "category": "肉类",
+      "per100g": {
+        "calories": 93,
+        "protein": 18.6,
+        "carbs": 2.8,
+        "fat": 0.7,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "crab",
+      "name": "螃蟹",
+      "category": "肉类",
+      "per100g": {
+        "calories": 95,
+        "protein": 13.8,
+        "carbs": 2.3,
+        "fat": 3.6,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "squid",
+      "name": "鱿鱼",
+      "category": "肉类",
+      "per100g": {
+        "calories": 75,
+        "protein": 17.0,
+        "carbs": 0.8,
+        "fat": 0.8,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "clam",
+      "name": "蛤蜊",
+      "category": "肉类",
+      "per100g": {
+        "calories": 62,
+        "protein": 10.1,
+        "carbs": 2.2,
+        "fat": 1.1,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "mussel",
+      "name": "贻贝（青口）",
+      "category": "肉类",
+      "per100g": {
+        "calories": 80,
+        "protein": 11.4,
+        "carbs": 3.4,
+        "fat": 2.2,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "scallop",
+      "name": "扇贝",
+      "category": "肉类",
+      "per100g": {
+        "calories": 60,
+        "protein": 11.1,
+        "carbs": 2.6,
+        "fat": 0.6,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "oyster",
+      "name": "生蚝",
+      "category": "肉类",
+      "per100g": {
+        "calories": 73,
+        "protein": 5.7,
+        "carbs": 8.2,
+        "fat": 1.6,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "abalone",
+      "name": "鲍鱼",
+      "category": "肉类",
+      "per100g": {
+        "calories": 84,
+        "protein": 12.6,
+        "carbs": 6.6,
+        "fat": 0.8,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "eel",
+      "name": "鳗鱼",
+      "category": "肉类",
+      "per100g": {
+        "calories": 181,
+        "protein": 18.0,
+        "carbs": 0.0,
+        "fat": 12.0,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "egg_boiled",
+      "name": "鸡蛋（煮）",
+      "category": "蛋奶",
+      "per100g": {
+        "calories": 144,
+        "protein": 13.3,
+        "carbs": 1.4,
+        "fat": 8.8,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "egg_white",
+      "name": "蛋白",
+      "category": "蛋奶",
+      "per100g": {
+        "calories": 48,
+        "protein": 11.0,
+        "carbs": 0.7,
+        "fat": 0.2,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "egg_yolk",
+      "name": "蛋黄",
+      "category": "蛋奶",
+      "per100g": {
+        "calories": 328,
+        "protein": 15.2,
+        "carbs": 3.6,
+        "fat": 27.0,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "egg_quail",
+      "name": "鹌鹑蛋",
+      "category": "蛋奶",
+      "per100g": {
+        "calories": 160,
+        "protein": 12.8,
+        "carbs": 1.1,
+        "fat": 11.1,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "duck_egg",
+      "name": "鸭蛋",
+      "category": "蛋奶",
+      "per100g": {
+        "calories": 180,
+        "protein": 12.6,
+        "carbs": 3.1,
+        "fat": 13.0,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "salted_duck_egg",
+      "name": "咸鸭蛋",
+      "category": "蛋奶",
+      "per100g": {
+        "calories": 190,
+        "protein": 12.7,
+        "carbs": 3.0,
+        "fat": 14.7,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "century_egg",
+      "name": "皮蛋",
+      "category": "蛋奶",
+      "per100g": {
+        "calories": 171,
+        "protein": 14.2,
+        "carbs": 2.0,
+        "fat": 11.7,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "milk_whole",
+      "name": "全脂牛奶",
+      "category": "蛋奶",
+      "per100g": {
+        "calories": 54,
+        "protein": 3.0,
+        "carbs": 3.4,
+        "fat": 3.2,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "milk_skim",
+      "name": "脱脂牛奶",
+      "category": "蛋奶",
+      "per100g": {
+        "calories": 33,
+        "protein": 3.3,
+        "carbs": 4.9,
+        "fat": 0.1,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "yogurt_plain",
+      "name": "原味酸奶",
+      "category": "蛋奶",
+      "per100g": {
+        "calories": 72,
+        "protein": 3.1,
+        "carbs": 9.3,
+        "fat": 2.7,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "yogurt_sugar_free",
+      "name": "无糖酸奶",
+      "category": "蛋奶",
+      "per100g": {
+        "calories": 57,
+        "protein": 3.3,
+        "carbs": 4.7,
+        "fat": 3.0,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "greek_yogurt",
+      "name": "希腊酸奶",
+      "category": "蛋奶",
+      "per100g": {
+        "calories": 97,
+        "protein": 9.0,
+        "carbs": 3.6,
+        "fat": 5.0,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "cheese_cheddar",
+      "name": "切达奶酪",
+      "category": "蛋奶",
+      "per100g": {
+        "calories": 403,
+        "protein": 24.9,
+        "carbs": 1.3,
+        "fat": 33.1,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "cheese_mozzarella",
+      "name": "马苏里拉奶酪",
+      "category": "蛋奶",
+      "per100g": {
+        "calories": 280,
+        "protein": 28.0,
+        "carbs": 3.1,
+        "fat": 17.0,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "cream_cheese",
+      "name": "奶油奶酪",
+      "category": "蛋奶",
+      "per100g": {
+        "calories": 342,
+        "protein": 5.9,
+        "carbs": 4.1,
+        "fat": 34.2,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "butter",
+      "name": "黄油",
+      "category": "蛋奶",
+      "per100g": {
+        "calories": 717,
+        "protein": 0.9,
+        "carbs": 0.1,
+        "fat": 81.1,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "condensed_milk",
+      "name": "炼乳",
+      "category": "蛋奶",
+      "per100g": {
+        "calories": 321,
+        "protein": 8.1,
+        "carbs": 54.4,
+        "fat": 8.7,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "whey_protein",
+      "name": "乳清蛋白粉",
+      "category": "蛋奶",
+      "per100g": {
+        "calories": 390,
+        "protein": 78.0,
+        "carbs": 8.0,
+        "fat": 5.0,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "soy_milk",
+      "name": "豆浆（无糖）",
+      "category": "蛋奶",
+      "per100g": {
+        "calories": 16,
+        "protein": 1.8,
+        "carbs": 1.1,
+        "fat": 0.7,
+        "fiber": 0.1
+      }
+    },
+    {
+      "id": "soy_milk_sweet",
+      "name": "豆浆（加糖）",
+      "category": "蛋奶",
+      "per100g": {
+        "calories": 33,
+        "protein": 1.8,
+        "carbs": 4.8,
+        "fat": 0.7,
+        "fiber": 0.1
+      }
+    },
+    {
+      "id": "oat_milk",
+      "name": "燕麦奶",
+      "category": "蛋奶",
+      "per100g": {
+        "calories": 48,
+        "protein": 1.0,
+        "carbs": 7.0,
+        "fat": 1.5,
+        "fiber": 0.8
+      }
+    },
+    {
+      "id": "spinach",
+      "name": "菠菜",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 24,
+        "protein": 2.6,
+        "carbs": 3.6,
+        "fat": 0.3,
+        "fiber": 2.2
+      }
+    },
+    {
+      "id": "broccoli",
+      "name": "西兰花",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 34,
+        "protein": 4.1,
+        "carbs": 4.3,
+        "fat": 0.6,
+        "fiber": 3.8
+      }
+    },
+    {
+      "id": "cabbage",
+      "name": "大白菜",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 17,
+        "protein": 1.5,
+        "carbs": 2.4,
+        "fat": 0.1,
+        "fiber": 0.8
+      }
+    },
+    {
+      "id": "bok_choy",
+      "name": "小白菜",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 15,
+        "protein": 1.5,
+        "carbs": 2.2,
+        "fat": 0.3,
+        "fiber": 1.1
+      }
+    },
+    {
+      "id": "lettuce",
+      "name": "生菜",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 13,
+        "protein": 1.3,
+        "carbs": 1.9,
+        "fat": 0.3,
+        "fiber": 1.1
+      }
+    },
+    {
+      "id": "chinese_chives",
+      "name": "韭菜",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 26,
+        "protein": 2.4,
+        "carbs": 3.2,
+        "fat": 0.4,
+        "fiber": 1.4
+      }
+    },
+    {
+      "id": "celery",
+      "name": "芹菜",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 14,
+        "protein": 0.8,
+        "carbs": 2.2,
+        "fat": 0.1,
+        "fiber": 1.2
+      }
+    },
+    {
+      "id": "asparagus",
+      "name": "芦笋",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 22,
+        "protein": 2.6,
+        "carbs": 2.5,
+        "fat": 0.2,
+        "fiber": 1.9
+      }
+    },
+    {
+      "id": "green_bean",
+      "name": "四季豆",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 28,
+        "protein": 2.0,
+        "carbs": 4.5,
+        "fat": 0.4,
+        "fiber": 2.4
+      }
+    },
+    {
+      "id": "snow_pea",
+      "name": "荷兰豆",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 36,
+        "protein": 3.0,
+        "carbs": 5.5,
+        "fat": 0.3,
+        "fiber": 2.6
+      }
+    },
+    {
+      "id": "tomato",
+      "name": "番茄",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 15,
+        "protein": 0.9,
+        "carbs": 3.3,
+        "fat": 0.2,
+        "fiber": 0.5
+      }
+    },
+    {
+      "id": "cucumber",
+      "name": "黄瓜",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 15,
+        "protein": 0.8,
+        "carbs": 2.7,
+        "fat": 0.2,
+        "fiber": 0.5
+      }
+    },
+    {
+      "id": "zucchini",
+      "name": "西葫芦",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 18,
+        "protein": 1.2,
+        "carbs": 3.0,
+        "fat": 0.2,
+        "fiber": 1.0
+      }
+    },
+    {
+      "id": "bitter_melon",
+      "name": "苦瓜",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 22,
+        "protein": 1.0,
+        "carbs": 3.5,
+        "fat": 0.1,
+        "fiber": 1.4
+      }
+    },
+    {
+      "id": "loofah",
+      "name": "丝瓜",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 20,
+        "protein": 1.0,
+        "carbs": 4.2,
+        "fat": 0.2,
+        "fiber": 0.6
+      }
+    },
+    {
+      "id": "winter_melon",
+      "name": "冬瓜",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 12,
+        "protein": 0.4,
+        "carbs": 2.6,
+        "fat": 0.2,
+        "fiber": 0.7
+      }
+    },
+    {
+      "id": "pumpkin",
+      "name": "南瓜",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 22,
+        "protein": 0.7,
+        "carbs": 4.5,
+        "fat": 0.1,
+        "fiber": 0.8
+      }
+    },
+    {
+      "id": "eggplant",
+      "name": "茄子",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 21,
+        "protein": 1.1,
+        "carbs": 4.0,
+        "fat": 0.2,
+        "fiber": 1.3
+      }
+    },
+    {
+      "id": "bell_pepper_red",
+      "name": "红甜椒",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 32,
+        "protein": 1.0,
+        "carbs": 6.4,
+        "fat": 0.2,
+        "fiber": 1.6
+      }
+    },
+    {
+      "id": "bell_pepper_green",
+      "name": "青椒",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 22,
+        "protein": 1.0,
+        "carbs": 4.7,
+        "fat": 0.2,
+        "fiber": 1.4
+      }
+    },
+    {
+      "id": "chili_red",
+      "name": "红辣椒",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 32,
+        "protein": 1.3,
+        "carbs": 5.5,
+        "fat": 0.4,
+        "fiber": 1.6
+      }
+    },
+    {
+      "id": "carrot",
+      "name": "胡萝卜",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 37,
+        "protein": 1.0,
+        "carbs": 8.1,
+        "fat": 0.2,
+        "fiber": 2.8
+      }
+    },
+    {
+      "id": "white_radish",
+      "name": "白萝卜",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 16,
+        "protein": 0.7,
+        "carbs": 3.4,
+        "fat": 0.1,
+        "fiber": 1.0
+      }
+    },
+    {
+      "id": "lotus_root",
+      "name": "莲藕",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 70,
+        "protein": 1.9,
+        "carbs": 16.4,
+        "fat": 0.2,
+        "fiber": 1.2
+      }
+    },
+    {
+      "id": "bamboo_shoot",
+      "name": "竹笋",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 19,
+        "protein": 2.6,
+        "carbs": 2.5,
+        "fat": 0.2,
+        "fiber": 1.5
+      }
+    },
+    {
+      "id": "garlic_bolt",
+      "name": "蒜薹",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 45,
+        "protein": 2.1,
+        "carbs": 9.0,
+        "fat": 0.4,
+        "fiber": 1.3
+      }
+    },
+    {
+      "id": "scallion",
+      "name": "大葱",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 30,
+        "protein": 1.7,
+        "carbs": 5.8,
+        "fat": 0.3,
+        "fiber": 1.3
+      }
+    },
+    {
+      "id": "ginger",
+      "name": "生姜",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 41,
+        "protein": 1.3,
+        "carbs": 8.5,
+        "fat": 0.6,
+        "fiber": 2.0
+      }
+    },
+    {
+      "id": "garlic",
+      "name": "大蒜",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 126,
+        "protein": 4.5,
+        "carbs": 27.6,
+        "fat": 0.2,
+        "fiber": 1.1
+      }
+    },
+    {
+      "id": "onion",
+      "name": "洋葱",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 39,
+        "protein": 1.1,
+        "carbs": 8.8,
+        "fat": 0.2,
+        "fiber": 1.1
+      }
+    },
+    {
+      "id": "corn_kernel",
+      "name": "玉米粒",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 106,
+        "protein": 3.2,
+        "carbs": 19.0,
+        "fat": 1.4,
+        "fiber": 2.4
+      }
+    },
+    {
+      "id": "edamame",
+      "name": "毛豆",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 131,
+        "protein": 13.0,
+        "carbs": 8.4,
+        "fat": 5.0,
+        "fiber": 4.0
+      }
+    },
+    {
+      "id": "bean_sprout",
+      "name": "豆芽",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 18,
+        "protein": 2.1,
+        "carbs": 2.1,
+        "fat": 0.1,
+        "fiber": 0.8
+      }
+    },
+    {
+      "id": "water_spinach",
+      "name": "空心菜",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 20,
+        "protein": 2.2,
+        "carbs": 2.8,
+        "fat": 0.3,
+        "fiber": 1.4
+      }
+    },
+    {
+      "id": "crown_daisy",
+      "name": "茼蒿",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 20,
+        "protein": 1.9,
+        "carbs": 2.6,
+        "fat": 0.3,
+        "fiber": 1.2
+      }
+    },
+    {
+      "id": "chinese_cabbage_heart",
+      "name": "娃娃菜",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 12,
+        "protein": 1.2,
+        "carbs": 1.5,
+        "fat": 0.1,
+        "fiber": 0.8
+      }
+    },
+    {
+      "id": "kale",
+      "name": "羽衣甘蓝",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 35,
+        "protein": 3.3,
+        "carbs": 4.4,
+        "fat": 0.7,
+        "fiber": 4.1
+      }
+    },
+    {
+      "id": "cauliflower",
+      "name": "花菜",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 24,
+        "protein": 2.1,
+        "carbs": 3.6,
+        "fat": 0.2,
+        "fiber": 2.4
+      }
+    },
+    {
+      "id": "shiitake",
+      "name": "香菇",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 26,
+        "protein": 2.2,
+        "carbs": 3.3,
+        "fat": 0.3,
+        "fiber": 2.5
+      }
+    },
+    {
+      "id": "enoki",
+      "name": "金针菇",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 32,
+        "protein": 2.4,
+        "carbs": 4.9,
+        "fat": 0.3,
+        "fiber": 2.7
+      }
+    },
+    {
+      "id": "oyster_mushroom",
+      "name": "平菇",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 23,
+        "protein": 1.9,
+        "carbs": 3.3,
+        "fat": 0.3,
+        "fiber": 2.3
+      }
+    },
+    {
+      "id": "king_oyster_mushroom",
+      "name": "杏鲍菇",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 31,
+        "protein": 1.3,
+        "carbs": 6.1,
+        "fat": 0.1,
+        "fiber": 1.8
+      }
+    },
+    {
+      "id": "wood_ear",
+      "name": "黑木耳（水发）",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 21,
+        "protein": 1.5,
+        "carbs": 4.5,
+        "fat": 0.2,
+        "fiber": 2.6
+      }
+    },
+    {
+      "id": "seaweed_dried",
+      "name": "紫菜（干）",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 207,
+        "protein": 26.7,
+        "carbs": 44.1,
+        "fat": 1.1,
+        "fiber": 4.7
+      }
+    },
+    {
+      "id": "kelp",
+      "name": "海带",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 12,
+        "protein": 1.2,
+        "carbs": 2.1,
+        "fat": 0.1,
+        "fiber": 0.5
+      }
+    },
+    {
+      "id": "chinese_yam",
+      "name": "铁棍山药",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 57,
+        "protein": 1.9,
+        "carbs": 12.4,
+        "fat": 0.2,
+        "fiber": 0.8
+      }
+    },
+    {
+      "id": "okra",
+      "name": "秋葵",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 25,
+        "protein": 2.0,
+        "carbs": 3.5,
+        "fat": 0.1,
+        "fiber": 2.5
+      }
+    },
+    {
+      "id": "lily_bulb",
+      "name": "百合",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 162,
+        "protein": 3.2,
+        "carbs": 38.8,
+        "fat": 0.1,
+        "fiber": 1.7
+      }
+    },
+    {
+      "id": "water_chestnut",
+      "name": "荸荠",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 61,
+        "protein": 1.4,
+        "carbs": 14.2,
+        "fat": 0.2,
+        "fiber": 1.1
+      }
+    },
+    {
+      "id": "tong_hao",
+      "name": "油麦菜",
+      "category": "蔬菜",
+      "per100g": {
+        "calories": 15,
+        "protein": 1.4,
+        "carbs": 2.1,
+        "fat": 0.4,
+        "fiber": 1.1
+      }
+    },
+    {
+      "id": "apple",
+      "name": "苹果",
+      "category": "水果",
+      "per100g": {
+        "calories": 52,
+        "protein": 0.2,
+        "carbs": 13.5,
+        "fat": 0.2,
+        "fiber": 1.2
+      }
+    },
+    {
+      "id": "banana",
+      "name": "香蕉",
+      "category": "水果",
+      "per100g": {
+        "calories": 93,
+        "protein": 1.4,
+        "carbs": 22.0,
+        "fat": 0.2,
+        "fiber": 1.2
+      }
+    },
+    {
+      "id": "orange",
+      "name": "橙子",
+      "category": "水果",
+      "per100g": {
+        "calories": 48,
+        "protein": 0.8,
+        "carbs": 11.5,
+        "fat": 0.2,
+        "fiber": 0.6
+      }
+    },
+    {
+      "id": "mandarin",
+      "name": "橘子",
+      "category": "水果",
+      "per100g": {
+        "calories": 44,
+        "protein": 0.8,
+        "carbs": 10.0,
+        "fat": 0.2,
+        "fiber": 0.4
+      }
+    },
+    {
+      "id": "grapefruit",
+      "name": "柚子",
+      "category": "水果",
+      "per100g": {
+        "calories": 42,
+        "protein": 0.8,
+        "carbs": 9.5,
+        "fat": 0.1,
+        "fiber": 0.6
+      }
+    },
+    {
+      "id": "lemon",
+      "name": "柠檬",
+      "category": "水果",
+      "per100g": {
+        "calories": 35,
+        "protein": 1.1,
+        "carbs": 6.2,
+        "fat": 0.5,
+        "fiber": 1.3
+      }
+    },
+    {
+      "id": "grape_green",
+      "name": "青葡萄",
+      "category": "水果",
+      "per100g": {
+        "calories": 43,
+        "protein": 0.5,
+        "carbs": 10.3,
+        "fat": 0.2,
+        "fiber": 0.4
+      }
+    },
+    {
+      "id": "grape_red",
+      "name": "红葡萄",
+      "category": "水果",
+      "per100g": {
+        "calories": 67,
+        "protein": 0.6,
+        "carbs": 16.0,
+        "fat": 0.2,
+        "fiber": 0.6
+      }
+    },
+    {
+      "id": "watermelon",
+      "name": "西瓜",
+      "category": "水果",
+      "per100g": {
+        "calories": 25,
+        "protein": 0.5,
+        "carbs": 5.8,
+        "fat": 0.1,
+        "fiber": 0.3
+      }
+    },
+    {
+      "id": "cantaloupe",
+      "name": "哈密瓜",
+      "category": "水果",
+      "per100g": {
+        "calories": 34,
+        "protein": 0.9,
+        "carbs": 7.7,
+        "fat": 0.1,
+        "fiber": 0.8
+      }
+    },
+    {
+      "id": "honeydew",
+      "name": "蜜瓜",
+      "category": "水果",
+      "per100g": {
+        "calories": 36,
+        "protein": 0.5,
+        "carbs": 9.0,
+        "fat": 0.1,
+        "fiber": 0.8
+      }
+    },
+    {
+      "id": "strawberry",
+      "name": "草莓",
+      "category": "水果",
+      "per100g": {
+        "calories": 32,
+        "protein": 1.0,
+        "carbs": 7.1,
+        "fat": 0.2,
+        "fiber": 1.1
+      }
+    },
+    {
+      "id": "blueberry",
+      "name": "蓝莓",
+      "category": "水果",
+      "per100g": {
+        "calories": 57,
+        "protein": 0.7,
+        "carbs": 14.5,
+        "fat": 0.3,
+        "fiber": 2.4
+      }
+    },
+    {
+      "id": "raspberry",
+      "name": "树莓",
+      "category": "水果",
+      "per100g": {
+        "calories": 52,
+        "protein": 1.2,
+        "carbs": 11.9,
+        "fat": 0.7,
+        "fiber": 6.5
+      }
+    },
+    {
+      "id": "cherry",
+      "name": "樱桃",
+      "category": "水果",
+      "per100g": {
+        "calories": 46,
+        "protein": 1.1,
+        "carbs": 10.2,
+        "fat": 0.2,
+        "fiber": 1.0
+      }
+    },
+    {
+      "id": "mango",
+      "name": "芒果",
+      "category": "水果",
+      "per100g": {
+        "calories": 35,
+        "protein": 0.6,
+        "carbs": 8.3,
+        "fat": 0.2,
+        "fiber": 1.3
+      }
+    },
+    {
+      "id": "pineapple",
+      "name": "菠萝",
+      "category": "水果",
+      "per100g": {
+        "calories": 44,
+        "protein": 0.5,
+        "carbs": 10.8,
+        "fat": 0.1,
+        "fiber": 1.3
+      }
+    },
+    {
+      "id": "papaya",
+      "name": "木瓜",
+      "category": "水果",
+      "per100g": {
+        "calories": 29,
+        "protein": 0.4,
+        "carbs": 7.0,
+        "fat": 0.1,
+        "fiber": 1.7
+      }
+    },
+    {
+      "id": "kiwi",
+      "name": "猕猴桃",
+      "category": "水果",
+      "per100g": {
+        "calories": 56,
+        "protein": 0.8,
+        "carbs": 12.0,
+        "fat": 0.6,
+        "fiber": 1.4
+      }
+    },
+    {
+      "id": "dragon_fruit",
+      "name": "火龙果",
+      "category": "水果",
+      "per100g": {
+        "calories": 55,
+        "protein": 1.1,
+        "carbs": 11.3,
+        "fat": 0.4,
+        "fiber": 1.6
+      }
+    },
+    {
+      "id": "peach",
+      "name": "桃子",
+      "category": "水果",
+      "per100g": {
+        "calories": 39,
+        "protein": 0.9,
+        "carbs": 9.5,
+        "fat": 0.1,
+        "fiber": 1.0
+      }
+    },
+    {
+      "id": "nectarine",
+      "name": "油桃",
+      "category": "水果",
+      "per100g": {
+        "calories": 44,
+        "protein": 1.1,
+        "carbs": 9.2,
+        "fat": 0.3,
+        "fiber": 1.7
+      }
+    },
+    {
+      "id": "pear",
+      "name": "梨",
+      "category": "水果",
+      "per100g": {
+        "calories": 44,
+        "protein": 0.4,
+        "carbs": 11.0,
+        "fat": 0.1,
+        "fiber": 2.1
+      }
+    },
+    {
+      "id": "plum",
+      "name": "李子",
+      "category": "水果",
+      "per100g": {
+        "calories": 36,
+        "protein": 0.5,
+        "carbs": 8.7,
+        "fat": 0.2,
+        "fiber": 0.9
+      }
+    },
+    {
+      "id": "apricot",
+      "name": "杏",
+      "category": "水果",
+      "per100g": {
+        "calories": 36,
+        "protein": 0.9,
+        "carbs": 7.6,
+        "fat": 0.4,
+        "fiber": 1.5
+      }
+    },
+    {
+      "id": "lychee",
+      "name": "荔枝",
+      "category": "水果",
+      "per100g": {
+        "calories": 71,
+        "protein": 0.8,
+        "carbs": 16.6,
+        "fat": 0.4,
+        "fiber": 0.5
+      }
+    },
+    {
+      "id": "longan",
+      "name": "龙眼",
+      "category": "水果",
+      "per100g": {
+        "calories": 71,
+        "protein": 1.2,
+        "carbs": 16.2,
+        "fat": 0.1,
+        "fiber": 0.4
+      }
+    },
+    {
+      "id": "persimmon",
+      "name": "柿子",
+      "category": "水果",
+      "per100g": {
+        "calories": 74,
+        "protein": 0.4,
+        "carbs": 18.5,
+        "fat": 0.2,
+        "fiber": 1.6
+      }
+    },
+    {
+      "id": "pomegranate",
+      "name": "石榴",
+      "category": "水果",
+      "per100g": {
+        "calories": 63,
+        "protein": 0.9,
+        "carbs": 14.0,
+        "fat": 0.2,
+        "fiber": 0.5
+      }
+    },
+    {
+      "id": "coconut_meat",
+      "name": "椰肉",
+      "category": "水果",
+      "per100g": {
+        "calories": 354,
+        "protein": 3.3,
+        "carbs": 15.2,
+        "fat": 33.5,
+        "fiber": 9.0
+      }
+    },
+    {
+      "id": "avocado",
+      "name": "牛油果",
+      "category": "水果",
+      "per100g": {
+        "calories": 161,
+        "protein": 2.0,
+        "carbs": 5.7,
+        "fat": 15.3,
+        "fiber": 2.1
+      }
+    },
+    {
+      "id": "durian",
+      "name": "榴莲",
+      "category": "水果",
+      "per100g": {
+        "calories": 147,
+        "protein": 1.5,
+        "carbs": 28.3,
+        "fat": 3.3,
+        "fiber": 1.4
+      }
+    },
+    {
+      "id": "passion_fruit",
+      "name": "百香果",
+      "category": "水果",
+      "per100g": {
+        "calories": 64,
+        "protein": 2.2,
+        "carbs": 11.0,
+        "fat": 0.7,
+        "fiber": 5.4
+      }
+    },
+    {
+      "id": "fig",
+      "name": "无花果",
+      "category": "水果",
+      "per100g": {
+        "calories": 65,
+        "protein": 0.8,
+        "carbs": 16.3,
+        "fat": 0.3,
+        "fiber": 2.9
+      }
+    },
+    {
+      "id": "date_fresh",
+      "name": "鲜枣",
+      "category": "水果",
+      "per100g": {
+        "calories": 125,
+        "protein": 1.8,
+        "carbs": 30.5,
+        "fat": 0.2,
+        "fiber": 1.9
+      }
+    },
+    {
+      "id": "guava",
+      "name": "番石榴",
+      "category": "水果",
+      "per100g": {
+        "calories": 49,
+        "protein": 0.9,
+        "carbs": 10.7,
+        "fat": 0.4,
+        "fiber": 5.0
+      }
+    },
+    {
+      "id": "starfruit",
+      "name": "杨桃",
+      "category": "水果",
+      "per100g": {
+        "calories": 31,
+        "protein": 1.0,
+        "carbs": 6.7,
+        "fat": 0.3,
+        "fiber": 2.8
+      }
+    },
+    {
+      "id": "mulberry",
+      "name": "桑葚",
+      "category": "水果",
+      "per100g": {
+        "calories": 48,
+        "protein": 1.7,
+        "carbs": 9.2,
+        "fat": 0.4,
+        "fiber": 1.7
+      }
+    },
+    {
+      "id": "waxberry",
+      "name": "杨梅",
+      "category": "水果",
+      "per100g": {
+        "calories": 30,
+        "protein": 0.8,
+        "carbs": 6.7,
+        "fat": 0.2,
+        "fiber": 1.0
+      }
+    },
+    {
+      "id": "sugar_cane",
+      "name": "甘蔗",
+      "category": "水果",
+      "per100g": {
+        "calories": 64,
+        "protein": 0.4,
+        "carbs": 16.0,
+        "fat": 0.1,
+        "fiber": 0.6
+      }
+    },
+    {
+      "id": "kumquat",
+      "name": "金桔",
+      "category": "水果",
+      "per100g": {
+        "calories": 55,
+        "protein": 1.0,
+        "carbs": 12.5,
+        "fat": 0.3,
+        "fiber": 3.7
+      }
+    },
+    {
+      "id": "hawthorn",
+      "name": "山楂",
+      "category": "水果",
+      "per100g": {
+        "calories": 95,
+        "protein": 0.5,
+        "carbs": 22.0,
+        "fat": 0.6,
+        "fiber": 3.1
+      }
+    },
+    {
+      "id": "tofu_firm",
+      "name": "北豆腐",
+      "category": "豆制品",
+      "per100g": {
+        "calories": 98,
+        "protein": 12.2,
+        "carbs": 1.5,
+        "fat": 4.8,
+        "fiber": 0.5
+      }
+    },
+    {
+      "id": "tofu_soft",
+      "name": "南豆腐（嫩豆腐）",
+      "category": "豆制品",
+      "per100g": {
+        "calories": 57,
+        "protein": 6.2,
+        "carbs": 2.0,
+        "fat": 2.5,
+        "fiber": 0.3
+      }
+    },
+    {
+      "id": "tofu_dried",
+      "name": "豆腐干",
+      "category": "豆制品",
+      "per100g": {
+        "calories": 140,
+        "protein": 16.2,
+        "carbs": 4.5,
+        "fat": 6.0,
+        "fiber": 0.8
+      }
+    },
+    {
+      "id": "tofu_skin",
+      "name": "豆腐皮",
+      "category": "豆制品",
+      "per100g": {
+        "calories": 409,
+        "protein": 44.6,
+        "carbs": 18.8,
+        "fat": 17.4,
+        "fiber": 0.5
+      }
+    },
+    {
+      "id": "yuba",
+      "name": "腐竹",
+      "category": "豆制品",
+      "per100g": {
+        "calories": 461,
+        "protein": 44.6,
+        "carbs": 22.3,
+        "fat": 21.7,
+        "fiber": 1.0
+      }
+    },
+    {
+      "id": "soybean",
+      "name": "黄豆（干）",
+      "category": "豆制品",
+      "per100g": {
+        "calories": 390,
+        "protein": 35.0,
+        "carbs": 18.7,
+        "fat": 18.0,
+        "fiber": 15.5
+      }
+    },
+    {
+      "id": "black_bean",
+      "name": "黑豆（干）",
+      "category": "豆制品",
+      "per100g": {
+        "calories": 381,
+        "protein": 36.0,
+        "carbs": 23.6,
+        "fat": 15.9,
+        "fiber": 10.2
+      }
+    },
+    {
+      "id": "red_bean",
+      "name": "红豆（干）",
+      "category": "豆制品",
+      "per100g": {
+        "calories": 324,
+        "protein": 20.2,
+        "carbs": 58.0,
+        "fat": 0.6,
+        "fiber": 7.7
+      }
+    },
+    {
+      "id": "green_bean_dry",
+      "name": "绿豆（干）",
+      "category": "豆制品",
+      "per100g": {
+        "calories": 329,
+        "protein": 21.6,
+        "carbs": 55.6,
+        "fat": 0.8,
+        "fiber": 6.4
+      }
+    },
+    {
+      "id": "mung_bean_sprout",
+      "name": "绿豆芽",
+      "category": "豆制品",
+      "per100g": {
+        "calories": 18,
+        "protein": 2.1,
+        "carbs": 2.1,
+        "fat": 0.1,
+        "fiber": 0.8
+      }
+    },
+    {
+      "id": "tofu_puff",
+      "name": "油豆腐",
+      "category": "豆制品",
+      "per100g": {
+        "calories": 244,
+        "protein": 17.6,
+        "carbs": 4.3,
+        "fat": 17.6,
+        "fiber": 0.5
+      }
+    },
+    {
+      "id": "tempeh",
+      "name": "天贝",
+      "category": "豆制品",
+      "per100g": {
+        "calories": 193,
+        "protein": 18.5,
+        "carbs": 9.4,
+        "fat": 10.8,
+        "fiber": 6.0
+      }
+    },
+    {
+      "id": "red_bean_paste",
+      "name": "红豆沙（有糖）",
+      "category": "豆制品",
+      "per100g": {
+        "calories": 240,
+        "protein": 5.0,
+        "carbs": 51.0,
+        "fat": 0.8,
+        "fiber": 4.0
+      }
+    },
+    {
+      "id": "chickpea",
+      "name": "鹰嘴豆",
+      "category": "豆制品",
+      "per100g": {
+        "calories": 164,
+        "protein": 8.9,
+        "carbs": 27.4,
+        "fat": 2.6,
+        "fiber": 7.6
+      }
+    },
+    {
+      "id": "lentil",
+      "name": "扁豆",
+      "category": "豆制品",
+      "per100g": {
+        "calories": 116,
+        "protein": 9.0,
+        "carbs": 20.1,
+        "fat": 0.4,
+        "fiber": 7.9
+      }
+    },
+    {
+      "id": "broad_bean",
+      "name": "蚕豆",
+      "category": "豆制品",
+      "per100g": {
+        "calories": 335,
+        "protein": 21.6,
+        "carbs": 59.8,
+        "fat": 1.0,
+        "fiber": 5.8
+      }
+    },
+    {
+      "id": "walnut",
+      "name": "核桃",
+      "category": "坚果零食",
+      "per100g": {
+        "calories": 654,
+        "protein": 15.2,
+        "carbs": 13.7,
+        "fat": 65.2,
+        "fiber": 6.7
+      }
+    },
+    {
+      "id": "almond",
+      "name": "杏仁",
+      "category": "坚果零食",
+      "per100g": {
+        "calories": 578,
+        "protein": 21.2,
+        "carbs": 21.6,
+        "fat": 49.4,
+        "fiber": 12.5
+      }
+    },
+    {
+      "id": "peanut",
+      "name": "花生",
+      "category": "坚果零食",
+      "per100g": {
+        "calories": 567,
+        "protein": 25.8,
+        "carbs": 16.1,
+        "fat": 49.2,
+        "fiber": 8.5
+      }
+    },
+    {
+      "id": "cashew",
+      "name": "腰果",
+      "category": "坚果零食",
+      "per100g": {
+        "calories": 553,
+        "protein": 18.2,
+        "carbs": 30.2,
+        "fat": 43.8,
+        "fiber": 3.3
+      }
+    },
+    {
+      "id": "pistachio",
+      "name": "开心果",
+      "category": "坚果零食",
+      "per100g": {
+        "calories": 562,
+        "protein": 20.2,
+        "carbs": 27.2,
+        "fat": 45.3,
+        "fiber": 10.6
+      }
+    },
+    {
+      "id": "sunflower_seed",
+      "name": "葵花子",
+      "category": "坚果零食",
+      "per100g": {
+        "calories": 584,
+        "protein": 20.8,
+        "carbs": 20.0,
+        "fat": 51.5,
+        "fiber": 8.6
+      }
+    },
+    {
+      "id": "pumpkin_seed",
+      "name": "南瓜子",
+      "category": "坚果零食",
+      "per100g": {
+        "calories": 559,
+        "protein": 30.2,
+        "carbs": 10.7,
+        "fat": 49.1,
+        "fiber": 6.0
+      }
+    },
+    {
+      "id": "pine_nut",
+      "name": "松子",
+      "category": "坚果零食",
+      "per100g": {
+        "calories": 673,
+        "protein": 13.7,
+        "carbs": 13.1,
+        "fat": 68.4,
+        "fiber": 3.7
+      }
+    },
+    {
+      "id": "macadamia",
+      "name": "夏威夷果",
+      "category": "坚果零食",
+      "per100g": {
+        "calories": 718,
+        "protein": 7.9,
+        "carbs": 13.8,
+        "fat": 75.8,
+        "fiber": 8.6
+      }
+    },
+    {
+      "id": "hazelnut",
+      "name": "榛子",
+      "category": "坚果零食",
+      "per100g": {
+        "calories": 628,
+        "protein": 15.0,
+        "carbs": 16.7,
+        "fat": 60.8,
+        "fiber": 9.7
+      }
+    },
+    {
+      "id": "chestnut",
+      "name": "栗子",
+      "category": "坚果零食",
+      "per100g": {
+        "calories": 185,
+        "protein": 4.2,
+        "carbs": 40.5,
+        "fat": 1.5,
+        "fiber": 5.1
+      }
+    },
+    {
+      "id": "melon_seed",
+      "name": "西瓜子",
+      "category": "坚果零食",
+      "per100g": {
+        "calories": 556,
+        "protein": 28.8,
+        "carbs": 15.0,
+        "fat": 45.6,
+        "fiber": 4.5
+      }
+    },
+    {
+      "id": "sesame",
+      "name": "芝麻",
+      "category": "坚果零食",
+      "per100g": {
+        "calories": 578,
+        "protein": 17.7,
+        "carbs": 23.5,
+        "fat": 49.7,
+        "fiber": 11.8
+      }
+    },
+    {
+      "id": "dried_cranberry",
+      "name": "蔓越莓干",
+      "category": "坚果零食",
+      "per100g": {
+        "calories": 308,
+        "protein": 0.1,
+        "carbs": 82.4,
+        "fat": 1.4,
+        "fiber": 5.7
+      }
+    },
+    {
+      "id": "raisin",
+      "name": "葡萄干",
+      "category": "坚果零食",
+      "per100g": {
+        "calories": 299,
+        "protein": 3.1,
+        "carbs": 79.2,
+        "fat": 0.5,
+        "fiber": 3.7
+      }
+    },
+    {
+      "id": "dried_date",
+      "name": "红枣干",
+      "category": "坚果零食",
+      "per100g": {
+        "calories": 264,
+        "protein": 3.5,
+        "carbs": 67.8,
+        "fat": 0.5,
+        "fiber": 6.2
+      }
+    },
+    {
+      "id": "chocolate_dark",
+      "name": "黑巧克力",
+      "category": "坚果零食",
+      "per100g": {
+        "calories": 546,
+        "protein": 7.8,
+        "carbs": 45.9,
+        "fat": 31.3,
+        "fiber": 10.9
+      }
+    },
+    {
+      "id": "potato_chips",
+      "name": "薯片",
+      "category": "坚果零食",
+      "per100g": {
+        "calories": 536,
+        "protein": 6.5,
+        "carbs": 51.5,
+        "fat": 33.0,
+        "fiber": 3.2
+      }
+    },
+    {
+      "id": "cookie",
+      "name": "曲奇饼干",
+      "category": "坚果零食",
+      "per100g": {
+        "calories": 502,
+        "protein": 5.5,
+        "carbs": 62.0,
+        "fat": 25.0,
+        "fiber": 1.5
+      }
+    },
+    {
+      "id": "dried_mango",
+      "name": "芒果干",
+      "category": "坚果零食",
+      "per100g": {
+        "calories": 319,
+        "protein": 2.5,
+        "carbs": 75.0,
+        "fat": 1.2,
+        "fiber": 4.0
+      }
+    },
+    {
+      "id": "beef_jerky",
+      "name": "牛肉干",
+      "category": "坚果零食",
+      "per100g": {
+        "calories": 475,
+        "protein": 45.6,
+        "carbs": 10.0,
+        "fat": 28.0,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "green_tea",
+      "name": "绿茶（无糖）",
+      "category": "饮品",
+      "per100g": {
+        "calories": 1,
+        "protein": 0.2,
+        "carbs": 0.0,
+        "fat": 0.0,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "black_tea",
+      "name": "红茶（无糖）",
+      "category": "饮品",
+      "per100g": {
+        "calories": 1,
+        "protein": 0.0,
+        "carbs": 0.2,
+        "fat": 0.0,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "coffee_black",
+      "name": "黑咖啡",
+      "category": "饮品",
+      "per100g": {
+        "calories": 2,
+        "protein": 0.1,
+        "carbs": 0.0,
+        "fat": 0.0,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "coffee_latte",
+      "name": "拿铁咖啡",
+      "category": "饮品",
+      "per100g": {
+        "calories": 56,
+        "protein": 2.8,
+        "carbs": 5.1,
+        "fat": 2.5,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "cola",
+      "name": "可乐",
+      "category": "饮品",
+      "per100g": {
+        "calories": 43,
+        "protein": 0.0,
+        "carbs": 10.6,
+        "fat": 0.0,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "sprite",
+      "name": "雪碧",
+      "category": "饮品",
+      "per100g": {
+        "calories": 41,
+        "protein": 0.0,
+        "carbs": 10.2,
+        "fat": 0.0,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "orange_juice",
+      "name": "橙汁",
+      "category": "饮品",
+      "per100g": {
+        "calories": 45,
+        "protein": 0.7,
+        "carbs": 10.4,
+        "fat": 0.2,
+        "fiber": 0.2
+      }
+    },
+    {
+      "id": "apple_juice",
+      "name": "苹果汁",
+      "category": "饮品",
+      "per100g": {
+        "calories": 46,
+        "protein": 0.1,
+        "carbs": 11.3,
+        "fat": 0.1,
+        "fiber": 0.2
+      }
+    },
+    {
+      "id": "coconut_water",
+      "name": "椰子水",
+      "category": "饮品",
+      "per100g": {
+        "calories": 19,
+        "protein": 0.7,
+        "carbs": 3.7,
+        "fat": 0.2,
+        "fiber": 1.1
+      }
+    },
+    {
+      "id": "beer",
+      "name": "啤酒",
+      "category": "饮品",
+      "per100g": {
+        "calories": 43,
+        "protein": 0.5,
+        "carbs": 3.6,
+        "fat": 0.0,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "red_wine",
+      "name": "红酒",
+      "category": "饮品",
+      "per100g": {
+        "calories": 85,
+        "protein": 0.1,
+        "carbs": 2.6,
+        "fat": 0.0,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "baijiu",
+      "name": "白酒",
+      "category": "饮品",
+      "per100g": {
+        "calories": 298,
+        "protein": 0.0,
+        "carbs": 0.8,
+        "fat": 0.0,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "milk_tea",
+      "name": "奶茶（珍珠）",
+      "category": "饮品",
+      "per100g": {
+        "calories": 52,
+        "protein": 0.8,
+        "carbs": 9.8,
+        "fat": 1.2,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "sports_drink",
+      "name": "运动饮料",
+      "category": "饮品",
+      "per100g": {
+        "calories": 26,
+        "protein": 0.0,
+        "carbs": 6.4,
+        "fat": 0.0,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "rice_wine",
+      "name": "米酒",
+      "category": "饮品",
+      "per100g": {
+        "calories": 46,
+        "protein": 0.2,
+        "carbs": 4.8,
+        "fat": 0.0,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "soy_sauce",
+      "name": "酱油",
+      "category": "调味油脂",
+      "per100g": {
+        "calories": 53,
+        "protein": 5.6,
+        "carbs": 4.9,
+        "fat": 0.0,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "vinegar",
+      "name": "醋",
+      "category": "调味油脂",
+      "per100g": {
+        "calories": 31,
+        "protein": 2.1,
+        "carbs": 4.9,
+        "fat": 0.3,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "sugar_white",
+      "name": "白砂糖",
+      "category": "调味油脂",
+      "per100g": {
+        "calories": 400,
+        "protein": 0.0,
+        "carbs": 99.9,
+        "fat": 0.0,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "brown_sugar",
+      "name": "红糖",
+      "category": "调味油脂",
+      "per100g": {
+        "calories": 389,
+        "protein": 0.7,
+        "carbs": 96.6,
+        "fat": 0.3,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "honey",
+      "name": "蜂蜜",
+      "category": "调味油脂",
+      "per100g": {
+        "calories": 321,
+        "protein": 0.4,
+        "carbs": 75.6,
+        "fat": 1.9,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "peanut_oil",
+      "name": "花生油",
+      "category": "调味油脂",
+      "per100g": {
+        "calories": 899,
+        "protein": 0.0,
+        "carbs": 0.0,
+        "fat": 99.9,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "soybean_oil",
+      "name": "大豆油",
+      "category": "调味油脂",
+      "per100g": {
+        "calories": 899,
+        "protein": 0.0,
+        "carbs": 0.0,
+        "fat": 99.9,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "olive_oil",
+      "name": "橄榄油",
+      "category": "调味油脂",
+      "per100g": {
+        "calories": 899,
+        "protein": 0.0,
+        "carbs": 0.0,
+        "fat": 99.9,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "sesame_oil",
+      "name": "芝麻油",
+      "category": "调味油脂",
+      "per100g": {
+        "calories": 898,
+        "protein": 0.0,
+        "carbs": 0.0,
+        "fat": 99.8,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "lard",
+      "name": "猪油",
+      "category": "调味油脂",
+      "per100g": {
+        "calories": 897,
+        "protein": 0.0,
+        "carbs": 0.0,
+        "fat": 99.6,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "oyster_sauce",
+      "name": "蚝油",
+      "category": "调味油脂",
+      "per100g": {
+        "calories": 107,
+        "protein": 2.5,
+        "carbs": 22.8,
+        "fat": 0.3,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "doubanjiang",
+      "name": "豆瓣酱",
+      "category": "调味油脂",
+      "per100g": {
+        "calories": 141,
+        "protein": 6.7,
+        "carbs": 12.0,
+        "fat": 7.2,
+        "fiber": 2.0
+      }
+    },
+    {
+      "id": "chili_sauce",
+      "name": "辣椒酱",
+      "category": "调味油脂",
+      "per100g": {
+        "calories": 80,
+        "protein": 2.2,
+        "carbs": 12.0,
+        "fat": 2.5,
+        "fiber": 2.5
+      }
+    },
+    {
+      "id": "tomato_paste",
+      "name": "番茄酱",
+      "category": "调味油脂",
+      "per100g": {
+        "calories": 83,
+        "protein": 3.6,
+        "carbs": 17.1,
+        "fat": 0.5,
+        "fiber": 1.5
+      }
+    },
+    {
+      "id": "mayonnaise",
+      "name": "蛋黄酱",
+      "category": "调味油脂",
+      "per100g": {
+        "calories": 680,
+        "protein": 1.3,
+        "carbs": 3.4,
+        "fat": 72.8,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "peanut_butter",
+      "name": "花生酱",
+      "category": "调味油脂",
+      "per100g": {
+        "calories": 600,
+        "protein": 22.0,
+        "carbs": 14.0,
+        "fat": 50.0,
+        "fiber": 6.0
+      }
+    },
+    {
+      "id": "kung_pao_chicken",
+      "name": "宫保鸡丁",
+      "category": "常见菜肴",
+      "per100g": {
+        "calories": 158,
+        "protein": 14.5,
+        "carbs": 8.0,
+        "fat": 7.5,
+        "fiber": 1.2
+      }
+    },
+    {
+      "id": "tomato_egg",
+      "name": "番茄炒蛋",
+      "category": "常见菜肴",
+      "per100g": {
+        "calories": 95,
+        "protein": 5.8,
+        "carbs": 5.2,
+        "fat": 5.8,
+        "fiber": 0.6
+      }
+    },
+    {
+      "id": "braised_pork",
+      "name": "红烧肉",
+      "category": "常见菜肴",
+      "per100g": {
+        "calories": 252,
+        "protein": 11.5,
+        "carbs": 6.0,
+        "fat": 20.5,
+        "fiber": 0.1
+      }
+    },
+    {
+      "id": "steamed_fish",
+      "name": "清蒸鱼",
+      "category": "常见菜肴",
+      "per100g": {
+        "calories": 108,
+        "protein": 17.5,
+        "carbs": 2.5,
+        "fat": 3.2,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "mapo_tofu",
+      "name": "麻婆豆腐",
+      "category": "常见菜肴",
+      "per100g": {
+        "calories": 98,
+        "protein": 6.5,
+        "carbs": 3.0,
+        "fat": 6.8,
+        "fiber": 0.3
+      }
+    },
+    {
+      "id": "stir_fry_greens",
+      "name": "清炒时蔬",
+      "category": "常见菜肴",
+      "per100g": {
+        "calories": 52,
+        "protein": 2.0,
+        "carbs": 3.5,
+        "fat": 3.5,
+        "fiber": 1.5
+      }
+    },
+    {
+      "id": "sweet_sour_pork",
+      "name": "糖醋排骨",
+      "category": "常见菜肴",
+      "per100g": {
+        "calories": 198,
+        "protein": 15.0,
+        "carbs": 14.0,
+        "fat": 9.5,
+        "fiber": 0.2
+      }
+    },
+    {
+      "id": "fish_flavored_pork",
+      "name": "鱼香肉丝",
+      "category": "常见菜肴",
+      "per100g": {
+        "calories": 142,
+        "protein": 10.0,
+        "carbs": 9.5,
+        "fat": 7.5,
+        "fiber": 1.0
+      }
+    },
+    {
+      "id": "twice_cooked_pork",
+      "name": "回锅肉",
+      "category": "常见菜肴",
+      "per100g": {
+        "calories": 210,
+        "protein": 12.0,
+        "carbs": 5.0,
+        "fat": 16.0,
+        "fiber": 0.8
+      }
+    },
+    {
+      "id": "shredded_potato",
+      "name": "醋溜土豆丝",
+      "category": "常见菜肴",
+      "per100g": {
+        "calories": 82,
+        "protein": 1.8,
+        "carbs": 13.5,
+        "fat": 2.8,
+        "fiber": 1.2
+      }
+    },
+    {
+      "id": "stewed_chicken",
+      "name": "黄焖鸡",
+      "category": "常见菜肴",
+      "per100g": {
+        "calories": 145,
+        "protein": 14.8,
+        "carbs": 3.0,
+        "fat": 8.0,
+        "fiber": 0.3
+      }
+    },
+    {
+      "id": "boiled_fish",
+      "name": "水煮鱼",
+      "category": "常见菜肴",
+      "per100g": {
+        "calories": 135,
+        "protein": 13.5,
+        "carbs": 2.0,
+        "fat": 8.0,
+        "fiber": 0.5
+      }
+    },
+    {
+      "id": "hot_pot_broth",
+      "name": "火锅（清汤底料）",
+      "category": "常见菜肴",
+      "per100g": {
+        "calories": 12,
+        "protein": 0.5,
+        "carbs": 1.8,
+        "fat": 0.3,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "hot_pot_spicy",
+      "name": "火锅（麻辣底料）",
+      "category": "常见菜肴",
+      "per100g": {
+        "calories": 85,
+        "protein": 1.5,
+        "carbs": 4.0,
+        "fat": 7.0,
+        "fiber": 0.5
+      }
+    },
+    {
+      "id": "steamed_egg",
+      "name": "蒸蛋羹",
+      "category": "常见菜肴",
+      "per100g": {
+        "calories": 65,
+        "protein": 5.5,
+        "carbs": 1.0,
+        "fat": 4.5,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "cold_cucumber",
+      "name": "拍黄瓜",
+      "category": "常见菜肴",
+      "per100g": {
+        "calories": 28,
+        "protein": 0.8,
+        "carbs": 3.0,
+        "fat": 1.5,
+        "fiber": 0.5
+      }
+    },
+    {
+      "id": "dry_fried_green_bean",
+      "name": "干煸四季豆",
+      "category": "常见菜肴",
+      "per100g": {
+        "calories": 92,
+        "protein": 2.5,
+        "carbs": 6.0,
+        "fat": 6.5,
+        "fiber": 2.0
+      }
+    },
+    {
+      "id": "braised_eggplant",
+      "name": "红烧茄子",
+      "category": "常见菜肴",
+      "per100g": {
+        "calories": 78,
+        "protein": 1.5,
+        "carbs": 7.0,
+        "fat": 5.0,
+        "fiber": 1.5
+      }
+    },
+    {
+      "id": "curry_chicken",
+      "name": "咖喱鸡",
+      "category": "常见菜肴",
+      "per100g": {
+        "calories": 132,
+        "protein": 12.5,
+        "carbs": 6.0,
+        "fat": 6.8,
+        "fiber": 0.8
+      }
+    },
+    {
+      "id": "scrambled_egg_chive",
+      "name": "韭菜炒蛋",
+      "category": "常见菜肴",
+      "per100g": {
+        "calories": 120,
+        "protein": 8.0,
+        "carbs": 3.5,
+        "fat": 8.5,
+        "fiber": 1.0
+      }
+    },
+    {
+      "id": "fried_rice_egg",
+      "name": "蛋炒饭",
+      "category": "常见菜肴",
+      "per100g": {
+        "calories": 168,
+        "protein": 5.5,
+        "carbs": 24.0,
+        "fat": 5.5,
+        "fiber": 0.5
+      }
+    },
+    {
+      "id": "steamed_spare_ribs",
+      "name": "蒸排骨",
+      "category": "常见菜肴",
+      "per100g": {
+        "calories": 185,
+        "protein": 15.5,
+        "carbs": 5.0,
+        "fat": 11.0,
+        "fiber": 0.2
+      }
+    },
+    {
+      "id": "pickled_fish",
+      "name": "酸菜鱼",
+      "category": "常见菜肴",
+      "per100g": {
+        "calories": 88,
+        "protein": 10.0,
+        "carbs": 3.0,
+        "fat": 4.0,
+        "fiber": 0.5
+      }
+    },
+    {
+      "id": "braised_beef",
+      "name": "红烧牛肉",
+      "category": "常见菜肴",
+      "per100g": {
+        "calories": 135,
+        "protein": 18.0,
+        "carbs": 3.5,
+        "fat": 5.5,
+        "fiber": 0.2
+      }
+    },
+    {
+      "id": "clay_pot_rice",
+      "name": "煲仔饭",
+      "category": "常见菜肴",
+      "per100g": {
+        "calories": 175,
+        "protein": 7.5,
+        "carbs": 23.0,
+        "fat": 5.5,
+        "fiber": 0.5
+      }
+    },
+    {
+      "id": "wontons_soup",
+      "name": "馄饨汤",
+      "category": "常见菜肴",
+      "per100g": {
+        "calories": 52,
+        "protein": 2.8,
+        "carbs": 6.0,
+        "fat": 2.0,
+        "fiber": 0.2
+      }
+    },
+    {
+      "id": "hot_dry_noodle",
+      "name": "热干面",
+      "category": "常见菜肴",
+      "per100g": {
+        "calories": 152,
+        "protein": 5.5,
+        "carbs": 21.0,
+        "fat": 5.0,
+        "fiber": 1.0
+      }
+    },
+    {
+      "id": "dan_dan_noodle",
+      "name": "担担面",
+      "category": "常见菜肴",
+      "per100g": {
+        "calories": 165,
+        "protein": 6.5,
+        "carbs": 20.0,
+        "fat": 6.5,
+        "fiber": 0.8
+      }
+    },
+    {
+      "id": "zhajiang_noodle",
+      "name": "炸酱面",
+      "category": "常见菜肴",
+      "per100g": {
+        "calories": 148,
+        "protein": 6.0,
+        "carbs": 20.5,
+        "fat": 4.8,
+        "fiber": 0.7
+      }
+    },
+    {
+      "id": "kung_pao_shrimp",
+      "name": "宫保虾仁",
+      "category": "常见菜肴",
+      "per100g": {
+        "calories": 128,
+        "protein": 15.0,
+        "carbs": 7.0,
+        "fat": 4.5,
+        "fiber": 1.0
+      }
+    },
+    {
+      "id": "jianbing",
+      "name": "煎饼果子",
+      "category": "快餐小吃",
+      "per100g": {
+        "calories": 218,
+        "protein": 7.0,
+        "carbs": 26.0,
+        "fat": 9.5,
+        "fiber": 1.2
+      }
+    },
+    {
+      "id": "roujiamo",
+      "name": "肉夹馍",
+      "category": "快餐小吃",
+      "per100g": {
+        "calories": 235,
+        "protein": 11.0,
+        "carbs": 25.0,
+        "fat": 10.0,
+        "fiber": 0.8
+      }
+    },
+    {
+      "id": "hamburger",
+      "name": "汉堡",
+      "category": "快餐小吃",
+      "per100g": {
+        "calories": 255,
+        "protein": 12.5,
+        "carbs": 24.5,
+        "fat": 12.0,
+        "fiber": 1.2
+      }
+    },
+    {
+      "id": "fried_chicken",
+      "name": "炸鸡",
+      "category": "快餐小吃",
+      "per100g": {
+        "calories": 267,
+        "protein": 18.5,
+        "carbs": 12.0,
+        "fat": 15.8,
+        "fiber": 0.5
+      }
+    },
+    {
+      "id": "french_fries",
+      "name": "薯条",
+      "category": "快餐小吃",
+      "per100g": {
+        "calories": 312,
+        "protein": 3.4,
+        "carbs": 41.4,
+        "fat": 15.0,
+        "fiber": 3.8
+      }
+    },
+    {
+      "id": "pizza",
+      "name": "披萨",
+      "category": "快餐小吃",
+      "per100g": {
+        "calories": 266,
+        "protein": 11.0,
+        "carbs": 33.0,
+        "fat": 10.4,
+        "fiber": 2.3
+      }
+    },
+    {
+      "id": "bbq_skewer_meat",
+      "name": "烤肉串",
+      "category": "快餐小吃",
+      "per100g": {
+        "calories": 220,
+        "protein": 18.0,
+        "carbs": 3.0,
+        "fat": 15.0,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "bbq_skewer_veggie",
+      "name": "烤蔬菜串",
+      "category": "快餐小吃",
+      "per100g": {
+        "calories": 65,
+        "protein": 2.0,
+        "carbs": 6.0,
+        "fat": 3.5,
+        "fiber": 2.0
+      }
+    },
+    {
+      "id": "spring_roll",
+      "name": "春卷（炸）",
+      "category": "快餐小吃",
+      "per100g": {
+        "calories": 262,
+        "protein": 5.5,
+        "carbs": 28.0,
+        "fat": 14.0,
+        "fiber": 1.5
+      }
+    },
+    {
+      "id": "baozi_veggie",
+      "name": "素包子",
+      "category": "快餐小吃",
+      "per100g": {
+        "calories": 178,
+        "protein": 5.5,
+        "carbs": 30.0,
+        "fat": 3.5,
+        "fiber": 1.5
+      }
+    },
+    {
+      "id": "shengjian",
+      "name": "生煎包",
+      "category": "快餐小吃",
+      "per100g": {
+        "calories": 235,
+        "protein": 8.5,
+        "carbs": 26.0,
+        "fat": 10.5,
+        "fiber": 0.6
+      }
+    },
+    {
+      "id": "xiaolongbao",
+      "name": "小笼包",
+      "category": "快餐小吃",
+      "per100g": {
+        "calories": 192,
+        "protein": 9.5,
+        "carbs": 20.5,
+        "fat": 7.8,
+        "fiber": 0.5
+      }
+    },
+    {
+      "id": "guotie",
+      "name": "锅贴",
+      "category": "快餐小吃",
+      "per100g": {
+        "calories": 225,
+        "protein": 8.0,
+        "carbs": 24.0,
+        "fat": 10.5,
+        "fiber": 0.7
+      }
+    },
+    {
+      "id": "scallion_pancake",
+      "name": "葱油饼",
+      "category": "快餐小吃",
+      "per100g": {
+        "calories": 290,
+        "protein": 6.0,
+        "carbs": 35.0,
+        "fat": 14.0,
+        "fiber": 1.0
+      }
+    },
+    {
+      "id": "egg_pancake",
+      "name": "鸡蛋灌饼",
+      "category": "快餐小吃",
+      "per100g": {
+        "calories": 240,
+        "protein": 8.5,
+        "carbs": 28.0,
+        "fat": 10.0,
+        "fiber": 0.8
+      }
+    },
+    {
+      "id": "malatang",
+      "name": "麻辣烫（均）",
+      "category": "快餐小吃",
+      "per100g": {
+        "calories": 68,
+        "protein": 4.0,
+        "carbs": 5.0,
+        "fat": 3.5,
+        "fiber": 1.0
+      }
+    },
+    {
+      "id": "chuanr_lamb",
+      "name": "羊肉串",
+      "category": "快餐小吃",
+      "per100g": {
+        "calories": 195,
+        "protein": 16.0,
+        "carbs": 3.5,
+        "fat": 13.0,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "stinky_tofu",
+      "name": "臭豆腐",
+      "category": "快餐小吃",
+      "per100g": {
+        "calories": 175,
+        "protein": 10.5,
+        "carbs": 5.0,
+        "fat": 12.5,
+        "fiber": 0.5
+      }
+    },
+    {
+      "id": "tanghulu",
+      "name": "糖葫芦",
+      "category": "快餐小吃",
+      "per100g": {
+        "calories": 165,
+        "protein": 0.5,
+        "carbs": 40.0,
+        "fat": 0.2,
+        "fiber": 1.5
+      }
+    },
+    {
+      "id": "egg_tart",
+      "name": "蛋挞",
+      "category": "快餐小吃",
+      "per100g": {
+        "calories": 285,
+        "protein": 5.5,
+        "carbs": 26.0,
+        "fat": 17.5,
+        "fiber": 0.3
+      }
+    },
+    {
+      "id": "fried_dough_stick",
+      "name": "油炸糕",
+      "category": "快餐小吃",
+      "per100g": {
+        "calories": 320,
+        "protein": 4.5,
+        "carbs": 42.0,
+        "fat": 14.5,
+        "fiber": 0.8
+      }
+    },
+    {
+      "id": "liangpi",
+      "name": "凉皮",
+      "category": "快餐小吃",
+      "per100g": {
+        "calories": 117,
+        "protein": 3.5,
+        "carbs": 22.0,
+        "fat": 1.8,
+        "fiber": 0.5
+      }
+    },
+    {
+      "id": "crayfish",
+      "name": "小龙虾",
+      "category": "快餐小吃",
+      "per100g": {
+        "calories": 90,
+        "protein": 18.0,
+        "carbs": 1.5,
+        "fat": 1.5,
+        "fiber": 0
+      }
+    },
+    {
+      "id": "fried_rice_yangzhou",
+      "name": "扬州炒饭",
+      "category": "快餐小吃",
+      "per100g": {
+        "calories": 175,
+        "protein": 6.5,
+        "carbs": 24.0,
+        "fat": 5.8,
+        "fiber": 0.8
+      }
+    },
+    {
+      "id": "sandwich",
+      "name": "三明治",
+      "category": "快餐小吃",
+      "per100g": {
+        "calories": 230,
+        "protein": 10.0,
+        "carbs": 26.0,
+        "fat": 9.5,
+        "fiber": 1.5
+      }
+    }
+  ]
+}

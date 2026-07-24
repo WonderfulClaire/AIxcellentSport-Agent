@@ -170,3 +170,36 @@ export async function deleteAccount() {
   localStorage.removeItem(lsKey("wearable"));
   return { ok: true };
 }
+
+/* ── 饮食记录（当日 meals）── */
+export async function getMeals(date?: string): Promise<any[]> {
+  const d = date || new Date().toISOString().slice(0, 10);
+  if (API_BASE) {
+    try {
+      const r = await apiFetch(`/api/health/meals?date=${d}`);
+      return r.meals || [];
+    } catch { /* 降级本地 */ }
+  }
+  try {
+    const all = JSON.parse(localStorage.getItem(lsKey("meals")) || "{}");
+    return all[d] || [];
+  } catch {
+    return [];
+  }
+}
+
+export async function saveMeals(meals: any[], date?: string): Promise<any[]> {
+  const d = date || new Date().toISOString().slice(0, 10);
+  if (API_BASE) {
+    try {
+      const r = await apiFetch("/api/health/meals", { method: "POST", body: { date: d, meals } });
+      return r.meals || meals;
+    } catch { /* 降级本地 */ }
+  }
+  try {
+    const all = JSON.parse(localStorage.getItem(lsKey("meals")) || "{}");
+    all[d] = meals;
+    localStorage.setItem(lsKey("meals"), JSON.stringify(all));
+  } catch {}
+  return meals;
+}

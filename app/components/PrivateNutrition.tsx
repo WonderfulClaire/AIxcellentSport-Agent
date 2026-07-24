@@ -66,7 +66,7 @@ export default function PrivateNutrition() {
       // 本地基础版
       const bmr = calcBMR(profile);
       const tdee = calcTDEE(bmr, profile.activity);
-      const macros = calcMacros(tdee, profile.goal);
+      const macros = calcMacros(tdee, profile.goal, profile.weight);
       const cycle = profile.gender === "female" ? getCyclePhase(profile.cycleDay) : null;
       const fallback = await generateNutritionPlan(profile);
       setPlan({ ...fallback, bmr, tdee, macros, cycle });
@@ -189,6 +189,29 @@ export default function PrivateNutrition() {
 
   return (
     <div className="pn-result">
+      {/* TDEE / BMR 核心数据 */}
+      <div className="pn-tdee-card">
+        <div className="pn-tdee-row">
+          <div className="pn-tdee-item">
+            <span className="pn-tdee-label">BMR 基础代谢</span>
+            <span className="pn-tdee-val">{plan.bmr} <small>kcal</small></span>
+            <span className="pn-tdee-desc">Mifflin-St Jeor 公式</span>
+          </div>
+          <div className="pn-tdee-arrow">→</div>
+          <div className="pn-tdee-item">
+            <span className="pn-tdee-label">TDEE 每日消耗</span>
+            <span className="pn-tdee-val">{plan.tdee} <small>kcal</small></span>
+            <span className="pn-tdee-desc">BMR × 活动系数</span>
+          </div>
+          <div className="pn-tdee-arrow">→</div>
+          <div className="pn-tdee-item pn-tdee-target">
+            <span className="pn-tdee-label">目标热量</span>
+            <span className="pn-tdee-val">{plan.macros.calories} <small>kcal</small></span>
+            <span className="pn-tdee-desc">{plan.macros.calories < plan.tdee ? `减脂 -${plan.tdee - plan.macros.calories}` : plan.macros.calories > plan.tdee ? `增肌 +${plan.macros.calories - plan.tdee}` : "维持"}</span>
+          </div>
+        </div>
+      </div>
+
       {/* Summary + Macros */}
       <div className="pn-summary-card">
         <div className="pn-summary-left">
@@ -205,14 +228,17 @@ export default function PrivateNutrition() {
           <div className="pn-macro">
             <span className="pn-macro-val">{plan.macros.protein}g</span>
             <span className="pn-macro-label">蛋白质</span>
+            <span className="pn-macro-pct">{Math.round(plan.macros.protein * 4 / plan.macros.calories * 100)}%</span>
           </div>
           <div className="pn-macro">
             <span className="pn-macro-val">{plan.macros.carbs}g</span>
             <span className="pn-macro-label">碳水</span>
+            <span className="pn-macro-pct">{Math.round(plan.macros.carbs * 4 / plan.macros.calories * 100)}%</span>
           </div>
           <div className="pn-macro">
             <span className="pn-macro-val">{plan.macros.fat}g</span>
             <span className="pn-macro-label">脂肪</span>
+            <span className="pn-macro-pct">{Math.round(plan.macros.fat * 9 / plan.macros.calories * 100)}%</span>
           </div>
         </div>
       </div>

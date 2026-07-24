@@ -79,3 +79,26 @@
 
 **遗留问题**：
 - 无
+
+## U4. 营养/饮食接真实数据 ✅
+
+**做了什么**：
+- 修复 foods.json 注释问题，扩充至 308 条常见中国食物（覆盖主食/肉类/蛋奶/蔬菜/水果/豆制品/坚果/饮品/调味/菜肴/快餐 11 大类）
+- DietTracker 增强：搜索食物（中文模糊匹配）+ 克数份量输入 + 当日营养累加 + 目标对比差距提示
+- PrivateNutrition 增强：Mifflin-St Jeor 公式计算 BMR/TDEE + 营养素配比百分比 + 三级展示（BMR→TDEE→目标）
+- nutritionPlanner calcMacros 修复：使用实际体重计算蛋白质需求（不再硬编码）
+- 数据持久化走 healthStore 双通道模式（getMeals/saveMeals）
+
+**改了哪些文件**：
+- `public/data/foods.json`（扩充至 308 条，去除注释，合法 JSON）
+- `app/components/DietTracker.tsx`（搜索+克数份量+累加+目标对比+healthStore双通道）
+- `app/components/PrivateNutrition.tsx`（TDEE/BMR展示+营养素百分比+weight传参）
+- `app/agent/nutritionPlanner.ts`（calcMacros 用实际体重）
+- `app/healthStore.ts`（新增 getMeals/saveMeals 双通道）
+
+**自测结果**：
+- `npm run build` 构建通过 ✅
+- `npm test` 测试通过 ✅
+
+**遗留问题**：
+- Open Food Facts API 需联网环境验证（已跳过，CORS 限制需后端代理）

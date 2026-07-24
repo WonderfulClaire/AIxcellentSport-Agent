@@ -1,16 +1,16 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { getMeals, saveMeals, getProfile } from "../healthStore";
 import ModuleIntro from "./ModuleIntro";
 
-type Food = {
+type FoodItem = {
   id: string; name: string; category: string;
-  calories: number; protein: number; carbs: number; fat: number; fiber: number;
-  unit: string; portionGrams: number;
+  per100g: { calories: number; protein: number; carbs: number; fat: number; fiber: number };
 };
 
 type MealEntry = {
-  id: string; foodId: string; foodName: string; amount: number;
+  id: string; foodId: string; foodName: string; grams: number;
   mealType: "breakfast" | "lunch" | "dinner" | "snack";
   calories: number; protein: number; carbs: number; fat: number;
   timestamp: number;
@@ -25,81 +25,85 @@ const MEAL_TYPES: Array<{ key: MealEntry["mealType"]; label: string; icon: strin
   { key: "snack", label: "加餐", icon: "🍎" },
 ];
 
-const STORAGE_KEY = "aix_diet_v1";
+const DEFAULT_GOAL: DailyGoal = { calories: 2000, protein: 120, carbs: 250, fat: 60 };
 
 export default function DietTracker() {
-  const [foods, setFoods] = useState<Food[]>([]);
+  const [foods, setFoods] = useState<FoodItem[]>([]);
   const [entries, setEntries] = useState<MealEntry[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedMeal, setSelectedMeal] = useState<MealEntry["mealType"]>("breakfast");
-  const [selectedFood, setSelectedFood] = useState<Food | null>(null);
-  const [amount, setAmount] = useState(1);
-  const [goal, setGoal] = useState<DailyGoal>({ calories: 2000, protein: 120, carbs: 250, fat: 60 });
+  const [selectedFood, setSelectedFood] = useState<FoodItem | null>(null);
+  const [grams, setGrams] = useState(100);
+  const [goal, setGoal] = useState<DailyGoal>(DEFAULT_GOAL);
   const [showGoalEdit, setShowGoalEdit] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
-  // 加载食物数据库
+  // 加载食物数据库（新格式 with per100g）
   useEffect(() => {
     fetch("/data/foods.json")
       .then((r) => r.json())
-      .then(setFoods)
+      .then((data) => {
+        // 支持新格式（对象带 foods 字段）和旧格式（直接数组）
+        const list = Array.isArray(data) ? data : (data.foods || []);
+        setFoods(list);
+      })
       .catch(() => console.error("Failed to load foods"));
   }, []);
 
-  // 从 localStorage 加载今日记录
+  // 从 healthStore 加载今日记录（双通道模式）
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const data = JSON.parse(saved);
-        // 只加载今天的记录
-        const today = new Date().toDateString();
-        setEntries((data.entries || []).filter((e: MealEntry) => new Date(e.timestamp).toDateString() === today));
-        if (data.goal) setGoal(data.goal);
-      }
-    } catch {}
+    (async () => {
+      try {
+        const meals = await getMeals();
+        if (meals && meals.length > 0) setEntries(meals);
+        // 尝试从 profile 读取目标
+        const profile = await getProfile();
+        if (profile?.dailyGoal) setGoal(profile.dailyGoal);
+      } catch {}
+      setLoaded(true);
+    })();
   }, []);
 
-  // 保存到 localStorage
-  const saveEntries = useCallback((next: MealEntry[]) => {
+  // 保存到 healthStore（双通道）
+  const persistEntries = useCallback(async (next: MealEntry[]) => {
     setEntries(next);
-    try {
-      const existing = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-      existing.entries = next;
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(existing));
-    } catch {}
+    try { await saveMeals(next); } catch {}
   }, []);
 
   // 添加食物
   const addEntry = useCallback(() => {
     if (!selectedFood) return;
+    const g = grams;
+    const p = selectedFood.per100g;
     const entry: MealEntry = {
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       foodId: selectedFood.id,
       foodName: selectedFood.name,
-      amount,
+      grams: g,
       mealType: selectedMeal,
-      calories: Math.round(selectedFood.calories * selectedFood.portionGrams / 100 * amount),
-      protein: Math.round(selectedFood.protein * selectedFood.portionGrams / 100 * amount * 10) / 10,
-      carbs: Math.round(selectedFood.carbs * selectedFood.portionGrams / 100 * amount * 10) / 10,
-      fat: Math.round(selectedFood.fat * selectedFood.portionGrams / 100 * amount * 10) / 10,
+      calories: Math.round(p.calories * g / 100),
+      protein: Math.round(p.protein * g / 100 * 10) / 10,
+      carbs: Math.round(p.carbs * g / 100 * 10) / 10,
+      fat: Math.round(p.fat * g / 100 * 10) / 10,
       timestamp: Date.now(),
     };
-    saveEntries([...entries, entry]);
+    persistEntries([...entries, entry]);
     setSelectedFood(null);
-    setAmount(1);
+    setGrams(100);
     setSearchQuery("");
-  }, [selectedFood, amount, selectedMeal, entries, saveEntries]);
+  }, [selectedFood, grams, selectedMeal, entries, persistEntries]);
 
   // 删除记录
-  const removeEntry = (id: string) => saveEntries(entries.filter((e) => e.id !== id));
+  const removeEntry = (id: string) => persistEntries(entries.filter((e) => e.id !== id));
 
-  // 搜索过滤
-  const filteredFoods = foods.filter(
-    (f) =>
-      f.name.includes(searchQuery) ||
-      f.category.includes(searchQuery) ||
-      f.id.includes(searchQuery),
-  );
+  // 搜索过滤（模糊匹配）
+  const filteredFoods = searchQuery.trim()
+    ? foods.filter((f) =>
+        f.name.includes(searchQuery) ||
+        f.category.includes(searchQuery) ||
+        f.id.includes(searchQuery.toLowerCase()),
+      )
+    : [];
 
   // 汇总数据
   const totals = entries.reduce(
@@ -112,6 +116,7 @@ export default function DietTracker() {
     { calories: 0, protein: 0, carbs: 0, fat: 0 },
   );
 
+  const calDiff = totals.calories - goal.calories;
   const calPct = Math.min(100, Math.round((totals.calories / goal.calories) * 100));
 
   // 按餐次分组
@@ -120,21 +125,16 @@ export default function DietTracker() {
     items: entries.filter((e) => e.mealType === m.key),
   }));
 
-
-  // --- 示例数据 ---
+  // 示例数据
   const loadDemoData = () => {
     const demoEntries: MealEntry[] = [
-      { id: "demo-1", foodId: "egg", foodName: "水煮蛋", amount: 2, mealType: "breakfast", calories: 156, protein: 12.6, carbs: 1.2, fat: 10.6, timestamp: Date.now() - 36000000 },
-      { id: "demo-2", foodId: "oat", foodName: "燕麦片", amount: 1, mealType: "breakfast", calories: 150, protein: 5, carbs: 27, fat: 2.5, timestamp: Date.now() - 35000000 },
-      { id: "demo-3", foodId: "chicken", foodName: "鸡胸肉", amount: 1.5, mealType: "lunch", calories: 248, protein: 46.5, carbs: 0, fat: 5.4, timestamp: Date.now() - 18000000 },
-      { id: "demo-4", foodId: "rice", foodName: "糙米饭", amount: 1, mealType: "lunch", calories: 216, protein: 4.5, carbs: 45, fat: 1.8, timestamp: Date.now() - 17500000 },
-      { id: "demo-5", foodId: "salmon", foodName: "三文鱼", amount: 1, mealType: "dinner", calories: 208, protein: 20, carbs: 0, fat: 13, timestamp: Date.now() - 7200000 },
+      { id: "demo-1", foodId: "egg_boiled", foodName: "鸡蛋（煮）", grams: 100, mealType: "breakfast", calories: 144, protein: 13.3, carbs: 1.4, fat: 8.8, timestamp: Date.now() - 36000000 },
+      { id: "demo-2", foodId: "oatmeal", foodName: "燕麦片", grams: 40, mealType: "breakfast", calories: 151, protein: 6, carbs: 26.4, fat: 2.7, timestamp: Date.now() - 35000000 },
+      { id: "demo-3", foodId: "chicken_breast", foodName: "鸡胸肉", grams: 150, mealType: "lunch", calories: 200, protein: 46.5, carbs: 0, fat: 5.4, timestamp: Date.now() - 18000000 },
+      { id: "demo-4", foodId: "rice_white", foodName: "白米饭", grams: 200, mealType: "lunch", calories: 232, protein: 5.2, carbs: 51.2, fat: 0.6, timestamp: Date.now() - 17500000 },
+      { id: "demo-5", foodId: "salmon", foodName: "三文鱼", grams: 120, mealType: "dinner", calories: 167, protein: 24.6, carbs: 0, fat: 7.6, timestamp: Date.now() - 7200000 },
     ];
-    saveEntries(demoEntries);
-  };
-
-  const clearDemoData = () => {
-    saveEntries([]);
+    persistEntries(demoEntries);
   };
 
   return (
@@ -142,11 +142,11 @@ export default function DietTracker() {
       <ModuleIntro
         title="饮食追踪"
         what="记录每餐食物，自动计算热量和营养素摄入"
-        how={["搜索或选择食物","填写份量","查看当日营养摄入与目标对比"]}
+        how={["搜索食物（支持中文模糊匹配）","输入克数，确认添加","查看当日营养摄入与目标对比"]}
       />
       <div className="dt-header">
         <h2>🥗 饮食管理</h2>
-        <p>记录每日饮食，追踪营养摄入</p>
+        <p>记录每日饮食，追踪营养摄入（食物库 {foods.length} 种）</p>
       </div>
 
       {/* 今日概览卡片 */}
@@ -184,6 +184,15 @@ export default function DietTracker() {
             <strong>{totals.fat.toFixed(1)}<small>/{goal.fat}g</small></strong>
             <i style={{ width: `${Math.min(100, (totals.fat / goal.fat) * 100)}%` }} />
           </div>
+          {/* 差距提示 */}
+          <div className="dt-gap-hint">
+            {calDiff < 0
+              ? <span className="dt-gap-under">还差 <b>{Math.abs(calDiff)}</b> 大卡达标</span>
+              : calDiff === 0
+              ? <span className="dt-gap-ok">🎯 恰好达标！</span>
+              : <span className="dt-gap-over">已超出 <b>{calDiff}</b> 大卡</span>
+            }
+          </div>
         </div>
         <button className="dt-goal-btn" onClick={() => setShowGoalEdit(!showGoalEdit)}>
           ⚙️ 设定目标
@@ -200,10 +209,7 @@ export default function DietTracker() {
             <label>碳水(g)<input type="number" value={goal.carbs} onChange={(e) => setGoal({ ...goal, carbs: Number(e.target.value) })} /></label>
             <label>脂肪(g)<input type="number" value={goal.fat} onChange={(e) => setGoal({ ...goal, fat: Number(e.target.value) })} /></label>
           </div>
-          <button onClick={() => {
-            setShowGoalEdit(false);
-            try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ entries, goal })); } catch {}
-          }}>保存目标</button>
+          <button onClick={() => setShowGoalEdit(false)}>保存目标</button>
         </div>
       )}
 
@@ -226,45 +232,59 @@ export default function DietTracker() {
         <div className="dt-search-row">
           <input
             className="dt-search"
-            placeholder="搜索食物（如：鸡胸、鸡蛋、米饭…）"
+            placeholder="搜索食物（如：鸡胸、牛肉、苹果、红烧肉…）"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => { setSearchQuery(e.target.value); setSelectedFood(null); }}
           />
-          <select className="dt-amount" value={amount} onChange={(e) => setAmount(Number(e.target.value))}>
-            {[0.5, 1, 1.5, 2, 3].map((n) => (
-              <option key={n} value={n}>{n}份</option>
-            ))}
-          </select>
         </div>
 
         {/* 搜索结果 */}
         {searchQuery && filteredFoods.length > 0 && !selectedFood && (
           <div className="dt-food-list">
-            {filteredFoods.slice(0, 8).map((f) => (
-              <button key={f.id} className="dt-food-item" onClick={() => { setSelectedFood(f); setSearchQuery(""); }}>
+            {filteredFoods.slice(0, 10).map((f) => (
+              <button key={f.id} className="dt-food-item" onClick={() => { setSelectedFood(f); setSearchQuery(f.name); setGrams(100); }}>
                 <span className="dt-food-name">{f.name}</span>
                 <span className="dt-food-cat">{f.category}</span>
-                <span className="dt-food-cals">{Math.round(f.calories * f.portionGrams / 100)} kcal/{f.unit}</span>
+                <span className="dt-food-cals">{f.per100g.calories} kcal/100g</span>
               </button>
             ))}
           </div>
         )}
 
-        {/* 已选食物确认 */}
+        {searchQuery && filteredFoods.length === 0 && !selectedFood && (
+          <div className="dt-no-result">未找到匹配食物，试试其他关键词</div>
+        )}
+
+        {/* 已选食物 - 份量输入 */}
         {selectedFood && (
           <div className="dt-selected-confirm">
             <div className="dt-confirm-info">
               <strong>{selectedFood.name}</strong>
-              <span>{amount} × {selectedFood.unit} = {Math.round(selectedFood.calories * selectedFood.portionGrams / 100 * amount)} kcal</span>
+              <span className="dt-confirm-cat">{selectedFood.category}</span>
+              <div className="dt-gram-input">
+                <label>份量 (克)：</label>
+                <input
+                  type="number"
+                  min="1"
+                  value={grams}
+                  onChange={(e) => setGrams(Math.max(1, Number(e.target.value)))}
+                />
+                <span className="dt-gram-presets">
+                  {[50, 100, 150, 200, 300].map(g => (
+                    <button key={g} className={grams === g ? "active" : ""} onClick={() => setGrams(g)}>{g}g</button>
+                  ))}
+                </span>
+              </div>
               <span className="dt-confirm-nutri">
-                蛋白{Math.round(selectedFood.protein * selectedFood.portionGrams / 100 * amount)}g ·
-                碳水{Math.round(selectedFood.carbs * selectedFood.portionGrams / 100 * amount)}g ·
-                脂肪{Math.round(selectedFood.fat * selectedFood.portionGrams / 100 * amount)}g
+                {Math.round(selectedFood.per100g.calories * grams / 100)} kcal ·
+                蛋白{(selectedFood.per100g.protein * grams / 100).toFixed(1)}g ·
+                碳水{(selectedFood.per100g.carbs * grams / 100).toFixed(1)}g ·
+                脂肪{(selectedFood.per100g.fat * grams / 100).toFixed(1)}g
               </span>
             </div>
             <div className="dt-confirm-actions">
               <button className="dt-add-btn" onClick={addEntry}>✓ 添加到{MEAL_TYPES.find((m) => m.key === selectedMeal)?.label}</button>
-              <button className="dt-cancel-btn" onClick={() => setSelectedFood(null)}>取消</button>
+              <button className="dt-cancel-btn" onClick={() => { setSelectedFood(null); setSearchQuery(""); }}>取消</button>
             </div>
           </div>
         )}
@@ -279,7 +299,7 @@ export default function DietTracker() {
               <h4>{meal.icon} {meal.label}</h4>
               {meal.items.map((entry) => (
                 <div key={entry.id} className="dt-entry">
-                  <span className="dt-entry-name">{entry.foodName}{entry.amount > 1 ? ` ×${entry.amount}` : ""}</span>
+                  <span className="dt-entry-name">{entry.foodName} <small>{entry.grams}g</small></span>
                   <span className="dt-entry-cals">{entry.calories} kcal</span>
                   <button className="dt-remove" onClick={() => removeEntry(entry.id)}>×</button>
                 </div>
@@ -290,7 +310,12 @@ export default function DietTracker() {
             </div>
           )
         ))}
-        {entries.length === 0 && <p className="dt-empty">今天还没有记录，开始添加吧 👆</p>}
+        {entries.length === 0 && (
+          <div className="dt-empty">
+            <p>今天还没有记录，开始添加吧 👆</p>
+            <button className="dt-demo-btn" onClick={loadDemoData}>加载示例数据体验</button>
+          </div>
+        )}
       </div>
     </div>
   );

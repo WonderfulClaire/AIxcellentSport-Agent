@@ -31,24 +31,25 @@ export function calcTDEE(bmr, activityLevel) {
 /**
  * 根据目标调整热量并分配宏量营养素
  */
-export function calcMacros(tdee, goal) {
+export function calcMacros(tdee, goal, weight = 60) {
   let calories = tdee;
   if (goal === "lose") calories = Math.round(tdee * 0.8);      // 减脂 -20%
   else if (goal === "gain") calories = Math.round(tdee * 1.1); // 增肌 +10%
   // maintain 维持不变
 
-  // 蛋白质: 1.6-2.2 g/kg
-  const proteinPerKg = goal === "gain" ? 2.0 : 1.8;
-  const protein = Math.round(28 * proteinPerKg); // 假设56kg基准，实际应传入weight
+  // 蛋白质: 1.6-2.2 g/kg 体重
+  const proteinPerKg = goal === "gain" ? 2.0 : goal === "lose" ? 2.0 : 1.6;
+  const protein = Math.round(weight * proteinPerKg);
   const proteinCal = protein * 4;
 
   // 脂肪: 25-30% 热量
-  const fatCal = Math.round(calories * 0.27);
+  const fatPct = goal === "lose" ? 0.25 : 0.27;
+  const fatCal = Math.round(calories * fatPct);
   const fat = Math.round(fatCal / 9);
 
   // 碳水: 剩余
   const carbCal = calories - proteinCal - fatCal;
-  const carbs = Math.round(carbCal / 4);
+  const carbs = Math.round(Math.max(0, carbCal) / 4);
 
   return { calories, protein, carbs, fat };
 }
@@ -70,7 +71,7 @@ export function getCyclePhase(cycleDay) {
 export async function generateNutritionPlan(profile) {
   const bmr = calcBMR(profile);
   const tdee = calcTDEE(bmr, profile.activity);
-  const macros = calcMacros(tdee, profile.goal);
+  const macros = calcMacros(tdee, profile.goal, profile.weight);
   const cycle = profile.gender === "female" ? getCyclePhase(profile.cycleDay) : null;
 
   const prompt = `你是**一线明星的私人营养师**（曾服务多位 A 咖艺人、超模）。请基于以下用户画像，生成一份专业、可执行、像给明星做的个性化营养方案。
