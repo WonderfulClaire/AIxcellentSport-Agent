@@ -11,6 +11,7 @@ import { CoachAgent, AgentMemory, loadAgentConfig, runMultiAgent } from "./agent
 
 // 首屏必需组件同步导入
 import LandingPage from "./components/LandingPage";
+import Onboarding from "./components/Onboarding";
 import MemberHome from "./components/MemberHome";
 import AuthModal from "./components/AuthModal";
 
@@ -110,6 +111,7 @@ export default function Home() {
   const [authOpen, setAuthOpen] = useState(false);
   const [installEvt, setInstallEvt] = useState<any>(null);
   const [installed, setInstalled] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   // PWA 安装：捕获 beforeinstallprompt，提供「添加到主屏幕」按钮
   useEffect(() => {
@@ -132,6 +134,8 @@ export default function Home() {
   // 启动时恢复登录态
   useEffect(() => {
     setAuthUser(getStoredUser());
+    // 首次访问检测：显示引导
+    if (!localStorage.getItem("aix_onboarded")) setShowOnboarding(true);
   }, []);
 
   const openAuth = () => setAuthOpen(true);
@@ -570,6 +574,7 @@ export default function Home() {
         </div>
 
         <nav aria-label="外部链接">
+          <button className="top-link" onClick={() => { localStorage.removeItem("aix_onboarded"); setShowOnboarding(true); setMenuOpen(false); }} title="重新查看产品引导">重新看引导</button>
           {installEvt && !installed && (
             <button className="top-link install-btn" onClick={promptInstall} title="添加到主屏幕，像 App 一样使用">⤓ 安装到手机</button>
           )}
@@ -839,6 +844,8 @@ export default function Home() {
           );
         })}
       </nav>
+
+      {showOnboarding && <Onboarding onComplete={() => { localStorage.setItem("aix_onboarded", "true"); setShowOnboarding(false); }} />}
     </main>
   );
 }

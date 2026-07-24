@@ -21,3 +21,24 @@
 
 **遗留问题**：
 - 真实大模型连接需主人填入有效 API Key 验证
+
+## U2. 首次引导 Onboarding 轮播 ✅
+
+**做了什么**：
+- 新建 `app/components/Onboarding.tsx`：4屏全屏轮播引导
+- 屏幕内容：私享管家介绍/三步流程/隐私承诺/开始评估
+- 支持触摸滑动 + 底部圆点导航 + 进度指示
+- 首次访问自动弹出（localStorage aix_onboarded 标记）
+- 「跳过」和「开始评估」两种退出方式
+- 顶栏菜单加「重新看引导」入口
+
+**改了哪些文件**：
+- `app/components/Onboarding.tsx`（新建）
+- `app/page.tsx`（集成引导逻辑 + 菜单入口）
+
+**自测结果**：
+- `npm run build` 构建通过 ✅
+- `npm test` 测试通过 ✅
+
+**遗留问题**：
+- 无
