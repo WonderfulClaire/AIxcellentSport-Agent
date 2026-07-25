@@ -18,6 +18,7 @@ import TCMWellness from "./components/TCMWellness";
 import PostureAssessment from "./components/PostureAssessment";
 import PrivateNutrition from "./components/PrivateNutrition";
 import HealthConcierge from "./components/HealthConcierge";
+import DailyTipCard from "./components/DailyTipCard";
 import ImageConsultant from "./components/ImageConsultant";
 import WorkoutPlanner from "./components/WorkoutPlanner";
 import TrainingTimeline from "./components/TrainingTimeline";
@@ -674,7 +675,7 @@ export default function Home() {
 
       {activeTab === "nutrition" && <PrivateNutrition />}
 
-      {activeTab === "doctor" && <HealthConcierge />}
+      {activeTab === "doctor" && (<><DailyTipCard /><HealthConcierge /></>)}
 
       {activeTab === "image" && <ImageConsultant />}
 

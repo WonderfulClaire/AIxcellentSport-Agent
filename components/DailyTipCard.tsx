@@ -37,7 +37,27 @@ export default function DailyTipCard() {
     };
   }, []);
 
-  if (!ready || !tip) return null;
+  if (!ready) return null;
+
+  // 未登录 / 后端不可达：展示示例占位，让功能可见、可演示（登录后按画像个性化）
+  if (!tip) {
+    return (
+      <section className="aix-dailytip aix-dailytip--placeholder" aria-label="每日健康小推送（示例）">
+        <style>{css}</style>
+        <div className="aix-dt-inner">
+          <div className="aix-dt-body">
+            <div className="aix-dt-head">
+              <span className="aix-dt-tag">今日健康小推送</span>
+              <span className="aix-dt-date">示例 · 登录后个性化</span>
+            </div>
+            <h3 className="aix-dt-title">用 90 分钟节律工作，精力比硬扛更持久</h3>
+            <p className="aix-dt-text">大脑专注约以 90 分钟为周期起伏。每完成一个周期主动休息 10–15 分钟（离开屏幕、走动、喝水），比连续硬扛更能维持全天高精力；研究也显示 20–30 分钟规律午睡可提升下午警觉度。</p>
+            <p className="aix-dt-source">来源：超日节律（ultradian rhythm）研究 · 登录后按你的画像推送</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="aix-dailytip" aria-label="今日健康小推送">
