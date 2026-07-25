@@ -52,6 +52,16 @@ window.__AGENT_CONFIG__ = {
 
 不配置 → 自动走确定性启发式（零依赖、零密钥）。LLM 超时自动降级。
 
+## 🌿 每日健康小推送（云端账号能力）
+
+当接入云端后端 [`AIxcellentHealth-backend`](https://github.com/WonderfulClaire/AIxcellentHealth-backend) 并登录后，前端会按**你的画像（年龄 / 目标 / 限制）+ 近期习惯**自动展示一条「今日健康小推送」卡片：
+
+- 中老年人 → 研究向内容（如「力量训练 vs 抗阻训练对老年人肌肉量」）
+- 年轻人 → 高质量休息 / 高精力工作向内容
+- 并据近期睡眠、压力、精力动态加权，近 7 天不重复
+
+组件为 drop-in 设计：`components/DailyTipCard.tsx` + `lib/healthApi.ts`。未登录或后端不可达时自动隐藏，对"本地优先"主流程零侵入。挂载示例见组件文件顶部注释。
+
 ## 架构
 
 ```
