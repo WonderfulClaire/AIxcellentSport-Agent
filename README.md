@@ -1,3 +1,6 @@
+> 📌 **本仓库是 AIxcellent 系列的主仓库（前端源码）。**
+> 线上站点（构建产物镜像）：[`AIxcellentHealth-site`](https://wonderfulclaire.github.io/AIxcellentHealth-site/) ｜ 后端：[`AIxcellentHealth-backend`](https://github.com/WonderfulClaire/AIxcellentHealth-backend)
+
 # AIxcellentHealth · AI 私人健康专家
 
 > **你的全方位 AI 健康管家** —— 实时姿态教练 + 视频动作分析 + 饮食营养管理 + 睡眠质量追踪 + 中医节气养生
