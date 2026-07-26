@@ -23,7 +23,23 @@ from datetime import datetime
 
 REPO = "WonderfulClaire/AIxcellentHealth-site"
 BRANCH = "main"
-SPA = os.environ.get("SPA", os.path.join(os.path.dirname(__file__), "..", "spa-dist"))
+
+
+def _find_spa():
+    """从脚本所在目录向上查找含 spa-dist 的仓库根；找不到再退回 __file__/../spa-dist。"""
+    d = os.path.dirname(os.path.abspath(__file__))
+    for _ in range(6):
+        cand = os.path.join(d, "spa-dist")
+        if os.path.isdir(cand):
+            return cand
+        parent = os.path.dirname(d)
+        if parent == d:
+            break
+        d = parent
+    return os.path.join(os.path.dirname(__file__), "..", "spa-dist")
+
+
+SPA = os.environ.get("SPA") or _find_spa()
 # 这些根文件不在 spa-dist 里，需从仓库当前 tree 继承，避免被整树替换清掉
 KEEP = {"README.md", ".nojekyll"}
 
