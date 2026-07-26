@@ -105,7 +105,11 @@ function scan(text: string, todayKey: string, yesterdayKey: string, out: ParsedH
     if (!type || !sd) return;
     const dt = parseAppleDate(sd);
     if (!dt) return;
-    const dk = localDateKey(dt);
+    // 关键：直接用导出文件里写明的本地日期（导出地时区），不要再用
+    // localDateKey(dt) 在 runner 时区里重新推导——否则 UTC runner 上
+    // +0800 的 07:00 会被算成前一天，导致清晨记录漏算。
+    const dk = sd.split(/[ T]/)[0];
+    const sdHour = parseInt((sd.split(/[ T]/)[1] || "00:00:00").slice(0, 2), 10);
     const val = numAttr(line, "value");
     out.raw[type] = (out.raw[type] || 0) + 1;
 
@@ -114,7 +118,7 @@ function scan(text: string, todayKey: string, yesterdayKey: string, out: ParsedH
     const isLastNightSleep =
       type === "HKCategoryTypeIdentifierSleepAnalysis" &&
       dk === yesterdayKey &&
-      dt.getHours() >= 18;
+      sdHour >= 18;
 
     if (type === "HKQuantityTypeIdentifierStepCount" && isToday && val != null) {
       out.steps = (out.steps || 0) + val;
