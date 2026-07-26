@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getProfile, getWearable, saveWearable } from "../healthStore";
+import { parseAppleHealthExport, toWearablePayload, type ParsedHealthDay } from "../agent/appleHealthExport";
 import ModuleIntro from "./ModuleIntro";
 
 /* 可穿戴设备接入
@@ -106,7 +107,7 @@ function normalizeAppleHealth(j: any): any[] {
   return [...byDate.values()];
 }
 
-export default function WearableConnect() {
+export default function WearableConnect({ onImported }: { onImported?: () => void }) {
   const supported =
     typeof navigator !== "undefined" && !!(navigator as any).bluetooth;
 
@@ -119,6 +120,10 @@ export default function WearableConnect() {
   const [saved, setSaved] = useState<string>("");
   const [history, setHistory] = useState<any[]>([]);
   const [showAppleSteps, setShowAppleSteps] = useState(false);
+  const [appleExportBusy, setAppleExportBusy] = useState(false);
+  const [appleExportResult, setAppleExportResult] = useState<ParsedHealthDay | null>(null);
+  const [appleExportErr, setAppleExportErr] = useState("");
+  const appleExportRef = useRef<HTMLInputElement>(null);
   const [sessionSummary, setSessionSummary] = useState<SessionSummary | null>(null);
   const [showSummary, setShowSummary] = useState(false);
   const [userAge, setUserAge] = useState<number | null>(null);
@@ -298,10 +303,37 @@ export default function WearableConnect() {
           }
           n++;
         }
-        setSaved(`已导入 ${n} 条数据 ✓（Apple Watch 数据标记为 🍎）`);
+        setSaved(`已导入 ${n} 条数据 ✓（Apple Watch 数据标记为 🍎）即将跳回「今日」面板…`);
         loadHistory();
+        if (onImported) setTimeout(() => onImported(), 1500);
       } catch (e: any) {
         setErr("导入失败：文件需为 JSON 数组、含表头的 CSV，或本产品「Apple 健康」快捷指令导出的 JSON。");
+      }
+    },
+    [loadHistory]
+  );
+
+  const onAppleExport = useCallback(
+    async (file: File) => {
+      setAppleExportErr("");
+      setAppleExportResult(null);
+      setAppleExportBusy(true);
+      try {
+        const parsed = await parseAppleHealthExport(file);
+        if (!parsed) {
+          setAppleExportErr("未解析到今天的数据。请确认：① 导出文件来自 iPhone「健康」App（export.zip 或导出的 export.xml）；② 文件包含今天的记录。");
+          return;
+        }
+        const payload = toWearablePayload(parsed);
+        await saveWearable(payload);
+        setAppleExportResult(parsed);
+        setSaved("已导入 Apple Watch 今日数据 ✓ 正在跳回「今日」面板…");
+        loadHistory();
+        if (onImported) setTimeout(() => onImported(), 1500);
+      } catch (e: any) {
+        setAppleExportErr("解析失败：" + (e?.message || "文件可能不是有效的健康导出") + "。也可改用上方「🍎 连接 Apple Watch」快捷指令。");
+      } finally {
+        setAppleExportBusy(false);
       }
     },
     [loadHistory]
@@ -549,6 +581,42 @@ export default function WearableConnect() {
 }`}</pre>
               <p className="wear-hint">导入时会按日期合并；<code>workouts</code> 的 <code>hr_samples</code> 会自动算出平均 / 峰值心率。</p>
             </div>
+          </div>
+        )}
+      </div>
+
+      {/* 📦 Apple 健康导出导入：一步拿到手表实测数据 */}
+      <div className="wear-apple-export">
+        <div className="wear-apple-export-head">
+          <span className="wear-apple-ico">📦</span>
+          <div>
+            <h3>一步导入 Apple Watch 数据</h3>
+            <p>从 iPhone「健康」App 导出文件（export.zip / export.xml），浏览器内解析，把<b>今天的步数、活动能量、静息心率、睡眠、训练</b>直接同步进档案——这就是连 iWatch 最简单的方式，无需原生 App。</p>
+          </div>
+        </div>
+        <input
+          ref={appleExportRef}
+          type="file"
+          accept=".zip,.xml"
+          style={{ display: "none" }}
+          onChange={(e) => { const f = e.target.files?.[0]; if (f) onAppleExport(f); e.currentTarget.value = ""; }}
+        />
+        <button className="wear-btn primary" onClick={() => appleExportRef.current?.click()} disabled={appleExportBusy}>
+          {appleExportBusy ? "解析中…" : "选择健康导出文件 (.zip/.xml)"}
+        </button>
+        <p className="wear-hint">导出路径：iPhone「健康」→ 右上角头像 → 最底部「导出所有健康数据」→ 生成后「存储到文件」→ 在这里选该 export.zip。</p>
+        {appleExportErr && <p className="wear-err">{appleExportErr}</p>}
+        {appleExportResult && (
+          <div className="wear-export-result">
+            <span className="wear-export-ok">✓ 今日数据已导入</span>
+            <div className="wear-export-metrics">
+              {appleExportResult.steps != null && <em>👟 {appleExportResult.steps.toLocaleString()} 步</em>}
+              {appleExportResult.activeEnergyKcal != null && <em>🔥 {appleExportResult.activeEnergyKcal} kcal</em>}
+              {appleExportResult.restingHr != null && <em>❤️ 静息 {appleExportResult.restingHr}</em>}
+              {appleExportResult.sleepHours != null && <em>😴 {appleExportResult.sleepHours}h</em>}
+              {appleExportResult.workouts.length > 0 && <em>🏋️ {appleExportResult.workouts.length} 次训练</em>}
+            </div>
+            <p className="wear-hint">回到「今日」面板即可看到步数环同步更新。</p>
           </div>
         )}
       </div>

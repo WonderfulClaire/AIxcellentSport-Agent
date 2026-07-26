@@ -1,0 +1,44 @@
+name: Deploy Frontend
+
+# 自动部署：push main 即构建并发布到 AIxcellentHealth-site（GitHub Pages 线上站）。
+# 每次部署只产生 1 个干净提交（force_orphan），彻底告别手动噪音提交。
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build (注入可选后端地址以启用云同步)
+        run: npm run build
+        env:
+          VITE_API_BASE: ${{ secrets.VITE_API_BASE }}
+
+      - name: Deploy to AIxcellentHealth-site (GitHub Pages)
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          personal_token: ${{ secrets.DEPLOY_TOKEN }}
+          external_repository: WonderfulClaire/AIxcellentHealth-site
+          publish_branch: main
+          publish_dir: ./spa-dist
+          user_name: github-actions[bot]
+          user_email: github-actions[bot]@users.noreply.github.com
+          commit_message: "deploy: ${{ github.sha }}"
+          force_orphan: true

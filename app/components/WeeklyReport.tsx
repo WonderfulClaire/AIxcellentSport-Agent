@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { getRecords, getWearable } from "../healthStore";
+import { getDailyLog, dailyToLegacy } from "../agent/dailyLog";
+import { getInsight } from "../healthStore";
 import ModuleIntro from "./ModuleIntro";
 
 /* --- Types --- */
@@ -89,6 +90,16 @@ const S = {
     fontWeight: 600,
     fontSize: 14,
     zIndex: 9999,
+  } as React.CSSProperties,
+  list: {
+    color: "#ECE7D8",
+    fontSize: 15,
+    lineHeight: 1.9,
+    paddingLeft: 20,
+    margin: "0",
+  } as React.CSSProperties,
+  li: {
+    marginBottom: 6,
   } as React.CSSProperties,
 };
 
@@ -253,11 +264,13 @@ export default function WeeklyReport() {
   const [hasData, setHasData] = useState(false);
   const [toast, setToast] = useState("");
   const [hoverBtn, setHoverBtn] = useState<string | null>(null);
+  const [insight, setInsight] = useState<any | null>(null);
 
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const [records, wearable] = await Promise.all([getRecords(), getWearable()]);
+      const daily = await getDailyLog(7);
+      const [records, wearable] = dailyToLegacy(daily);
       const stats = computeStats(records, wearable);
       if (stats) {
         setReport(generateReport(stats));
@@ -265,6 +278,12 @@ export default function WeeklyReport() {
       } else {
         setReport("");
         setHasData(false);
+      }
+      try {
+        const ins = await getInsight();
+        setInsight(ins || null);
+      } catch {
+        setInsight(null);
       }
     } catch {
       setReport("");
@@ -389,6 +408,39 @@ export default function WeeklyReport() {
           </div>
         )}
       </div>
+
+      {insight && (
+        <div style={S.card}>
+          <div style={S.title}>{"🤖 AI 周报点评"}</div>
+          <div style={S.subtitle}>
+            {insight.summary}
+            {insight.generated_by ? ` · 来源：${insight.generated_by}` : ""}
+          </div>
+          {insight.findings?.length > 0 && (
+            <div style={{ marginTop: 16 }}>
+              <div style={{ ...S.subtitle, marginBottom: 8 }}>{"本周发现"}</div>
+              <ul style={S.list}>
+                {insight.findings.map((f: string, i: number) => (
+                  <li key={i} style={S.li}>{f}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {insight.suggestions?.length > 0 && (
+            <div style={{ marginTop: 16 }}>
+              <div style={{ ...S.subtitle, marginBottom: 8 }}>{"下周建议"}</div>
+              <ul style={S.list}>
+                {insight.suggestions.map((s: string, i: number) => (
+                  <li key={i} style={S.li}>{s}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {!insight.findings?.length && !insight.suggestions?.length && (
+            <div style={S.empty}>{"暂无可生成的 AI 点评，多记录几天后重试。"}</div>
+          )}
+        </div>
+      )}
 
       {toast && <div style={S.toast}>{toast}</div>}
     </div>

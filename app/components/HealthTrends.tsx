@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { getRecords, getWearable } from "../healthStore";
+import { getDailyLog, type DailyLogEntry } from "../agent/dailyLog";
 import ModuleIntro from "./ModuleIntro";
 
 /* ─── Types ─── */
 type DataPoint = { date: string; value: number };
 type RangeMode = 30 | 90;
-type MetricKey = "weight" | "heartRate" | "sleep" | "steps";
+type MetricKey = "weight" | "heartRate" | "sleep" | "steps" | "water" | "calories";
 
 interface MetricConfig {
   key: MetricKey;
@@ -16,10 +16,12 @@ interface MetricConfig {
 }
 
 const METRICS: MetricConfig[] = [
+  { key: "steps", label: "步数", unit: "步" },
+  { key: "sleep", label: "睡眠", unit: "h" },
   { key: "weight", label: "体重", unit: "kg" },
   { key: "heartRate", label: "心率", unit: "bpm" },
-  { key: "sleep", label: "睡眠", unit: "h" },
-  { key: "steps", label: "步数", unit: "步" },
+  { key: "water", label: "饮水", unit: "ml" },
+  { key: "calories", label: "热量摄入", unit: "kcal" },
 ];
 
 /* ─── Demo data generator ─── */
@@ -36,6 +38,8 @@ function generateDemoData(days: number): Record<MetricKey, DataPoint[]> {
     heartRate: pts(() => Math.round(55 + Math.random() * 20)),
     sleep: pts(() => +(5 + Math.random() * 4).toFixed(1)),
     steps: pts(() => Math.round(3000 + Math.random() * 9000)),
+    water: pts(() => Math.round(1400 + Math.random() * 900)),
+    calories: pts(() => Math.round(1400 + Math.random() * 900)),
   };
 }
 
@@ -101,7 +105,7 @@ function TrendChart({ data, config }: { data: DataPoint[]; config: MetricConfig 
         <span style={styles.cardTitle}>{config.label}</span>
         {latestVal !== null && (
           <span style={styles.cardValue}>
-            {config.key === "steps" ? latestVal.toLocaleString() : latestVal}
+            {["steps", "water", "calories"].includes(config.key) ? latestVal.toLocaleString() : latestVal}
             <small style={styles.cardUnit}> {config.unit}</small>
           </span>
         )}
@@ -125,7 +129,7 @@ function TrendChart({ data, config }: { data: DataPoint[]; config: MetricConfig 
           const y = PAD_T + chartH - (i / 3) * chartH;
           return (
             <text key={i} x={PAD_L - 4} y={y + 3} textAnchor="end" fill="#D4AF37" fontSize="8" opacity="0.7">
-              {config.key === "steps" ? (v >= 1000 ? `${(v / 1000).toFixed(0)}k` : Math.round(v).toString()) : v.toFixed(config.key === "weight" || config.key === "sleep" ? 1 : 0)}
+              {["steps", "water", "calories"].includes(config.key) ? (v >= 1000 ? `${(v / 1000).toFixed(1)}k` : Math.round(v).toString()) : v.toFixed(config.key === "weight" || config.key === "sleep" ? 1 : 0)}
             </text>
           );
         })}
@@ -158,43 +162,27 @@ export default function HealthTrends() {
     (async () => {
       setLoading(true);
       try {
-        const [records, wearable] = await Promise.all([getRecords(), getWearable()]);
+        const daily = await getDailyLog(range);
         if (cancelled) return;
 
-        const now = Date.now();
-        const cutoff = now - range * 86400000;
+        const pick = (sel: (e: DailyLogEntry) => number | undefined): DataPoint[] =>
+          daily
+            .filter((e) => {
+              const v = sel(e);
+              return v != null && !isNaN(v);
+            })
+            .map((e) => ({ date: e.date, value: sel(e) as number }))
+            .sort((a, b) => a.date.localeCompare(b.date));
 
-        const filterByDate = (arr: any[]) =>
-          arr.filter((r: any) => {
-            if (!r.date) return false;
-            return new Date(r.date).getTime() >= cutoff;
-          }).sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime());
-
-        const filteredRecords = filterByDate(records);
-        const filteredWearable = filterByDate(wearable);
-
-        const heartRate: DataPoint[] = filteredWearable
-          .filter((w: any) => w.resting_hr || w.avg_hr)
-          .map((w: any) => ({ date: w.date, value: w.resting_hr || w.avg_hr }));
-
-        const steps: DataPoint[] = filteredWearable
-          .filter((w: any) => w.steps)
-          .map((w: any) => ({ date: w.date, value: w.steps }));
-
-        const sleepMap = new Map<string, number>();
-        filteredRecords.filter((r: any) => r.sleep_hours).forEach((r: any) => sleepMap.set(r.date, r.sleep_hours));
-        filteredWearable.filter((w: any) => w.sleep_hours).forEach((w: any) => sleepMap.set(w.date, w.sleep_hours));
-        const sleep: DataPoint[] = Array.from(sleepMap.entries())
-          .map(([date, value]) => ({ date, value }))
-          .sort((a, b) => a.date.localeCompare(b.date));
-
-        const weight: DataPoint[] = filteredRecords
-          .filter((r: any) => r.weight)
-          .map((r: any) => ({ date: r.date, value: r.weight }));
-
-        const result: Record<MetricKey, DataPoint[]> = { weight, heartRate, sleep, steps };
+        const result: Record<MetricKey, DataPoint[]> = {
+          weight: pick((e) => e.weight),
+          heartRate: pick((e) => e.restingHr),
+          sleep: pick((e) => e.sleepHours),
+          steps: pick((e) => e.steps),
+          water: pick((e) => e.waterMl),
+          calories: pick((e) => e.calories),
+        };
         const hasAny = Object.values(result).some((arr) => arr.length > 0);
-
         setRealData(hasAny ? result : null);
       } catch {
         setRealData(null);
@@ -212,7 +200,7 @@ export default function HealthTrends() {
     ? realData!
     : demoMode
     ? demoData
-    : { weight: [], heartRate: [], sleep: [], steps: [] };
+    : { weight: [], heartRate: [], sleep: [], steps: [], water: [], calories: [] };
   const showEmpty = !hasRealData && !demoMode;
 
   return (

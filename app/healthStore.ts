@@ -203,3 +203,14 @@ export async function saveMeals(meals: any[], date?: string): Promise<any[]> {
   } catch {}
   return meals;
 }
+
+/* ── AI 周报点评 ── */
+export async function getInsight(): Promise<any | null> {
+  if (!API_BASE) return null; // 本地演示模式无云端点评
+  try {
+    const r = await apiFetch("/api/health/insight");
+    return r.insight || null;
+  } catch {
+    return null;
+  }
+}

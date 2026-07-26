@@ -35,6 +35,8 @@ const ExerciseLibrary = lazy(() => import("./components/ExerciseLibrary"));
 const TrainingHistory = lazy(() => import("./components/TrainingHistory"));
 const AssistantHub = lazy(() => import("./components/AssistantHub"));
 const Settings = lazy(() => import("./components/Settings"));
+const QuickAssessment = lazy(() => import("./components/QuickAssessment"));
+const TodayDashboard = lazy(() => import("./components/TodayDashboard"));
 
 import { getStoredUser, clearSession } from "./api";
 
@@ -105,7 +107,7 @@ export default function Home() {
     plan: { nextPlan: string[]; generatedBy: "llm" | "heuristic" };
   }>(null);
   const [speakOn, setSpeakOn] = useState(false);
-  const [activeTab, setActiveTab] = useState<"assistant" | "member" | "hub" | "train" | "video" | "posture" | "nutrition" | "doctor" | "image" | "plan" | "timeline" | "energy" | "library" | "diet" | "sleep" | "tcm" | "dashboard" | "history" | "wearable" | "trends" | "weekly_report" | "settings">("assistant");
+  const [activeTab, setActiveTab] = useState<"today" | "assistant" | "member" | "hub" | "train" | "video" | "posture" | "nutrition" | "doctor" | "image" | "plan" | "timeline" | "energy" | "library" | "diet" | "sleep" | "tcm" | "dashboard" | "history" | "wearable" | "trends" | "weekly_report" | "settings" | "assess">("today");
   const [menuOpen, setMenuOpen] = useState(false);
   const [authUser, setAuthUser] = useState<any>(null);
   const [authOpen, setAuthOpen] = useState(false);
@@ -144,11 +146,10 @@ export default function Home() {
     setAuthUser(null);
     setActiveTab("assistant");
   };
-  // 统一入口：评估按钮需要登录态；其余直接跳转
+  // 统一入口：「3 分钟评估」直接进评估流，去掉登录墙，避免点进去体验断崖
   const handleLaunch = (tab: string) => {
     if (tab === "assess") {
-      if (!authUser) setAuthOpen(true);
-      else setActiveTab("member");
+      setActiveTab("assess");
       return;
     }
     setActiveTab(tab as any);
@@ -605,6 +606,45 @@ export default function Home() {
       )}
 
       <Suspense fallback={<div style={{color:'#D4AF37',textAlign:'center',padding:'3rem'}}>加载中...</div>}>
+      {activeTab === "today" && (
+        <div key="today" className="page-fade-in">
+          <TodayDashboard
+            onToModule={(t: string) => {
+              if (t === "member") {
+                if (authUser) setActiveTab("member");
+                else setAuthOpen(true);
+              } else if (t === "settings") {
+                setActiveTab("settings");
+              } else {
+                setActiveTab(t as any);
+              }
+            }}
+            onLogin={() => setAuthOpen(true)}
+          />
+        </div>
+      )}
+      </Suspense>
+
+      <Suspense fallback={<div style={{color:'#D4AF37',textAlign:'center',padding:'3rem'}}>加载中...</div>}>
+      {activeTab === "assess" && (
+        <div key="assess" className="page-fade-in">
+          <QuickAssessment
+            onComplete={() => setActiveTab("today")}
+            onLogin={() => setAuthOpen(true)}
+            onToModule={(t: string) => {
+              if (t === "member") {
+                if (authUser) setActiveTab("member");
+                else setAuthOpen(true);
+              } else {
+                setActiveTab(t as any);
+              }
+            }}
+          />
+        </div>
+      )}
+      </Suspense>
+
+      <Suspense fallback={<div style={{color:'#D4AF37',textAlign:'center',padding:'3rem'}}>加载中...</div>}>
       {activeTab === "hub" && <div key="hub" className="page-fade-in"><AssistantHub onLaunch={handleLaunch} /></div>}
       </Suspense>
 
@@ -806,7 +846,7 @@ export default function Home() {
       {activeTab === "library" && <div key="library" className="page-fade-in"><ExerciseLibrary /></div>}
       {activeTab === "dashboard" && <div key="dashboard" className="page-fade-in"><Dashboard /></div>}
       {activeTab === "history" && <div key="history" className="page-fade-in"><TrainingHistory /></div>}
-      {activeTab === "wearable" && <div key="wearable" className="page-fade-in"><WearableConnect /></div>}
+      {activeTab === "wearable" && <div key="wearable" className="page-fade-in"><WearableConnect onImported={() => setActiveTab("today")} /></div>}
       {activeTab === "trends" && <div key="trends" className="page-fade-in"><HealthTrends /></div>}
       {activeTab === "weekly_report" && <div key="weekly_report" className="page-fade-in"><WeeklyReport /></div>}
       {activeTab === "settings" && <div key="settings" className="page-fade-in"><Settings /></div>}
