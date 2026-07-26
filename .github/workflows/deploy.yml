@@ -1,6 +1,7 @@
 name: Deploy Frontend
 
-# 自动部署：push main 即构建并发布到 AIxcellentHealth-site（GitHub Pages 线上站）。
+# 自动部署：push main 即构建并发布到本仓库 GitHub Pages（gh-pages 分支）。
+# 使用内置 GITHUB_TOKEN，无需任何 secret / PAT / deploy key。
 # 每次部署只产生 1 个干净提交（force_orphan），彻底告别手动噪音提交。
 on:
   push:
@@ -8,7 +9,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build-and-deploy:
@@ -31,12 +32,11 @@ jobs:
         env:
           VITE_API_BASE: ${{ secrets.VITE_API_BASE }}
 
-      - name: Deploy to AIxcellentHealth-site (GitHub Pages)
+      - name: Deploy to GitHub Pages (本仓库 gh-pages)
         uses: peaceiris/actions-gh-pages@v4
         with:
-          personal_token: ${{ secrets.DEPLOY_TOKEN }}
-          external_repository: WonderfulClaire/AIxcellentHealth-site
-          publish_branch: main
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
           publish_dir: ./spa-dist
           user_name: github-actions[bot]
           user_email: github-actions[bot]@users.noreply.github.com

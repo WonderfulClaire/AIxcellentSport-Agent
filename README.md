@@ -12,7 +12,7 @@
 |------|------|------|
 | **AIxcellentSport-Agent**（本仓库） | 前端主仓库（源码 / 自动部署源） | [GitHub](https://github.com/WonderfulClaire/AIxcellentSport-Agent) |
 | **AIxcellentHealth-backend** | 后端：账户 / 健康档案 / 管理后台（Node + Express + Neon Postgres，Vercel 部署） | [GitHub](https://github.com/WonderfulClaire/AIxcellentHealth-backend) |
-| **AIxcellentHealth-site** | 线上站镜像（GitHub Pages 构建产物，由本仓库 CI 自动部署，**勿手改**） | [线上站](https://wonderfulclaire.github.io/AIxcellentHealth-site/) |
+| **AIxcellentHealth-site** | 早期线上站仓库（已停用，现线上站改由本仓库 GitHub Pages 直接托管，见下方「自动部署」） | [归档站](https://wonderfulclaire.github.io/AIxcellentHealth-site/) |
 | AIxcellentHealth / AIxcellentSport | 早期归档仓库（只读，已并入主仓库） | — |
 
 ---
@@ -107,12 +107,13 @@ GROQ_API_KEY=gsk_xxx         # Groq 免费额度即可，延迟更低
 
 本仓库 push `main` 即触发 GitHub Actions：
 
-1. `ci.yml`：安装依赖 → lint → 运行测试（保证质量门禁）。
-2. `deploy.yml`：构建 `spa-dist` → 用 `peaceiris/actions-gh-pages` 推送到 `AIxcellentHealth-site`（线上站）。
+1. `ci.yml`：安装依赖 → 审计 → lint（warning 级，不阻断）→ 运行测试（真正质量门禁）。
+2. `deploy.yml`：构建 `spa-dist` → 用内置 `GITHUB_TOKEN` 发布到**本仓库**的 `gh-pages` 分支（GitHub Pages 线上站）。
+   - **零 secret**：无需 PAT / Deploy Key / DEPLOY_TOKEN，开箱即用。
    - **每次部署只产生 1 个干净提交**（`force_orphan`），告别手动噪音提交。
-   - 需在仓库 `Settings → Secrets` 配置：
-     - `DEPLOY_TOKEN`：拥有 `repo` 权限的 Personal Access Token（用于跨仓库推送）。
-     - `VITE_API_BASE`（可选）：后端地址，填入后线上站自动启用云同步。
+   - 线上站地址：`https://wonderfulclaire.github.io/AIxcellentSport-Agent/`
+   - 首次部署后，请到仓库 `Settings → Pages` 确认 Source 为 **Deploy from a branch → `gh-pages`**（通常首次运行会自动开启）。
+   - `VITE_API_BASE`（可选 secret）：后端地址，填入后线上站自动启用云同步。
 
 ---
 
