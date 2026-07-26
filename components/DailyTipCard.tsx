@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchDailyTip, type DailyTip } from "../lib/healthApi";
+import { fetchDailyTip, AUTH_EVENT, type DailyTip } from "../lib/healthApi";
 
 /**
  * 每日健康小推送卡片（云端能力）。
@@ -22,18 +22,25 @@ export default function DailyTipCard() {
 
   useEffect(() => {
     let alive = true;
-    fetchDailyTip()
-      .then((t) => {
-        if (alive) {
-          setTip(t);
-          setReady(true);
-        }
-      })
-      .catch(() => {
-        if (alive) setReady(true);
-      });
+    const load = () => {
+      setReady(false);
+      fetchDailyTip()
+        .then((t) => {
+          if (alive) {
+            setTip(t);
+            setReady(true);
+          }
+        })
+        .catch(() => {
+          if (alive) setReady(true);
+        });
+    };
+    load();
+    // 登录 / 退出后自动刷新推送内容
+    window.addEventListener(AUTH_EVENT, load);
     return () => {
       alive = false;
+      window.removeEventListener(AUTH_EVENT, load);
     };
   }, []);
 

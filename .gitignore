@@ -35,6 +35,10 @@ yarn-error.log*
 # vercel
 .vercel
 
+# 本地自托管构建桩（OpenAI 站点创建器托管环境会注入真实实现，勿提交）
+/.openai/
+/build/sites-vite-plugin.ts
+
 # typescript
 next-env.d.ts
 /dist/
