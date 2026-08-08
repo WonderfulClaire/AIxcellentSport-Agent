@@ -33,3 +33,20 @@ test("contains no starter placeholder copy", async () => {
   const source = files.join("\n");
   assert.doesNotMatch(source, /Your site is taking shape|Building your site/);
 });
+
+test("keeps public privacy claims aligned with the local-first implementation", async () => {
+  const files = await Promise.all([
+    read("../README.md"),
+    read("../app/components/TrustSections.tsx"),
+    read("../app/components/CredibilitySections.tsx"),
+    read("../app/components/LandingPage.tsx"),
+  ]);
+  const source = files.join("\n");
+
+  assert.match(source, /原始摄像头帧.*不上传/);
+  assert.match(source, /VITE_API_BASE/);
+  assert.match(source, /结构化.*模型服务/);
+  assert.doesNotMatch(source, /所有体态视频.*加密存储于我们的云端服务器/);
+  assert.doesNotMatch(source, /普遍反馈/);
+  assert.doesNotMatch(source, /云端引擎依据新数据微调/);
+});

@@ -1,19 +1,37 @@
-# AIxcellent · AI 私人健康管家（主仓库 · 前端源码）
+# AIxcellent Motion Coach · 浏览器端动作教练
 
-> **你的全方位 AI 健康管家** —— 实时姿态教练 + 视频动作分析 + 饮食营养管理 + 睡眠质量追踪 + 中医节气养生 + **云端账户同步** + **AI 周报点评**。
+> **摄像头姿态识别 → 可解释动作指标 → CoachAgent 个性化反馈。**
 >
-> 浏览器端运行，数据默认保存在本机（零后端也能完整演示）；登录后无缝升级为端到端云同步。
+> 核心体验完全在浏览器运行，无需账号或 API Key。原始摄像头帧默认不上传、不持久化；
+> 结构化训练与健康记录默认保存在本机，可选接入自托管后端与 OpenAI-compatible LLM。
+
+[**在线体验**](https://wonderfulclaire.github.io/AIxcellentSport-Agent/) ·
+[架构说明](docs/ARCHITECTURE.md) ·
+[本地运行](#-快速开始) ·
+[隐私与能力边界](#-隐私与能力边界)
 
 ---
 
-## 🧭 AIxcellent 系列导航
+## 🎯 核心闭环
+
+1. MediaPipe 在浏览器端提取 33 个姿态关键点；
+2. 运动规则把关键点转成角度、阶段、次数与问题标签；
+3. `CoachAgent` 执行“评估 → 记忆 → 计划 → 反馈”；
+4. 没有 LLM Key 时使用确定性规则，公开 Demo 不会因外部服务不可用而失效；
+5. 只有配置 LLM 后，结构化文字指标才会发送到所选模型服务，原始视频帧不进入该请求。
+
+当前实时训练支持深蹲、俯卧撑和开合跳。Apple Health 导入、睡眠、营养和周报属于围绕训练闭环的扩展模块，不代表医疗诊断或临床验证。
+
+---
+
+## 🧭 仓库关系
 
 | 仓库 | 角色 | 地址 |
 |------|------|------|
 | **AIxcellentSport-Agent**（本仓库） | 前端主仓库（源码 / 自动部署源） | [GitHub](https://github.com/WonderfulClaire/AIxcellentSport-Agent) |
 | **AIxcellentHealth-backend** | 后端：账户 / 健康档案 / 管理后台（Node + Express + Neon Postgres，Vercel 部署） | [GitHub](https://github.com/WonderfulClaire/AIxcellentHealth-backend) |
-| **AIxcellentHealth-site** | 早期线上站仓库（已停用，现线上站改由本仓库 GitHub Pages 直接托管，见下方「自动部署」） | [归档站](https://wonderfulclaire.github.io/AIxcellentHealth-site/) |
-| AIxcellentHealth / AIxcellentSport | 早期归档仓库（只读，已并入主仓库） | — |
+| **AIxcellentHealth-site** | 旧部署镜像，已归档，不再作为入口 | [归档仓库](https://github.com/WonderfulClaire/AIxcellentHealth-site) |
+| AIxcellentHealth / AIxcellentSport | 早期版本，已归档并由本仓库取代 | — |
 
 ---
 
@@ -42,11 +60,23 @@ npm ci
 npm run dev
 ```
 
-打开本地 URL 即可使用全部功能。**无需任何 API Key 即可体验基础功能（本地演示模式）**。
+打开本地 URL 即可体验核心动作教练与本地演示模式，**无需账号或 API Key**。
 
 ```bash
 npm run check   # lint + 生产构建 + 契约测试
 ```
+
+---
+
+## 🔐 隐私与能力边界
+
+| 模式 | 默认数据路径 | 说明 |
+|---|---|---|
+| 本地演示 | 摄像头推理与结构化记录留在浏览器 | 默认模式；原始视频帧不上传、不持久化 |
+| 可选 LLM | 结构化文字指标发送到用户配置的模型服务 | 不发送原始视频帧；数据政策取决于所选服务商 |
+| 可选云同步 | 结构化档案与记录发送到 `VITE_API_BASE` | 仅在部署并配置后端后启用；传输使用 HTTPS |
+
+这是教育与运动反馈原型，不是医疗器械，也不提供疾病诊断、处方或治疗方案。生产部署前仍需独立完成身份认证、密钥管理、静态加密、日志脱敏、数据保留策略及适用地区的合规评估。
 
 ---
 

@@ -16,28 +16,28 @@ export default function LandingPage({ onLaunch }: Props): JSX.Element {
       <section className="hero-landing" id="top">
         <div className="hero-landing-glow" aria-hidden />
         <div className="hero-landing-inner">
-          <span className="eyebrow">PRIVATE HEALTH BUTLER · 私人订制</span>
+          <span className="eyebrow">LOCAL-FIRST MOTION COACH · 浏览器端动作教练</span>
           <h1>
-            为你建立一套<br />
-            会随身体状态<br />
-            <span className="gold-text">持续调整的健康决策系统</span>
+            让摄像头看懂动作<br />
+            让每一次反馈<br />
+            <span className="gold-text">都有指标与规则可解释</span>
           </h1>
           <p className="hero-sub">
-            不是又一款健身或饮食 App，而是一位长期、专属、懂你身体变化的健康管家——
-            把训练、营养、睡眠与压力，收进一套随你状态演进的方案里。
+            MediaPipe 在浏览器端提取姿态关键点，CoachAgent 把动作阶段、问题标签与历史记录
+            组合成个性化反馈。无需账号或 API Key，原始摄像头帧默认不上传。
           </p>
           <div className="hero-actions">
             <button className="primary-button" onClick={() => onLaunch("assess")}>
-              开始 3 分钟私人评估 <span>→</span>
+              开始动作评估 <span>→</span>
             </button>
             <button className="text-link-btn" onClick={() => scrollTo("service-loop")}>
               查看服务方式
             </button>
           </div>
           <div className="trust-row">
-            <span><b>1 对 1</b> 私人订制</span>
-            <span><b>本地</b> 优先存储</span>
-            <span><b>持续</b> 状态调整</span>
+            <span><b>33 点</b> 姿态追踪</span>
+            <span><b>本地</b> 默认处理</span>
+            <span><b>可解释</b> 规则反馈</span>
           </div>
         </div>
       </section>

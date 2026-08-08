@@ -1,6 +1,6 @@
 import type { JSX } from "react";
 
-// 专业背书 / 隐私安全 / 案例展示 —— 黑金质感信任区块
+// 设计依据 / 隐私安全 / 产品演示 —— 黑金质感信任区块
 export default function TrustSections(): JSX.Element {
   return (
     <div className="trust-sections">
@@ -8,20 +8,20 @@ export default function TrustSections(): JSX.Element {
       <section className="endorse-section" id="endorse">
         <div className="section-heading">
           <div>
-            <span className="eyebrow">PROFESSIONAL BACKING</span>
-            <h2>专业背书，安心托付</h2>
+            <span className="eyebrow">DESIGN BASIS</span>
+            <h2>规则从哪里来，边界写在哪里</h2>
           </div>
-          <p>每一个模块都建立在可被验证的专业标准之上，而非凭空而来。</p>
+          <p>公开实现中的输入、规则与能力边界都可以被检查，而不是只给出不可解释的结论。</p>
         </div>
 
         <div className="endorse-grid">
           <article className="endorse-card">
             <span className="endorse-icon">🏋️</span>
             <h3>训练体系</h3>
-            <p className="endorse-lead">对标线下私教标准</p>
+            <p className="endorse-lead">可解释的动作规则</p>
             <ul>
               <li>标准动作库 <b>200+</b>，覆盖力量、体态、有氧全场景</li>
-              <li>动作矫正逻辑基于<b>运动解剖学</b>，逐关节评估轨迹</li>
+              <li>动作反馈由关节角度、动作阶段和问题标签共同生成</li>
               <li>实时反馈替代肉眼盯练，动作标准度可量化</li>
             </ul>
           </article>
@@ -58,30 +58,30 @@ export default function TrustSections(): JSX.Element {
             <span className="eyebrow">PRIVACY &amp; SECURITY · 具体承诺</span>
             <h2>你的健康数据，只属于你</h2>
             <p>
-              所有体态视频、饮食记录、睡眠数据均<b>加密存储于我们的云端服务器</b>，
-              按你的账号<b>严格隔离</b>；传输全程 HTTPS，仅你本人凭账号可访问，
-              从机制上保护你的个人健康隐私。
+              默认演示模式下，摄像头推理和结构化记录都在<b>你的浏览器</b>完成；
+              原始摄像头帧<b>不上传、不持久化</b>。只有主动配置后端或 LLM 时，
+              对应的结构化数据才会发送到你选择的服务。
             </p>
           </div>
           <ul className="privacy-points">
-            <li><i /> 云端加密存储 · 账号隔离</li>
-            <li><i /> HTTPS 传输 · 全程加密</li>
-            <li><i /> 无广告 · 不向第三方共享</li>
+            <li><i /> 默认本地存储 · 无需账号</li>
+            <li><i /> 原始视频帧不上传</li>
+            <li><i /> 云端与 LLM 均为可选配置</li>
           </ul>
         </div>
 
         <div className="privacy-promises">
           <div className="promise">
             <span className="promise-k">数据存于何处</span>
-            <span className="promise-v">加密存储于我们的云端服务器，按你的账号严格隔离，彼此互不可见。</span>
+            <span className="promise-v">默认保存在浏览器 localStorage；配置 VITE_API_BASE 后，结构化记录可同步到自托管后端。</span>
           </div>
           <div className="promise">
             <span className="promise-k">如何导出 / 删除</span>
-            <span className="promise-v">可在账户设置中随时导出，或彻底删除全部健康数据，我们不留副本。</span>
+            <span className="promise-v">本地模式可在设置中导出或清除；云端模式的数据保留与备份策略由实际部署方负责。</span>
           </div>
           <div className="promise">
             <span className="promise-k">是否共享</span>
-            <span className="promise-v">数据仅在你的加密通道中读写，不向任何第三方共享或出售。</span>
+            <span className="promise-v">默认不发送；启用 LLM 后，结构化文字指标会发送到你配置的模型服务，须同时阅读其隐私政策。</span>
           </div>
           <div className="promise warning">
             <span className="promise-k">何时该就医</span>
@@ -100,46 +100,46 @@ export default function TrustSections(): JSX.Element {
         <div className="section-heading">
           <div>
             <span className="eyebrow">RESULTS · 通用参考</span>
-            <h2>看得见的日常改变</h2>
+            <h2>看得见系统如何工作</h2>
           </div>
-          <p>以下为通用变化示意，仅供参考，个体差异请以自身情况为准。</p>
+          <p>以下是功能演示场景与模拟指标，不是用户案例、临床结论或效果承诺。</p>
         </div>
 
         <div className="case-grid">
           <article className="case-card">
             <span className="case-tag">精力管理</span>
             <h3>上班族疲劳调理</h3>
-            <p className="case-metric"><b>30 天</b> 周期性精力提升</p>
+            <p className="case-metric"><b>30 天</b> 模拟趋势输入</p>
             <p className="case-desc">
-              针对久坐与作息紊乱，定制日常活动与恢复节奏，
-              普遍反馈白天更清醒、下班后更有余力。
+              系统可把睡眠、主观疲劳与活动记录汇总为周度趋势，
+              并解释下一周建议由哪些输入触发。
             </p>
             <div className="case-bar"><i style={{ width: "78%" }} /></div>
-            <small>精力状态 · 参考提升</small>
+            <small>精力状态 · 模拟趋势</small>
           </article>
 
           <article className="case-card">
             <span className="case-tag">体态矫正</span>
             <h3>圆肩驼背改善</h3>
-            <p className="case-metric"><b>4 周</b> 周期性姿态对比</p>
+            <p className="case-metric"><b>4 周</b> 模拟姿态对比</p>
             <p className="case-desc">
-              通过每日针对性动作与姿态提醒，肩颈线条更舒展，
-              久坐后的僵硬感普遍减轻。
+              系统可比较动作关键点与关节角变化，标记需要关注的阶段，
+              但不把模拟分数包装成真实改善结果。
             </p>
             <div className="case-bar"><i style={{ width: "64%" }} /></div>
-            <small>姿态舒展度 · 参考提升</small>
+            <small>姿态指标 · 模拟趋势</small>
           </article>
 
           <article className="case-card">
             <span className="case-tag">膳食计划</span>
             <h3>减脂定制膳食</h3>
-            <p className="case-metric"><b>12 周</b> 周期性体态变化</p>
+            <p className="case-metric"><b>12 周</b> 模拟记录摘要</p>
             <p className="case-desc">
-              基于膳食指南的定制饮食，结构清晰、容易坚持，
-              腰腹围度与体感轻盈度出现可见变化。
+              系统可根据记录生成结构化营养摘要，帮助用户回顾输入，
+              不替代营养师或医生的个体化建议。
             </p>
             <div className="case-bar"><i style={{ width: "71%" }} /></div>
-            <small>体感轻盈度 · 参考提升</small>
+            <small>营养记录 · 模拟趋势</small>
           </article>
         </div>
       </section>
