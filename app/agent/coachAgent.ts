@@ -133,6 +133,38 @@ function heuristicCoaching({ issues, recurring, focusArea, exercise, score }: an
   return { message: praise, tone: "good", focusArea: focusArea || "保持" };
 }
 
+
+export type CoachReply = {
+  message: string;
+  tone: "good" | "warn";
+  focusArea: string | null;
+};
+
+/**
+ * Validate the LLM-facing coaching contract before it reaches the UI or memory.
+ * Invalid / oversized outputs return null so CoachAgent can use the deterministic fallback.
+ */
+export function parseCoachReply(raw: string): CoachReply | null {
+  try {
+    const value = JSON.parse(raw);
+    if (!value || typeof value !== "object") return null;
+    if (typeof value.message !== "string") return null;
+    const message = value.message.trim();
+    if (!message || message.length > 240) return null;
+    if (value.tone !== "good" && value.tone !== "warn") return null;
+    const focusArea =
+      value.focusArea == null
+        ? null
+        : typeof value.focusArea === "string" && value.focusArea.trim().length <= 80
+          ? value.focusArea.trim() || null
+          : undefined;
+    if (focusArea === undefined) return null;
+    return { message, tone: value.tone, focusArea };
+  } catch {
+    return null;
+  }
+}
+
 export class CoachAgent {
   memory: any;
   config: any;
@@ -181,19 +213,17 @@ export class CoachAgent {
         [getTool("set_goal")],
       );
       if (reply) {
-        try {
-          const parsed = JSON.parse(reply);
+        const parsed = parseCoachReply(reply);
+        if (parsed) {
           message = parsed.message;
           this.focusArea = parsed.focusArea ?? this.focusArea;
           source = "llm";
           return {
             message,
-            tone: parsed.tone === "warn" ? "warn" : "good",
+            tone: parsed.tone,
             focusArea: this.focusArea,
             source,
           };
-        } catch {
-          // 模型没返回合法 JSON，退回启发式
         }
       }
     }
